@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Place Hotels — Property WiFi 2026 YTD vs 2025</title>
+<style>
+
+:root {
+  --bg:#EEF1F6; --card:#FFFFFF; --border:#D0D8E8;
+  --text:#1C355E; --muted:#5A6B84; --navy:#1C355E;
+  --orange:#FF5F00; --green:#2E8B57;
+  --C25:#4A7FC1; --C26:#FF5F00;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:Arial,'Helvetica Neue',Helvetica,sans-serif;
+       background:var(--bg); color:var(--text); min-height:100vh; font-size:13px; }
+.brand-bar { background:#FF5F00; height:5px; }
+.header { background:#1C355E; padding:22px 40px 18px; border-bottom:3px solid #FF5F00; }
+.header-inner { max-width:1400px; margin:0 auto;
+                display:flex; justify-content:space-between; align-items:flex-end; }
+.header-logo { display:flex; align-items:center; gap:16px; }
+.header-eyebrow { font-size:10px; font-weight:600; color:#FFD080;
+                  text-transform:uppercase; letter-spacing:2.5px; margin-bottom:4px; }
+.header h1 { font-size:20px; font-weight:700; color:#fff; line-height:1.1; }
+.header-subtitle { font-size:11px; color:rgba(255,255,255,0.65); margin-top:4px; }
+.header-meta { text-align:right; display:flex; flex-direction:column; align-items:flex-end; gap:6px; }
+.portal-btn { display:inline-flex; align-items:center; gap:5px; background:rgba(255,255,255,0.12);
+              border:1px solid rgba(255,255,255,0.3); color:rgba(255,255,255,0.85);
+              font-size:11px; font-weight:600; padding:4px 10px; border-radius:5px;
+              text-decoration:none; transition:background 0.2s; white-space:nowrap; }
+.portal-btn:hover { background:rgba(255,95,0,0.4); }
+.updated-pill { background:rgba(255,255,255,0.12); border:1px solid rgba(255,255,255,0.25);
+                color:rgba(255,255,255,0.7); font-size:10px; padding:3px 10px; border-radius:20px; }
+.main { max-width:1400px; margin:0 auto; padding:24px 40px 48px; }
+.info-bar { border-radius:8px; padding:10px 16px; margin-bottom:22px; font-size:11px;
+            color:#5A6B84; display:flex; align-items:center; gap:10px;
+            background:rgba(255,95,0,0.05); border:1px solid rgba(255,95,0,0.2); }
+.info-bar strong { color:#FF5F00; }
+.kpi-row { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:24px; }
+.kpi-card { background:#fff; border:1px solid var(--border); border-radius:10px;
+            padding:14px 16px; box-shadow:0 1px 4px rgba(28,53,94,0.06);
+            border-top:3px solid #FF5F00; }
+.kpi-label { font-size:9px; text-transform:uppercase; letter-spacing:0.8px;
+             color:#8ba0bf; font-weight:700; margin-bottom:5px; }
+.kpi-value { font-size:20px; font-weight:700; color:#1C355E; margin-bottom:3px; line-height:1; }
+.kpi-sub   { font-size:11px; color:#5A6B84; margin-bottom:5px; }
+.kpi-yoy  { margin-top:3px; }
+.section-hdr { display:flex; align-items:center; gap:10px; margin:24px 0 14px; }
+.section-hdr h2 { font-size:13px; font-weight:700; color:#1C355E; white-space:nowrap; }
+.section-hdr .desc { font-size:11px; color:#8ba0bf; font-style:italic; }
+.section-divider { flex:1; height:1px; background:linear-gradient(to right,#D0D8E8,transparent); }
+.chart-card { background:#fff; border:1px solid var(--border); border-radius:10px;
+              padding:18px 20px; box-shadow:0 1px 4px rgba(28,53,94,0.06); margin-bottom:16px; }
+.chart-card h3 { font-size:11px; font-weight:700; color:var(--muted); text-transform:uppercase;
+                 letter-spacing:0.6px; border-bottom:2px solid #FF5F00;
+                 padding-bottom:7px; margin-bottom:5px; }
+.chart-desc { font-size:10px; color:#8ba0bf; font-style:italic; margin-bottom:10px; line-height:1.5; }
+.legend-row { display:flex; gap:14px; margin-bottom:8px; }
+.legend-item { display:flex; align-items:center; gap:5px; font-size:10px; color:#5A6B84; }
+.legend-swatch { width:10px; height:10px; border-radius:2px; }
+.table-card { background:#fff; border:1px solid var(--border); border-radius:10px;
+              padding:18px 20px; box-shadow:0 1px 4px rgba(28,53,94,0.06); margin-bottom:16px; }
+.table-card h3 { font-size:11px; font-weight:700; color:var(--muted); text-transform:uppercase;
+                 letter-spacing:0.6px; border-bottom:2px solid #FF5F00;
+                 padding-bottom:7px; margin-bottom:5px; }
+table { width:100%; border-collapse:collapse; font-size:11px; }
+thead th { background:#1C355E; color:#fff; padding:7px 8px; text-align:left;
+           font-size:9px; text-transform:uppercase; letter-spacing:0.4px;
+           font-weight:700; white-space:nowrap; cursor:pointer; user-select:none; }
+thead th:hover { color:#FFD080; }
+thead th.sorted-asc::after  { content:' ▲'; font-size:7px; }
+thead th.sorted-desc::after { content:' ▼'; font-size:7px; }
+thead th.num { text-align:right; }
+tbody td { padding:6px 8px; border-bottom:1px solid var(--border); color:#1C355E; }
+tbody td.num { text-align:right; font-variant-numeric:tabular-nums; white-space:nowrap; }
+tbody td.name-cell { font-weight:600; }
+tbody tr:nth-child(even) { background:#F5F8FC; }
+tbody tr:hover { background:#E8F0FA; }
+tbody tr:last-child td { border-bottom:none; }
+.delta-cell { font-size:10px; font-weight:700; white-space:nowrap; }
+.delta-cell.up { color:#2E8B57; }
+.delta-cell.down { color:#CC3333; }
+.wifi-table { table-layout:fixed; width:100%; }
+.wifi-table thead th:nth-child(1) { width:30%; }
+.wifi-table thead th { width:11.7%; }
+.footer { background:#1C355E; border-top:3px solid #FF5F00; padding:14px 40px;
+          text-align:center; color:rgba(255,255,255,0.55); font-size:10px; }
+
+</style>
+</head>
+<body>
+<div class="brand-bar"></div>
+
+<div class="header">
+  <div class="header-inner">
+    <div class="header-logo">
+      <img src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyBpZD0iTXlfUGxhY2VfSG90ZWxzX0xvZ28iIGRhdGEtbmFtZT0iTXkgUGxhY2UgSG90ZWxzIExvZ28iIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgdmlld0JveD0iMCAwIDQ5My45MzEgNDg4LjQ2OCI+CiAgPGRlZnM+CiAgICA8c3R5bGU+CiAgICAgIC5jbHMtMSB7CiAgICAgICAgZmlsbDogI2UxMWIyMjsKICAgICAgfQoKICAgICAgLmNscy0yIHsKICAgICAgICBmaWxsOiAjZmZmOwogICAgICB9CgogICAgICAuY2xzLTMgewogICAgICAgIGZpbGw6ICNmZDA7CiAgICAgIH0KICAgIDwvc3R5bGU+CiAgPC9kZWZzPgogIDxnPgogICAgPHBhdGggY2xhc3M9ImNscy0zIiBkPSJNMjQ2Ljk2Niw0ODAuOTY2Yy03Mi4xNiwwLTE0My41MjUtNS41MTgtMjE4LjE4NS0xNi44NzJsLTUuNDkxLS44MzUtLjgwMy01LjQ5OEMyLjUwMiwzMjEuMDA1LDIuNTAyLDE4Mi4zMTcsMjIuNDg3LDQ1LjU2bC44MDMtNS40OTcsNS40OTEtLjgzNWM3NC42NTktMTEuMzU2LDE0Ni4wMjQtMTYuODc2LDIxOC4xODUtMTYuODc2czE0My41MjQsNS41MTksMjE4LjE4MiwxNi44NzZsNS40OTIuODM1LjgwMyw1LjQ5N2MxOS45ODYsMTM2Ljc1NywxOS45ODYsMjc1LjQ0NCwwLDQxMi4ybC0uODAzLDUuNDk4LTUuNDkyLjgzNWMtNzQuNjU3LDExLjM1NS0xNDYuMDI0LDE2Ljg3Mi0yMTguMTgyLDE2Ljg3MmgwWiIvPgogICAgPHBhdGggZD0iTTI0Ni45NjQsMjkuODUzYzcxLjczMiwwLDE0My40NjMsNS41OTcsMjE3LjA1NywxNi43OSwxOS44NjgsMTM1Ljk1NSwxOS44NjgsMjc0LjA3OCwwLDQxMC4wMzMtNzMuNTk0LDExLjE5My0xNDUuMzI0LDE2Ljc5MS0yMTcuMDU2LDE2Ljc5MXMtMTQzLjQ2My01LjU5OC0yMTcuMDU2LTE2Ljc5MWMtMTkuODY3LTEzNS45NTUtMTkuODY3LTI3NC4wNzgsMC00MTAuMDMzLDczLjU5My0xMS4xOTMsMTQ1LjMyNC0xNi43OSwyMTcuMDU1LTE2Ljc5TTI0Ni45NjQsMTQuODUzYy03Mi41MzksMC0xNDQuMjc1LDUuNTQ4LTIxOS4zMSwxNi45NmwtMTAuOTgsMS42Ny0xLjYwNiwxMC45OTFjLTIwLjA4OSwxMzcuNDc4LTIwLjA4OSwyNzYuODkzLDAsNDE0LjM3MmwxLjYwNiwxMC45ODksMTAuOTgsMS42NzFjNzUuMDM2LDExLjQxMywxNDYuNzczLDE2Ljk2MSwyMTkuMzExLDE2Ljk2MXMxNDQuMjc1LTUuNTQ4LDIxOS4zMTEtMTYuOTYxbDEwLjk4LTEuNjcxLDEuNjA1LTEwLjk4OWMyMC4wOTEtMTM3LjQ3OSwyMC4wOTEtMjc2Ljg5NCwwLTQxNC4zNzJsLTEuNjA1LTEwLjk5MS0xMC45OC0xLjY3Yy03NS4wMzUtMTEuNDEyLTE0Ni43NzItMTYuOTYtMjE5LjMxMi0xNi45NmgwWiIvPgogIDwvZz4KICA8Zz4KICAgIDxwYXRoIGNsYXNzPSJjbHMtMSIgZD0iTTM4Ni4yODksMTQ3LjE2MmMwLDc2LjgwMi02Mi4yNTQsMTM5LjA1Ny0xMzkuMDYyLDEzOS4wNTdzLTEzOS4wNTItNjIuMjU1LTEzOS4wNTItMTM5LjA1N1MxNzAuNDI4LDguMTAxLDI0Ny4yMjcsOC4xMDFzMTM5LjA2Miw2Mi4yNTQsMTM5LjA2MiwxMzkuMDYxWiIvPgogICAgPHBhdGggZD0iTTk5LjMyNywxNDYuOTQxQzk5LjMyNyw2NS43NzgsMTY1LjExMywwLDI0Ni4yNzIsMGgwYzgxLjE2MSwwLDE0Ni45MzksNjUuNzc4LDE0Ni45NDMsMTQ2Ljk0MWgwYy0uMDA0LDgxLjE2NC02NS43ODIsMTQ2LjkzNy0xNDYuOTQzLDE0Ni45NTFoMGMtODEuMTU4LS4wMTUtMTQ2Ljk0NC02NS43ODctMTQ2Ljk0NC0xNDYuOTUxaDBaTTExNS4xMDcsMTQ2Ljk0MWMuMTI4LDcyLjQ0Myw1OC43MjIsMTMxLjAzMywxMzEuMTY1LDEzMS4xNjZoMGM3Mi40NDEtLjEzMywxMzEuMDMzLTU4LjcyMywxMzEuMTc0LTEzMS4xNjZoMGMtLjE0MS03Mi40NDctNTguNzMyLTEzMS4wMzUtMTMxLjE3NC0xMzEuMTY2aDBjLTcyLjQ0My4xMzEtMTMxLjAzNyw1OC43MTktMTMxLjE2NSwxMzEuMTY2aDBaIi8+CiAgICA8Zz4KICAgICAgPHBhdGggZD0iTTg2LjQ4OSwyNTMuMzcyYy0xMC4zNjIsMC0xOS4wNzgtNC42NjctMjMuMzEzLTEyLjQ5NS0yLjUyMi00LjYzOS01LjQ5LTE0LjM0MiwyLjg4Mi0yNy4yMjEsNS42NDctOC42NzEsMTEuMzE5LTE3LjMyMiwxNi45NzItMjUuOTgybDQuOTA3LTcuNDg4YzguMDkyLTEyLjM4NywxNi4xNTctMjQuOCwyNC4yMzMtMzcuMjA0bDYuNzE3LTEwLjMzNiwxMS4wODgtMTcuMDE2LDExLjA3Ni0xNy4wMjgsMS4xODctMS44NWM2LjA2My05LjQzOSwxNS4yMDUtMjMuNywzMy42MDctMjMuNyw2LjA1OSwwLDI1LjgyNSwyLjE2MSwyNS44MjUsMzAuMDE2djQuNzI0YzMuNzM2LTUuMzksNy40NjctMTAuNzc0LDExLjIwNi0xNi4xNjcsNy44MTktMTAuOTM0LDE5LjY0Ny0xNy42NDMsMzAuOTc5LTE3LjY0Myw3LjE2NSwwLDEzLjc3NCwyLjY5MywxOC42Miw3LjU2NSwzLjk1MiwzLjk4Miw4LjY0NSwxMS4zOTcsOC41NjcsMjQuMDc2LS4xMjUsMTguOTYxLS4xMTIsMzguMjY4LS4wODYsNTYuOTNsLjAyMSwyMi40NzNjMCwxLjI3LjA3NSwyLjYxNS4xMzQsMy45OTIuMzgsOC4xMTMsMS4wMjMsMjEuNjkxLTEwLjE5NCwzMC4zMjgtNC45OSwzLjg0Ny0xMS4zMTQsNS45NjItMTcuODI0LDUuOTYyLTUuMzM2LDAtMTAuNDUzLTEuNDI0LTE0Ljc5MS00LjExOS0xMy4zMTItOC4yNTYtMTIuNTc2LTIzLjIyNC0xMi4xNDMtMzIuMTcxLjA3OS0xLjQyMi4xNDgtMi44MDkuMTQ4LTQuMDk4di0xLjI4MWwtMTYuNjY5LDI0LjU5MmMtMy4wNSw0LjQ5OC0xMS4xNjIsMTYuNDkxLTI1LjUxNSwxNy40MTQtLjU1OS4wMzktMS4xMTUuMDYxLTEuNjc2LjA2MS0xMi45MTQsMC0yMy43ODMtOS44NDQtMjUuMjk1LTIyLjkxMy0uNDU5LTMuOTc2LS43MzItNy45ODYtLjg2NS0xMS45OTRsLTMwLjk5LDQ3LjI4OWMtNi4zMTUsOS40NjUtMTcuMzQsMTUuMjg2LTI4LjgxLDE1LjI4NmgwWiIvPgogICAgICA8cGF0aCBjbGFzcz0iY2xzLTIiIGQ9Ik0xNzUuODQyLDg1Ljc4M2MxMC44NjcsMCwxMy4wOTMsOC4wOSwxMy4wOTMsMTcuMjgzdjQ1LjQ3OWMxMS40NjItMTYuNTU3LDIyLjkzNC0zMy4xMTcsMzQuNDA1LTQ5LjY3NiwxMS45MjUtMTYuNjYxLDM1LjEzNS0xNy43NjksMzQuOTcsNi42NzItLjE3OSwyNi40OS0uMDY3LDUyLjk5NC0uMDY3LDc5LjQ4MiwwLDcuOTg1LDIuMTkxLDE4LjYyMy01LjEwMSwyNC4yMzYtNS4wMjEsMy44Ny0xMi42ODUsNC40ODItMTguMTI2LDEuMTA5LTguNDQzLTUuMjQtNS45NzctMTcuMTM5LTUuOTc3LTI1LjQ0NnYtNDIuNzUzYy0xMy4zMDksMTkuNjMxLTI2LjYyMSwzOS4yNjktMzkuOTM1LDU4LjkwMi0zLjc1OSw1LjU1MS04LjU2NywxMS40LTE1LjgwNCwxMS44Ny02Ljk4MS40NTEtMTIuNzA4LTQuNzc0LTEzLjQ5LTExLjYwNC0yLjAyNy0xNy42MjctLjA3OS0zNi41NTMtLjA3OS01NC4zMDMtMTguMzY0LDI4LjAyOS0zNi43MjYsNTYuMDQzLTU1LjA5Myw4NC4wNzEtMTEuMDc3LDE2LjYxLTQxLjU3MiwxMC41MDYtMjcuOTA1LTEwLjUwMSw3LjI2LTExLjE2NiwxNC41NzUtMjIuMzA4LDIxLjg2MS0zMy40NTYsMTAuMzQ1LTE1LjgzOCwyMC42NTEtMzEuNzA1LDMwLjk2Ny00Ny41NTgsNy4zODgtMTEuMzUsMTQuNzcyLTIyLjY5NSwyMi4xNi0zNC4wNDcsNS44OTQtOS4wNzYsMTEuODI0LTE5Ljc2MiwyNC4xMi0xOS43NjIiLz4KICAgIDwvZz4KICAgIDxnPgogICAgICA8cGF0aCBkPSJNMjgxLjcsMjY4LjIxMWMtOC4xMjcsMC0xNS43OTQtNC4zMDMtMjAuNTE3LTExLjUxMi00Ljk0My03LjU2My01Ljc0Mi0xNi45OTgtMi4xNDItMjUuMjUsMy40MjYtNy44MTMsNy43MzUtMTUuMTQ0LDExLjUyOS0yMS42MDEsNS45NDctMTAuMTE2LDE5LjgxMy0zNC42ODcsMjMuODQ1LTQzLjQzM2wtNS4zMi0xOS4yMTEtMTQuNjI2LTUyLjg1OWMtMS44NDgtNi42ODgsMi4wMDItMTMuNjI3LDguNjY0LTE1LjYwM2wyNC4xNy03LjE1NGMxLjE4MS0uMzUsMi40MDItLjUyMiwzLjYwNS0uNTIyLDIuMjE1LDAsNC40MS41NzgsNi4zNjUsMS42OTYsMy4wMjUsMS43MzUsNS4xOTMsNC42NDEsNi4wMTksOC4wM2w0LjUwMiwxOC41NmM1Ljk5NC0xMy40MTMsMTIuMTExLTI3LjA3NiwxOC4yNTktNDAuNTMyLjk0NC0yLjA1OSwxLjg1Mi00LjE2NCwyLjc3NC02LjI5NywyLjg0Ni02LjU3OCw1Ljc5NS0xMy4zODksOS44NjUtMTkuODE2LDQuNTMxLTcuMTg0LDExLjc0Mi0xMS4yOTksMTkuNzczLTExLjI5OXMxNS44NzksNC4xMzEsMjAuOTEzLDExLjA0OGM0Ljk0Miw2Ljc5LDYuMzI5LDE1LjE1MiwzLjgxLDIyLjk0NC0uMTQ3LjQ0Ni0uMzA2Ljg4Ni0uNDk5LDEuMzExbC0zMi42MDMsNzIuMzU5Yy02Ljc3OCwxNC41OC0xMy45NDcsMjkuMTk3LTIxLjk2OSw0NC44MjUtLjk4NCwxLjkwNy0yLjM5OCw0LjcyNi00LjEyNyw4LjE2MS0yMC40NTksNDAuNjQ0LTM1LjkyNCw2OS41NjEtNDQuODgxLDc4LjU2Ni00Ljg2MSw0Ljg5My0xMS4wNDcsNy41ODgtMTcuNDExLDcuNTg4aDBaIi8+CiAgICAgIDxwYXRoIGNsYXNzPSJjbHMtMiIgZD0iTTM1OC40NzcsMTIzLjgzOWMtNi45MzMsMTQuODk1LTE0LjE4NSwyOS42MzQtMjEuNjg3LDQ0LjIzOS02Ljk4NiwxMy41OTktMzUuODAzLDcyLjYwMy00Ni43MDEsODMuNTY0LTEwLjUzOCwxMC41OTQtMjQuNzQ3LTIuODExLTE5LjM4MS0xNS4wOTYsMy4wNi02Ljk2OSw2Ljk5NC0xMy42OTcsMTAuODQ4LTIwLjI1MiwxLjQ0Ni0yLjQ2NywyNi45OTItNDYuNTYzLDI2LjE1Ni00OS41NzEtNi45OTQtMjUuMjU3LTEzLjk4NC01MC41MTMtMjAuOTcyLTc1Ljc3MmwyNC4xNzYtNy4xNTIsMTMuMzA2LDU0LjgyOGMxMS4xMjktMjQuODM4LDIyLjEwMi00OS43NSwzMy40MTYtNzQuNTA0LDMuNzIxLTguMTM3LDcuMDEyLTE3LjAxOSwxMS44MTQtMjQuNjA1LDcuOTU3LTEyLjU5NiwyNS43NDItLjc3MSwyMS42MTksMTEuOTYzbC0zMi41OTQsNzIuMzU4Ii8+CiAgICA8L2c+CiAgPC9nPgogIDxnPgogICAgPHBhdGggZD0iTTg0LjQxOSwzNjYuNjZoLTIwLjc4OXYzMy40NzloLTE4Ljg5OXYtOTQuNDk2aDQxLjMwOWMxNy44MTgsMCwzMi41MzQsOS44NTQsMzIuNTM0LDI5Ljk2OCwwLDIxLjg3LTE0LjU3OSwzMS4wNDktMzQuMTU0LDMxLjA0OVpNODUuMzY0LDMyNC4wMDNoLTIxLjczM3YyNC4yOTloMjIuMDAzYzguNzc2LDAsMTMuNS00LjA1MSwxMy41LTEyLjI4NXMtNS4zOTgtMTIuMDE0LTEzLjc3LTEyLjAxNFoiLz4KICAgIDxwYXRoIGQ9Ik0xMjkuNzgsNDAwLjEzOXYtOTQuNDk2aDE4Ljg5OXY3Ni4wMDJoNDcuMzg0djE4LjQ5NGgtNjYuMjgzWiIvPgogICAgPHBhdGggZD0iTTI3NC40NjYsNDAwLjEzOWwtNy40MjYtMjEuMDU5aC0zNC41NTlsLTcuNDI0LDIxLjA1OWgtMjAuMjVsMzYuMTgtOTQuNDk2aDE4LjM1OGwzNS45MDksOTQuNDk2aC0yMC43ODlaTTI1NC40ODcsMzQzLjk4MWMtMS44OTEtNS41MzQtMy43ODEtMTEuMjA1LTQuNzI2LTE0LjcxNS0uOTQ0LDMuNTEtMi44MzQsOS4xODEtNC43MjQsMTQuNzE1bC02LjA3NSwxNy4xNDVoMjEuNmwtNi4wNzQtMTcuMTQ1WiIvPgogICAgPHBhdGggZD0iTTM1My4xMTYsMzMzLjE4Yy0zLjM3NS02LjQ3OC04Ljc3NS0xMC4yNTgtMTcuMjc5LTEwLjI1OC0xNC4xNzUsMC0yMi4yNzMsMTIuNDE5LTIyLjI3MywyOS45NjgsMCwxNy4wMSw4LjIzMywyOS45NywyMi40MDgsMjkuOTcsOC41MDYsMCwxMy40OTktMy42NDQsMTguNDk0LTEyLjAxNmwxNS45Myw5LjQ1Yy02LjQ4LDEzLjM2NC0xNy44MTksMjEuMzI5LTM0Ljk2NCwyMS4zMjktMjQuNzAzLDAtNDEuMzA5LTE4Ljg5OC00MS4zMDktNDguNzMzLDAtMjguNzUzLDE3LjI3OS00OC43MzIsNDEuOTgzLTQ4LjczMiwxNy44MiwwLDI4LjYxOSw4LjY0LDM0LjU1OSwyMC45MjRsLTE3LjU0OSw4LjA5OVoiLz4KICAgIDxwYXRoIGQ9Ik0zODEuNTY3LDQwMC4xMzl2LTk0LjQ5Nmg2NS42MDd2MTguNDk0aC00Ni43MDd2MTYuMzM0aDI3LjEzM3YxOC4zNTloLTI3LjEzM3YyMi44MTRoNDguNzMzdjE4LjQ5NGgtNjcuNjMzWiIvPgogIDwvZz4KICA8Zz4KICAgIDxwYXRoIGNsYXNzPSJjbHMtMSIgZD0iTTE2OS41ODIsNDM4Ljk0djcuNTY3aDYuNjI4di03LjU2N2g1LjQ3OHYyMC40aC01LjQ3OHYtOC4wNWgtNi42Mjh2OC4wNWgtNS40Nzh2LTIwLjRoNS40NzhaIi8+CiAgICA8cGF0aCBjbGFzcz0iY2xzLTEiIGQ9Ik0yMDUuNzI2LDQ1OS42NzRjLTYuMzI2LDAtOS44MDctNC43NTMtOS44MDctMTAuNDEzLDAtNS45MzIsMy44NzQtMTAuNjUzLDEwLjE0LTEwLjY1Myw2LjU2OCwwLDkuODk3LDQuODcyLDkuODk3LDEwLjMyMSwwLDYuNTY4LTMuOTM1LDEwLjc0NS0xMC4yLDEwLjc0NWgtLjAzWk0yMDUuOTk4LDQ1NS4zNDZjMi42MzQsMCw0LjE3Ny0yLjU0Miw0LjE3Ny02LjIzNSwwLTMuNTEtMS41NzQtNi4xNzQtNC4yMzctNi4xNzQtMi42MzMsMC00LjIzNywyLjY2My00LjIzNyw2LjIwNC0uMDMsMy42NjMsMS42MDQsNi4yMDUsNC4yMzcsNi4yMDVoLjA2WiIvPgogICAgPHBhdGggY2xhc3M9ImNscy0xIiBkPSJNMjM0LjU2LDQ0My41NDJoLTUuMjA2di00LjYwMmgxNS45ODF2NC42MDJoLTUuMjk2djE1Ljc5OWgtNS40Nzh2LTE1Ljc5OVoiLz4KICAgIDxwYXRoIGNsYXNzPSJjbHMtMSIgZD0iTTI3Mi4zNjgsNDUxLjEwOGgtNy4zMjR2My43NTNoOC4yMDJ2NC40OGgtMTMuNjh2LTIwLjRoMTMuMjU3djQuNDhoLTcuNzc5djMuMjY5aDcuMzI0djQuNDE5WiIvPgogICAgPHBhdGggY2xhc3M9ImNscy0xIiBkPSJNMjg3LjYsNDM4Ljk0aDUuNDc4djE1LjgzaDcuODM5djQuNTdoLTEzLjMxN3YtMjAuNFoiLz4KICAgIDxwYXRoIGNsYXNzPSJjbHMtMSIgZD0iTTMxNi4xNzcsNDUzLjg5M2MxLjI0MS42MzYsMy4yMzksMS4yNzEsNS4yOTYsMS4yNzEsMS44NzcsMCwyLjc4NS0uNjM2LDIuNzg1LTEuNjY1LDAtLjk5OS0uOTA4LTEuNTQzLTMuMjA4LTIuMzMxLTMuNDUxLTEuMjQxLTUuNzUxLTMuMTE2LTUuNzUxLTYuMTQzLDAtMy42MDIsMy4wNTctNi4zODYsOC4yMDMtNi4zODYsMi40MjEsMCw0LjE3Ny40NTQsNS41MDksMS4wM2wtMS4xNSw0LjM4OGMtLjg3OC0uMzkzLTIuMzkxLS45NjgtNC40MTktLjk2OC0xLjY2NSwwLTIuNTczLjYwNS0yLjU3MywxLjUxMywwLDEuMDMsMS4wOSwxLjQyMiwzLjY2MywyLjM5MSwzLjY2MiwxLjM2Miw1LjI5NiwzLjI5OSw1LjI5Niw2LjE0MywwLDMuNTEyLTIuNzI0LDYuNTA3LTguNjg3LDYuNTA3LTIuNDUxLDAtNC44NDMtLjYzNi01Ljk5Mi0xLjI0bDEuMDI5LTQuNTFaIi8+CiAgPC9nPgogIDxwYXRoIGQ9Ik0yNDYuOTY2LDQxMS44ODljLTY2Ljk1NSwwLTEzMy45MTMsNi43NDMtMjAyLjIzNCwyMC4xODZ2Ny42NWM2OC40MTgtOS43MzksMTM1LjMyNi0xNC42MTMsMjAyLjIzNC0xNC42MTNzMTMzLjgxNiw0Ljg3NSwyMDIuMjMzLDE0LjYxM3YtNy42NWMtNjguMzItMTMuNDQzLTEzNS4yNzktMjAuMTg2LTIwMi4yMzMtMjAuMTg2WiIvPgogIDxwYXRoIGQ9Ik00NjUuNzU5LDMxNC44MzRjMCwzLjk5OS0zLjEzOSw3LjEzOC03LjIyNCw3LjEzOC00LjA0MiwwLTcuMjY3LTMuMTM5LTcuMjY3LTcuMTM4LDAtMy45MTMsMy4yMjUtNy4wNTIsNy4yNjctNy4wNTIsNC4wODUsMCw3LjIyNCwzLjEzOSw3LjIyNCw3LjA1MlpNNDUzLjA3NCwzMTQuODM0YzAsMy4xMzksMi4zMjIsNS42MzMsNS41MDQsNS42MzMsMy4wOTYsMCw1LjM3NS0yLjQ5NCw1LjM3NS01LjU5LDAtMy4xMzktMi4yNzktNS42NzYtNS40MTgtNS42NzZzLTUuNDYxLDIuNTM3LTUuNDYxLDUuNjMzWk00NTcuNDE3LDMxOC41MzJoLTEuNjM0di03LjA1MmMuNjQ1LS4xMjksMS41NDgtLjIxNSwyLjcwOS0uMjE1LDEuMzMzLDAsMS45MzUuMjE1LDIuNDUxLjUxNi4zODcuMzAxLjY4OC44Ni42ODgsMS41NDgsMCwuNzc0LS42MDIsMS4zNzYtMS40NjIsMS42MzR2LjA4NmMuNjg4LjI1OCwxLjA3NS43NzQsMS4yOSwxLjcyLjIxNSwxLjA3NS4zNDQsMS41MDUuNTE2LDEuNzYzaC0xLjc2M2MtLjIxNS0uMjU4LS4zNDQtLjkwMy0uNTU5LTEuNzItLjEyOS0uNzc0LS41NTktMS4xMTgtMS40NjItMS4xMThoLS43NzR2Mi44MzhaTTQ1Ny40NjEsMzE0LjUzM2guNzc0Yy45MDMsMCwxLjYzNC0uMzAxLDEuNjM0LTEuMDMyLDAtLjY0NS0uNDczLTEuMDc1LTEuNTA1LTEuMDc1LS40MywwLS43MzEuMDQzLS45MDMuMDg2djIuMDIxWiIvPgo8L3N2Zz4=" alt="My Place Hotels" style="height:42px;display:block;">
+      <div>
+        <div class="header-eyebrow">My Place Hotels of America</div>
+        <h1>Property WiFi Dashboard — 2026 YTD</h1>
+        <div class="header-subtitle">In-Hotel Digital Concierge &nbsp;·&nbsp; Jan 1 – Mar 31, 2026 vs same period 2025 &nbsp;·&nbsp; 77 Properties</div>
+      </div>
+    </div>
+    <div class="header-meta">
+      <div style="display:flex;gap:8px;">
+        <a href="wifi-dashboard.html" class="portal-btn">2024 vs 2025 WiFi</a>
+        <a href="index.html" class="portal-btn">← Portal</a>
+      </div>
+      <div class="updated-pill">Jan 1 – Mar 31, 2026</div>
+    </div>
+  </div>
+</div>
+
+<div class="main">
+
+  <div class="info-bar">
+    📅 <span><strong>YoY comparison is same-period only</strong> — 2026 YTD (Jan 1–Mar 31, 2026) is compared against the identical date range in 2025 (Jan 1–Mar 31, 2025) for a clean apples-to-apples view. Monthly trend chart shows all 12 months of 2025 for broader context. Property WiFi sessions reflect guest access on the in-hotel digital concierge pages (/wifi/ path).</span>
+  </div>
+
+  <!-- KPI Cards -->
+  <div class="kpi-row">
+    <div class="kpi-card">
+      <div class="kpi-label">2026 YTD WiFi Sessions</div>
+      <div class="kpi-value">75.3K</div>
+      <div class="kpi-sub">2025 (same period): 122.4K</div>
+      <div class="kpi-yoy"><span style="font-size:11px;font-weight:700;color:#CC3333;background:rgba(204,51,51,0.1);padding:2px 8px;border-radius:10px;">▼ 38.5%</span> vs 2025</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Full Year 2025 WiFi Sessions</div>
+      <div class="kpi-value">511.4K</div>
+      <div class="kpi-sub">Jan – Dec 2025 total</div>
+      <div class="kpi-yoy"><span style="font-size:11px;color:#5A6B84;">Full year baseline</span></div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Active Properties (YTD)</div>
+      <div class="kpi-value">77</div>
+      <div class="kpi-sub">WiFi pages with sessions in either period</div>
+      <div class="kpi-yoy"><span style="font-size:11px;color:#5A6B84;">Digital concierge pages</span></div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Avg Sessions / Property</div>
+      <div class="kpi-value">978</div>
+      <div class="kpi-sub">2025 same period: 1.6K</div>
+      <div class="kpi-yoy"><span style="font-size:11px;font-weight:700;color:#CC3333;background:rgba(204,51,51,0.1);padding:2px 8px;border-radius:10px;">▼ 38.5%</span> vs 2025</div>
+    </div>
+  </div>
+
+  <!-- Monthly Trend -->
+  <div class="section-hdr">
+    <h2>Monthly WiFi Sessions Trend</h2>
+    <span class="desc">Full 2025 (blue) + 2026 YTD (orange)</span>
+    <div class="section-divider"></div>
+  </div>
+
+  <div class="chart-card">
+    <h3>Monthly Property WiFi Sessions</h3>
+    <p class="chart-desc">All 12 months of 2025 shown for context, with 2026 YTD (Jan–Mar) overlaid. Sessions represent guest interactions on in-hotel digital concierge pages.</p>
+    <div class="legend-row">
+      <div class="legend-item"><div class="legend-swatch" style="background:var(--C25);"></div>2025 (full year)</div>
+      <div class="legend-item"><div class="legend-swatch" style="background:var(--C26);"></div>2026 YTD</div>
+    </div>
+    <canvas id="cSessions" style="width:100%;display:block;" height="160"></canvas>
+  </div>
+
+  <!-- Property Table -->
+  <div class="section-hdr">
+    <h2>Property WiFi Performance — 77 Properties</h2>
+    <span class="desc">Same period Jan 1–Mar 31 · sorted by combined views · click any column to re-sort</span>
+    <div class="section-divider"></div>
+  </div>
+  <div class="table-card">
+    <h3>Property WiFi Page Views &amp; Active Users — 2025 vs 2026 YTD</h3>
+    <p class="chart-desc">Views and unique active users per property WiFi page. Both years reflect Jan 1–Mar 31 only. Properties without activity in either period are excluded.</p>
+    <table id="wifiTable" class="wifi-table">
+      <thead><tr>
+        <th onclick="sortTbl('wifiTable',0,false)">Property</th>
+        <th class="num" onclick="sortTbl('wifiTable',1,true)">Views '25</th>
+        <th class="num" onclick="sortTbl('wifiTable',2,true)">Views '26</th>
+        <th class="num" onclick="sortTbl('wifiTable',3,true)">Δ Views</th>
+        <th class="num" onclick="sortTbl('wifiTable',4,true)">Users '25</th>
+        <th class="num" onclick="sortTbl('wifiTable',5,true)">Users '26</th>
+        <th class="num" onclick="sortTbl('wifiTable',6,true)">Δ Users</th>
+      </tr></thead>
+      <tbody id="wifiBody"></tbody>
+    </table>
+  </div>
+
+</div>
+
+<div class="footer">
+  My Place Hotels of America &nbsp;·&nbsp; Property WiFi 2026 YTD &nbsp;·&nbsp; Google Analytics 4 &nbsp;·&nbsp; Confidential — Internal Use Only
+</div>
+
+<script>
+
+const C25='#4A7FC1', C26='#FF5F00';
+
+function fmtN(n){ return n>=1e6?(n/1e6).toFixed(2)+'M':n>=1e3?(n/1e3).toFixed(1)+'K':Math.round(n).toLocaleString(); }
+
+// Trend chart — 2025 full year (12 pts) + 2026 YTD overlay (starts at x=0)
+function drawTrendLine(canvasId, arr25, arr26, fmtFn) {
+  const canvas = document.getElementById(canvasId); if (!canvas) return;
+  const dpr = window.devicePixelRatio || 1;
+  const W = canvas.parentElement.clientWidth || 900;
+  const H = parseInt(canvas.getAttribute('height')) || 160;
+  canvas.width = W*dpr; canvas.height = H*dpr;
+  canvas.style.width = W+'px'; canvas.style.height = H+'px';
+  const ctx = canvas.getContext('2d'); ctx.scale(dpr, dpr);
+  const PAD = {t:20,r:14,b:24,l:52};
+  const cW = W-PAD.l-PAD.r, cH = H-PAD.t-PAD.b;
+  const n = 12;
+  const maxVal = Math.max(...arr25, ...arr26) * 1.18;
+  const xp = i => PAD.l + (i/(n-1)) * cW;
+  const yp = v => PAD.t + cH * (1 - v/maxVal);
+  const moL = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  for (let i=0; i<=4; i++) {
+    const v = maxVal*i/4, y = yp(v);
+    ctx.strokeStyle='rgba(208,216,232,0.7)'; ctx.lineWidth=0.5;
+    ctx.beginPath(); ctx.moveTo(PAD.l,y); ctx.lineTo(PAD.l+cW,y); ctx.stroke();
+    ctx.fillStyle='#8ba0bf'; ctx.font='8px Arial';
+    ctx.textAlign='right'; ctx.fillText(fmtFn(v), PAD.l-4, y+3);
+  }
+  function drawLine(arr, color, fillAlpha, nPts) {
+    ctx.beginPath();
+    for (let i=0;i<nPts;i++) { i===0?ctx.moveTo(xp(i),yp(arr[i])):ctx.lineTo(xp(i),yp(arr[i])); }
+    ctx.lineTo(xp(nPts-1),PAD.t+cH); ctx.lineTo(xp(0),PAD.t+cH); ctx.closePath();
+    ctx.globalAlpha=fillAlpha; ctx.fillStyle=color; ctx.fill(); ctx.globalAlpha=1;
+    ctx.beginPath();
+    for (let i=0;i<nPts;i++) { i===0?ctx.moveTo(xp(i),yp(arr[i])):ctx.lineTo(xp(i),yp(arr[i])); }
+    ctx.strokeStyle=color; ctx.lineWidth=2; ctx.lineJoin='round'; ctx.stroke();
+    for (let i=0;i<nPts;i++) {
+      ctx.beginPath(); ctx.arc(xp(i),yp(arr[i]),3,0,Math.PI*2);
+      ctx.fillStyle=color; ctx.fill();
+    }
+  }
+  drawLine(arr25, C25, 0.07, 12);
+  drawLine(arr26, C26, 0.12, arr26.length);
+  ctx.fillStyle='#8ba0bf'; ctx.font='8px Arial'; ctx.textAlign='center';
+  for (let i=0;i<n;i++) ctx.fillText(moL[i], xp(i), H-4);
+  const p25 = arr25.indexOf(Math.max(...arr25));
+  ctx.font='bold 8px Arial'; ctx.fillStyle=C25; ctx.textAlign='center';
+  ctx.fillText(fmtFn(arr25[p25]), xp(p25), yp(arr25[p25])-6);
+  const last26 = arr26.length-1;
+  ctx.fillStyle=C26;
+  ctx.fillText(fmtFn(arr26[last26]), xp(last26), yp(arr26[last26])-6);
+}
+
+let sortState={};
+function sortTbl(id, col, numeric) {
+  const tbl=document.getElementById(id);
+  const tbody=tbl.querySelector('tbody');
+  const rows=Array.from(tbody.querySelectorAll('tr'));
+  const key=id+'_'+col, asc=sortState[key]!=='asc';
+  sortState[key]=asc?'asc':'desc';
+  rows.sort((a,b)=>{
+    const rawA=a.cells[col].textContent.trim();
+    const rawB=b.cells[col].textContent.trim();
+    if (numeric) {
+      const pn=s=>{const c=s.replace(/[$+,%▲▼\s]/g,'');const m=c.match(/([-\d.]+)\s*([KMpp]*)/i);if(!m)return 0;let v=parseFloat(m[1])||0;if(m[2]==='K'||m[2]==='k')v*=1e3;if(m[2]==='M'||m[2]==='m')v*=1e6;return v;};
+      const va=pn(rawA), vb=pn(rawB);
+      return asc?va-vb:vb-va;
+    } else {
+      return asc?rawA.localeCompare(rawB):rawB.localeCompare(rawA);
+    }
+  });
+  rows.forEach(r=>tbody.appendChild(r));
+  tbl.querySelectorAll('thead th').forEach((th,i)=>{
+    th.classList.remove('sorted-asc','sorted-desc');
+    if(i===col) th.classList.add(asc?'sorted-asc':'sorted-desc');
+  });
+}
+
+function deltaCell(vA, vB, fmtFn) {
+  const d=vB-vA;
+  const cls=d>=0?'up':'down';
+  return `<td class="num delta-cell ${cls}">${d>=0?'+':''}${fmtFn(Math.abs(d))}</td>`;
+}
+
+
+const SESS25=[36272, 38439, 47661, 49158, 53992, 59490, 62953, 53435, 30580, 31082, 25619, 22737], SESS26=[22677, 23513, 29124];
+const WIFI_DATA=[{"label": "My Place Hotel-Kalispell, MT", "path": "/wifi/kalispell-mt", "v25": 3150, "v26": 3072, "u25": 2310, "u26": 2535}, {"label": "My Place Hotel-Tucson South, AZ", "path": "/wifi/tucson-south-az", "v25": 3474, "v26": 1892, "u25": 3293, "u26": 1779}, {"label": "My Place Hotel-Moab, UT", "path": "/wifi/moab-ut", "v25": 3194, "v26": 1789, "u25": 3080, "u26": 1754}, {"label": "My Place Hotel-North Las Vegas, NV", "path": "/wifi/north-las-vegas-nv", "v25": 3879, "v26": 1086, "u25": 3547, "u26": 1027}, {"label": "My Place Hotel-Huntersville, NC", "path": "/wifi/huntersville-nc", "v25": 3492, "v26": 1400, "u25": 3124, "u26": 1230}, {"label": "My Place Hotel-Jacksonville/Camp Lejeune, NC", "path": "/wifi/jacksonville-nc", "v25": 3282, "v26": 1412, "u25": 2911, "u26": 1376}, {"label": "My Place Hotel-Loveland, CO", "path": "/wifi/loveland-co", "v25": 3120, "v26": 1479, "u25": 2744, "u26": 1307}, {"label": "My Place Hotel-Carson City/Reno, NV", "path": "/wifi/carson-city-nv", "v25": 2996, "v26": 1271, "u25": 2689, "u26": 1200}, {"label": "My Place Hotel-Atlanta West/Lithia Springs, GA", "path": "/wifi/lithia-springs-ga", "v25": 2426, "v26": 1695, "u25": 2151, "u26": 1476}, {"label": "My Place Hotel-Medford, OR", "path": "/wifi/medford-or", "v25": 2730, "v26": 1337, "u25": 2578, "u26": 1268}, {"label": "My Place Hotel-Portland East, OR", "path": "/wifi/portland-east-or", "v25": 2753, "v26": 1105, "u25": 2349, "u26": 1044}, {"label": "My Place Hotel-St. George, UT", "path": "/wifi/st-george-ut", "v25": 2511, "v26": 1238, "u25": 2346, "u26": 1175}, {"label": "My Place Hotel-Henderson, NV", "path": "/wifi/henderson-nv", "v25": 43, "v26": 3680, "u25": 18, "u26": 3233}, {"label": "My Place Hotel-Salt Lake City/West Valley City, UT", "path": "/wifi/west-valley-city-ut", "v25": 2396, "v26": 1269, "u25": 2198, "u26": 1208}, {"label": "My Place Hotel-Buckeye, AZ", "path": "/wifi/buckeye-az", "v25": 2519, "v26": 1100, "u25": 2293, "u26": 1012}, {"label": "My Place Hotel-Nampa, ID", "path": "/wifi/nampa-id", "v25": 2242, "v26": 1186, "u25": 2112, "u26": 1134}, {"label": "My Place Hotel-Mount Pleasant, WI", "path": "/wifi/mount-pleasant-wi", "v25": 2452, "v26": 902, "u25": 1961, "u26": 781}, {"label": "My Place Hotel-Amarillo West/Medical Center, TX", "path": "/wifi/amarillo-tx", "v25": 2362, "v26": 989, "u25": 2205, "u26": 934}, {"label": "My Place Hotel-Mitchell, SD", "path": "/wifi/mitchell-sd", "v25": 1742, "v26": 1483, "u25": 1295, "u26": 1300}, {"label": "My Place Hotel-Grand Rapids, MN", "path": "/wifi/grand-rapids-mn", "v25": 1957, "v26": 1257, "u25": 1601, "u26": 1067}, {"label": "My Place Hotel-King George, VA", "path": "/wifi/king-george-va", "v25": 2063, "v26": 958, "u25": 1905, "u26": 900}, {"label": "My Place Hotel-Yakima, WA", "path": "/wifi/yakima-wa", "v25": 2254, "v26": 735, "u25": 2011, "u26": 581}, {"label": "My Place Hotel-Ketchikan, AK", "path": "/wifi/ketchikan-ak", "v25": 1876, "v26": 1036, "u25": 1787, "u26": 979}, {"label": "My Place Hotel-Shakopee, MN", "path": "/wifi/shakopee-mn", "v25": 2255, "v26": 602, "u25": 2021, "u26": 557}, {"label": "My Place Hotel-Midland, TX", "path": "/wifi/midland-tx", "v25": 1907, "v26": 943, "u25": 1700, "u26": 871}, {"label": "My Place Hotel-Bozeman, MT", "path": "/wifi/bozeman-mt", "v25": 1804, "v26": 1045, "u25": 1680, "u26": 1007}, {"label": "My Place Hotel-Watertown, SD", "path": "/wifi/watertown-sd", "v25": 1891, "v26": 932, "u25": 1683, "u26": 864}, {"label": "My Place Hotel-Overland Park, KS", "path": "/wifi/overland-park-ks", "v25": 2087, "v26": 693, "u25": 1917, "u26": 662}, {"label": "My Place Hotel-Colorado Springs, CO", "path": "/wifi/colorado-springs-co", "v25": 1629, "v26": 1130, "u25": 1506, "u26": 1072}, {"label": "My Place Hotel-Idaho Falls, ID", "path": "/wifi/idaho-falls-id", "v25": 1721, "v26": 978, "u25": 1579, "u26": 906}, {"label": "My Place Hotel-Vancouver, WA", "path": "/wifi/vancouver-wa", "v25": 1630, "v26": 1051, "u25": 1431, "u26": 971}, {"label": "My Place Hotel-Wenatchee, WA", "path": "/wifi/wenatchee-wa", "v25": 1832, "v26": 789, "u25": 1691, "u26": 751}, {"label": "My Place Hotel-Grand Forks, ND", "path": "/wifi/grand-forks-nd", "v25": 2032, "v26": 497, "u25": 1841, "u26": 465}, {"label": "My Place Hotel-Pooler, GA", "path": "/wifi/pooler-ga", "v25": 0, "v26": 2423, "u25": 0, "u26": 2021}, {"label": "My Place Hotel-Salt Lake City/West Jordan, UT", "path": "/wifi/west-jordan-ut", "v25": 1678, "v26": 732, "u25": 1594, "u26": 679}, {"label": "My Place Hotel-Hurricane Zion National Park, UT", "path": "/wifi/hurricane-ut", "v25": 1390, "v26": 980, "u25": 1338, "u26": 956}, {"label": "My Place Hotel-Altoona, IA", "path": "/wifi/altoona-ia", "v25": 1679, "v26": 644, "u25": 1517, "u26": 587}, {"label": "My Place Hotel-Plainfield, IN", "path": "/wifi/plainfield-in", "v25": 1603, "v26": 662, "u25": 1478, "u26": 612}, {"label": "My Place Hotel-Missoula, MT", "path": "/wifi/missoula-mt", "v25": 1191, "v26": 998, "u25": 1131, "u26": 943}, {"label": "My Place Hotel-Kansas City East/Independence, MO", "path": "/wifi/independence-mo", "v25": 1551, "v26": 620, "u25": 1445, "u26": 559}, {"label": "My Place Hotel-Beatrice, NE", "path": "/wifi/beatrice-ne", "v25": 1589, "v26": 560, "u25": 1491, "u26": 477}, {"label": "My Place Hotel-Aberdeen, SD", "path": "/wifi/aberdeen-sd", "v25": 1304, "v26": 834, "u25": 1202, "u26": 740}, {"label": "My Place Hotel-Twin Falls, ID", "path": "/wifi/twin-falls-id", "v25": 1178, "v26": 827, "u25": 1020, "u26": 763}, {"label": "My Place Hotel-Billings, MT", "path": "/wifi/billings-mt", "v25": 1165, "v26": 783, "u25": 1043, "u26": 735}, {"label": "My Place Hotel-Mesa, AZ", "path": "/wifi/mesa-az", "v25": 0, "v26": 1931, "u25": 0, "u26": 1717}, {"label": "My Place Hotel-Jamestown, ND", "path": "/wifi/jamestown-nd", "v25": 812, "v26": 1082, "u25": 750, "u26": 897}, {"label": "My Place Hotel-Wixom/Novi/Detroit, MI", "path": "/wifi/wixom-mi", "v25": 1133, "v26": 741, "u25": 1048, "u26": 693}, {"label": "My Place Hotel-Lubbock, TX", "path": "/wifi/lubbock-tx", "v25": 1096, "v26": 662, "u25": 965, "u26": 615}, {"label": "My Place Hotel-East Moline, IL", "path": "/wifi/east-moline-il", "v25": 1213, "v26": 540, "u25": 1071, "u26": 506}, {"label": "My Place Hotel-Augusta, GA", "path": "/wifi/augusta-ga", "v25": 0, "v26": 1709, "u25": 0, "u26": 1378}, {"label": "My Place Hotel-Sioux Falls, SD", "path": "/wifi/sioux-falls-sd", "v25": 1094, "v26": 613, "u25": 965, "u26": 583}, {"label": "My Place Hotel-Marion, OH", "path": "/wifi/marion-oh", "v25": 728, "v26": 927, "u25": 702, "u26": 853}, {"label": "My Place Hotel-Bentonville, AR", "path": "/wifi/bentonville-ar", "v25": 19, "v26": 1636, "u25": 17, "u26": 1425}, {"label": "My Place Hotel-Green Bay, WI", "path": "/wifi/green-bay-wi", "v25": 1151, "v26": 486, "u25": 1028, "u26": 456}, {"label": "My Place Hotel-South Omaha/La Vista, NE", "path": "/wifi/la-vista-ne", "v25": 1278, "v26": 330, "u25": 1118, "u26": 301}, {"label": "My Place Hotel-Brookings, SD", "path": "/wifi/brookings-sd", "v25": 1052, "v26": 510, "u25": 1006, "u26": 497}, {"label": "My Place Hotel-Lebanon, TN", "path": "/wifi/lebanon-tn", "v25": 1062, "v26": 487, "u25": 976, "u26": 454}, {"label": "My Place Hotel-Ankeny, IA", "path": "/wifi/ankeny-ia", "v25": 941, "v26": 467, "u25": 902, "u26": 444}, {"label": "My Place Hotel-Bismarck, ND", "path": "/wifi/bismarck-nd", "v25": 744, "v26": 626, "u25": 634, "u26": 595}, {"label": "My Place Hotel-Rock Springs, WY", "path": "/wifi/rock-springs-wy", "v25": 1048, "v26": 285, "u25": 968, "u26": 270}, {"label": "My Place Hotel-Hastings, NE", "path": "/wifi/hastings-ne", "v25": 851, "v26": 468, "u25": 782, "u26": 442}, {"label": "My Place Hotel-Pittsburgh North/Monaca, PA", "path": "/wifi/monaca-pa", "v25": 843, "v26": 474, "u25": 752, "u26": 448}, {"label": "My Place Hotel-Tucson North, AZ", "path": "/wifi/tucson-north-az", "v25": 0, "v26": 1236, "u25": 0, "u26": 1192}, {"label": "My Place Hotel-Anchorage, AK", "path": "/wifi/anchorage-ak", "v25": 2, "v26": 1219, "u25": 1, "u26": 868}, {"label": "My Place Hotel-Randolph, VT", "path": "/wifi/randolph-vt", "v25": 0, "v26": 1210, "u25": 0, "u26": 1139}, {"label": "My Place Hotel-Raleigh/Garner, NC", "path": "/wifi/raleigh-garner-nc", "v25": 0, "v26": 1188, "u25": 0, "u26": 1102}, {"label": "My Place Hotel-St. Joseph, MO", "path": "/wifi/st-joseph-mo", "v25": 9, "v26": 1160, "u25": 3, "u26": 940}, {"label": "My Place Hotel-Fort Pierre, SD", "path": "/wifi/fort-pierre-sd", "v25": 690, "v26": 412, "u25": 596, "u26": 381}, {"label": "My Place Hotel-Cheyenne, WY", "path": "/wifi/cheyenne-wy", "v25": 480, "v26": 517, "u25": 439, "u26": 491}, {"label": "My Place Hotel-Davenport/Quad Cities, IA", "path": "/wifi/davenport-ia", "v25": 302, "v26": 653, "u25": 274, "u26": 629}, {"label": "My Place Hotel-Dickinson, ND", "path": "/wifi/dickinson-nd", "v25": 524, "v26": 270, "u25": 479, "u26": 247}, {"label": "My Place Hotel-Redding, CA", "path": "/wifi/redding-ca", "v25": 0, "v26": 622, "u25": 0, "u26": 606}, {"label": "My Place Hotel-Fargo, ND", "path": "/wifi/fargo-nd", "v25": 0, "v26": 581, "u25": 0, "u26": 553}, {"label": "My Place Hotel-Pasco, WA", "path": "/wifi/pasco-wa", "v25": 0, "v26": 451, "u25": 0, "u26": 438}, {"label": "My Place Hotel-Jonesboro, AR", "path": "/wifi/jonesboro-ar", "v25": 0, "v26": 87, "u25": 0, "u26": 40}, {"label": "My Place Hotel-Grad Forks, ND", "path": "/wifi/grad-forks-nd", "v25": 0, "v26": 20, "u25": 0, "u26": 1}, {"label": "My Place Hotel-Moab, UTYOU2TV.COM", "path": "/wifi/moab-utyou2tv.com", "v25": 0, "v26": 2, "u25": 0, "u26": 1}];
+
+
+function renderWifiTable() {
+  document.getElementById('wifiBody').innerHTML = WIFI_DATA.map(r=>{
+    return `<tr>
+      <td class="name-cell">${r.label}</td>
+      <td class="num">${r.v25.toLocaleString()}</td>
+      <td class="num">${r.v26.toLocaleString()}</td>
+      ${deltaCell(r.v25,r.v26,n=>Math.round(n).toLocaleString())}
+      <td class="num">${r.u25.toLocaleString()}</td>
+      <td class="num">${r.u26.toLocaleString()}</td>
+      ${deltaCell(r.u25,r.u26,n=>Math.round(n).toLocaleString())}
+    </tr>`;
+  }).join('');
+}
+
+window.addEventListener('load', ()=>{
+  drawTrendLine('cSessions', SESS25, SESS26, fmtN);
+  renderWifiTable();
+});
+window.addEventListener('resize', ()=>{
+  drawTrendLine('cSessions', SESS25, SESS26, fmtN);
+});
+</script>
+</body>
+</html>

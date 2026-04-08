@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Place Hotels — Performance Dashboard Portal</title>
+<style>
+  :root {
+    --bg:     #EEF1F6;
+    --card:   #FFFFFF;
+    --border: #D0D8E8;
+    --text:   #1C355E;
+    --muted:  #5A6B84;
+    --navy:   #1C355E;
+    --orange: #FF5F00;
+    --green:  #2E8B57;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif;
+         background: var(--bg); color: var(--text); min-height:100vh; }
+
+  /* ── Brand Bar ── */
+  .brand-bar { background: #FF5F00; height: 5px; }
+
+  /* ── Header ── */
+  .header { background: #1C355E; padding: 28px 40px 24px;
+            border-bottom: 3px solid #FF5F00; }
+  .header-inner { max-width: 1400px; margin: 0 auto;
+                  display: flex; justify-content: space-between; align-items: flex-end; }
+  .header-logo { display: flex; align-items: center; gap: 16px; }
+  .logo-mark { width: 48px; height: 48px; background: #FF5F00; border-radius: 8px;
+               display: flex; align-items: center; justify-content: center;
+               font-size: 22px; font-weight: 900; color: white; letter-spacing: -1px; }
+  .header-text {}
+  .header-eyebrow { font-size: 11px; font-weight: 600; color: #FFD080;
+                    text-transform: uppercase; letter-spacing: 2.5px; margin-bottom: 4px; }
+  .header h1 { font-size: 24px; font-weight: 700; color: #FFFFFF; line-height: 1.1; }
+  .header-subtitle { font-size: 13px; color: rgba(255,255,255,0.65); margin-top: 5px; }
+  .header-meta { text-align: right; }
+  .updated-pill { background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.25);
+                  color: rgba(255,255,255,0.7); font-size: 11px; padding: 5px 12px;
+                  border-radius: 20px; display: inline-block; }
+
+  /* ── Main ── */
+  .main { max-width: 1400px; margin: 0 auto; padding: 32px 40px 48px; }
+
+  /* ── Section headings ── */
+  .section-header { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
+  .section-header h2 { font-size: 16px; font-weight: 700; color: #1C355E; }
+  .section-divider { flex: 1; height: 1px; background: linear-gradient(to right, #D0D8E8, transparent); }
+  .section-count { font-size: 11px; font-weight: 700; color: #FF5F00;
+                   background: rgba(255,95,0,0.1); padding: 2px 9px;
+                   border-radius: 10px; }
+
+  /* ── Dashboard Cards Grid ── */
+  .cards-grid { display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+                gap: 22px; margin-bottom: 40px; }
+
+  .dash-card { background: var(--card); border: 1px solid var(--border);
+               border-radius: 12px; overflow: hidden;
+               box-shadow: 0 2px 8px rgba(28,53,94,0.08);
+               transition: box-shadow 0.2s, transform 0.2s;
+               display: flex; flex-direction: column; }
+  .dash-card:hover { box-shadow: 0 6px 20px rgba(28,53,94,0.14); transform: translateY(-2px); }
+
+  .card-accent { height: 4px; }
+
+  .card-body { padding: 20px 22px 16px; flex: 1; }
+
+  .card-badges { display: flex; gap: 7px; margin-bottom: 12px; flex-wrap: wrap; }
+  .badge { font-size: 10px; font-weight: 700; text-transform: uppercase;
+           letter-spacing: 0.6px; padding: 3px 9px; border-radius: 10px; }
+  .badge-period { background: rgba(28,53,94,0.08); color: #1C355E; }
+  .badge-new    { background: rgba(46,139,87,0.12); color: #2E8B57; }
+  .badge-updated{ background: rgba(255,95,0,0.10); color: #FF5F00; }
+  .badge-coming { background: rgba(90,107,132,0.10); color: #5A6B84; }
+
+  .card-title { font-size: 17px; font-weight: 700; color: #1C355E;
+                margin-bottom: 6px; line-height: 1.3; }
+  .card-desc  { font-size: 12px; color: #5A6B84; line-height: 1.6; margin-bottom: 16px; }
+
+  /* KPI strip inside card */
+  .card-kpis { display: flex; gap: 0; border-top: 1px solid var(--border);
+               border-bottom: 1px solid var(--border); margin: 0 -22px 16px;
+               padding: 0 22px; }
+  .card-kpi  { flex: 1; padding: 10px 0; }
+  .card-kpi + .card-kpi { border-left: 1px solid var(--border); padding-left: 14px; margin-left:0; }
+  .card-kpi-label { font-size: 9px; text-transform: uppercase; letter-spacing: 0.8px;
+                    color: #5A6B84; font-weight: 700; margin-bottom: 3px; }
+  .card-kpi-value { font-size: 16px; font-weight: 700; color: #1C355E; }
+
+  .card-footer { padding: 0 22px 18px;
+                 display: flex; flex-direction: column; align-items: flex-start; gap: 10px; }
+  .card-source { font-size: 10px; color: #8ba0bf; }
+
+  .open-btn { display: inline-flex; align-items: center; gap: 6px;
+              background: #1C355E; color: white; font-size: 12px; font-weight: 700;
+              padding: 8px 18px; border-radius: 8px; text-decoration: none;
+              transition: background 0.2s; white-space: nowrap; flex-shrink: 0; }
+  .open-btn:hover { background: #FF5F00; }
+  .open-btn svg { width: 13px; height: 13px; }
+
+  /* Coming-soon card variant */
+  .dash-card.coming-soon { opacity: 0.65; pointer-events: none; }
+  .dash-card.coming-soon .open-btn { background: #8ba0bf; cursor: default; }
+
+  /* ── Info bar ── */
+  .info-bar { background: rgba(28,53,94,0.05); border: 1px solid var(--border);
+              border-radius: 10px; padding: 16px 22px; margin-bottom: 32px;
+              display: flex; align-items: center; gap: 14px; }
+  .info-icon { width: 36px; height: 36px; background: rgba(255,95,0,0.1);
+               border-radius: 50%; display: flex; align-items: center;
+               justify-content: center; flex-shrink: 0;
+               font-size: 16px; }
+  .info-text { font-size: 12px; color: #5A6B84; line-height: 1.6; }
+  .info-text strong { color: #1C355E; }
+
+  /* ── Footer ── */
+  .footer { background: #1C355E; border-top: 3px solid #FF5F00;
+            padding: 18px 40px; text-align: center;
+            color: rgba(255,255,255,0.55); font-size: 11px; }
+</style>
+</head>
+<body>
+
+<div class="brand-bar"></div>
+
+<div class="header">
+  <div class="header-inner">
+    <div class="header-logo">
+      <img src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyBpZD0iTXlfUGxhY2VfSG90ZWxzX0xvZ28iIGRhdGEtbmFtZT0iTXkgUGxhY2UgSG90ZWxzIExvZ28iIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgdmlld0JveD0iMCAwIDQ5My45MzEgNDg4LjQ2OCI+CiAgPGRlZnM+CiAgICA8c3R5bGU+CiAgICAgIC5jbHMtMSB7CiAgICAgICAgZmlsbDogI2UxMWIyMjsKICAgICAgfQoKICAgICAgLmNscy0yIHsKICAgICAgICBmaWxsOiAjZmZmOwogICAgICB9CgogICAgICAuY2xzLTMgewogICAgICAgIGZpbGw6ICNmZDA7CiAgICAgIH0KICAgIDwvc3R5bGU+CiAgPC9kZWZzPgogIDxnPgogICAgPHBhdGggY2xhc3M9ImNscy0zIiBkPSJNMjQ2Ljk2Niw0ODAuOTY2Yy03Mi4xNiwwLTE0My41MjUtNS41MTgtMjE4LjE4NS0xNi44NzJsLTUuNDkxLS44MzUtLjgwMy01LjQ5OEMyLjUwMiwzMjEuMDA1LDIuNTAyLDE4Mi4zMTcsMjIuNDg3LDQ1LjU2bC44MDMtNS40OTcsNS40OTEtLjgzNWM3NC42NTktMTEuMzU2LDE0Ni4wMjQtMTYuODc2LDIxOC4xODUtMTYuODc2czE0My41MjQsNS41MTksMjE4LjE4MiwxNi44NzZsNS40OTIuODM1LjgwMyw1LjQ5N2MxOS45ODYsMTM2Ljc1NywxOS45ODYsMjc1LjQ0NCwwLDQxMi4ybC0uODAzLDUuNDk4LTUuNDkyLjgzNWMtNzQuNjU3LDExLjM1NS0xNDYuMDI0LDE2Ljg3Mi0yMTguMTgyLDE2Ljg3MmgwWiIvPgogICAgPHBhdGggZD0iTTI0Ni45NjQsMjkuODUzYzcxLjczMiwwLDE0My40NjMsNS41OTcsMjE3LjA1NywxNi43OSwxOS44NjgsMTM1Ljk1NSwxOS44NjgsMjc0LjA3OCwwLDQxMC4wMzMtNzMuNTk0LDExLjE5My0xNDUuMzI0LDE2Ljc5MS0yMTcuMDU2LDE2Ljc5MXMtMTQzLjQ2My01LjU5OC0yMTcuMDU2LTE2Ljc5MWMtMTkuODY3LTEzNS45NTUtMTkuODY3LTI3NC4wNzgsMC00MTAuMDMzLDczLjU5My0xMS4xOTMsMTQ1LjMyNC0xNi43OSwyMTcuMDU1LTE2Ljc5TTI0Ni45NjQsMTQuODUzYy03Mi41MzksMC0xNDQuMjc1LDUuNTQ4LTIxOS4zMSwxNi45NmwtMTAuOTgsMS42Ny0xLjYwNiwxMC45OTFjLTIwLjA4OSwxMzcuNDc4LTIwLjA4OSwyNzYuODkzLDAsNDE0LjM3MmwxLjYwNiwxMC45ODksMTAuOTgsMS42NzFjNzUuMDM2LDExLjQxMywxNDYuNzczLDE2Ljk2MSwyMTkuMzExLDE2Ljk2MXMxNDQuMjc1LTUuNTQ4LDIxOS4zMTEtMTYuOTYxbDEwLjk4LTEuNjcxLDEuNjA1LTEwLjk4OWMyMC4wOTEtMTM3LjQ3OSwyMC4wOTEtMjc2Ljg5NCwwLTQxNC4zNzJsLTEuNjA1LTEwLjk5MS0xMC45OC0xLjY3Yy03NS4wMzUtMTEuNDEyLTE0Ni43NzItMTYuOTYtMjE5LjMxMi0xNi45NmgwWiIvPgogIDwvZz4KICA8Zz4KICAgIDxwYXRoIGNsYXNzPSJjbHMtMSIgZD0iTTM4Ni4yODksMTQ3LjE2MmMwLDc2LjgwMi02Mi4yNTQsMTM5LjA1Ny0xMzkuMDYyLDEzOS4wNTdzLTEzOS4wNTItNjIuMjU1LTEzOS4wNTItMTM5LjA1N1MxNzAuNDI4LDguMTAxLDI0Ny4yMjcsOC4xMDFzMTM5LjA2Miw2Mi4yNTQsMTM5LjA2MiwxMzkuMDYxWiIvPgogICAgPHBhdGggZD0iTTk5LjMyNywxNDYuOTQxQzk5LjMyNyw2NS43NzgsMTY1LjExMywwLDI0Ni4yNzIsMGgwYzgxLjE2MSwwLDE0Ni45MzksNjUuNzc4LDE0Ni45NDMsMTQ2Ljk0MWgwYy0uMDA0LDgxLjE2NC02NS43ODIsMTQ2LjkzNy0xNDYuOTQzLDE0Ni45NTFoMGMtODEuMTU4LS4wMTUtMTQ2Ljk0NC02NS43ODctMTQ2Ljk0NC0xNDYuOTUxaDBaTTExNS4xMDcsMTQ2Ljk0MWMuMTI4LDcyLjQ0Myw1OC43MjIsMTMxLjAzMywxMzEuMTY1LDEzMS4xNjZoMGM3Mi40NDEtLjEzMywxMzEuMDMzLTU4LjcyMywxMzEuMTc0LTEzMS4xNjZoMGMtLjE0MS03Mi40NDctNTguNzMyLTEzMS4wMzUtMTMxLjE3NC0xMzEuMTY2aDBjLTcyLjQ0My4xMzEtMTMxLjAzNyw1OC43MTktMTMxLjE2NSwxMzEuMTY2aDBaIi8+CiAgICA8Zz4KICAgICAgPHBhdGggZD0iTTg2LjQ4OSwyNTMuMzcyYy0xMC4zNjIsMC0xOS4wNzgtNC42NjctMjMuMzEzLTEyLjQ5NS0yLjUyMi00LjYzOS01LjQ5LTE0LjM0MiwyLjg4Mi0yNy4yMjEsNS42NDctOC42NzEsMTEuMzE5LTE3LjMyMiwxNi45NzItMjUuOTgybDQuOTA3LTcuNDg4YzguMDkyLTEyLjM4NywxNi4xNTctMjQuOCwyNC4yMzMtMzcuMjA0bDYuNzE3LTEwLjMzNiwxMS4wODgtMTcuMDE2LDExLjA3Ni0xNy4wMjgsMS4xODctMS44NWM2LjA2My05LjQzOSwxNS4yMDUtMjMuNywzMy42MDctMjMuNyw2LjA1OSwwLDI1LjgyNSwyLjE2MSwyNS44MjUsMzAuMDE2djQuNzI0YzMuNzM2LTUuMzksNy40NjctMTAuNzc0LDExLjIwNi0xNi4xNjcsNy44MTktMTAuOTM0LDE5LjY0Ny0xNy42NDMsMzAuOTc5LTE3LjY0Myw3LjE2NSwwLDEzLjc3NCwyLjY5MywxOC42Miw3LjU2NSwzLjk1MiwzLjk4Miw4LjY0NSwxMS4zOTcsOC41NjcsMjQuMDc2LS4xMjUsMTguOTYxLS4xMTIsMzguMjY4LS4wODYsNTYuOTNsLjAyMSwyMi40NzNjMCwxLjI3LjA3NSwyLjYxNS4xMzQsMy45OTIuMzgsOC4xMTMsMS4wMjMsMjEuNjkxLTEwLjE5NCwzMC4zMjgtNC45OSwzLjg0Ny0xMS4zMTQsNS45NjItMTcuODI0LDUuOTYyLTUuMzM2LDAtMTAuNDUzLTEuNDI0LTE0Ljc5MS00LjExOS0xMy4zMTItOC4yNTYtMTIuNTc2LTIzLjIyNC0xMi4xNDMtMzIuMTcxLjA3OS0xLjQyMi4xNDgtMi44MDkuMTQ4LTQuMDk4di0xLjI4MWwtMTYuNjY5LDI0LjU5MmMtMy4wNSw0LjQ5OC0xMS4xNjIsMTYuNDkxLTI1LjUxNSwxNy40MTQtLjU1OS4wMzktMS4xMTUuMDYxLTEuNjc2LjA2MS0xMi45MTQsMC0yMy43ODMtOS44NDQtMjUuMjk1LTIyLjkxMy0uNDU5LTMuOTc2LS43MzItNy45ODYtLjg2NS0xMS45OTRsLTMwLjk5LDQ3LjI4OWMtNi4zMTUsOS40NjUtMTcuMzQsMTUuMjg2LTI4LjgxLDE1LjI4NmgwWiIvPgogICAgICA8cGF0aCBjbGFzcz0iY2xzLTIiIGQ9Ik0xNzUuODQyLDg1Ljc4M2MxMC44NjcsMCwxMy4wOTMsOC4wOSwxMy4wOTMsMTcuMjgzdjQ1LjQ3OWMxMS40NjItMTYuNTU3LDIyLjkzNC0zMy4xMTcsMzQuNDA1LTQ5LjY3NiwxMS45MjUtMTYuNjYxLDM1LjEzNS0xNy43NjksMzQuOTcsNi42NzItLjE3OSwyNi40OS0uMDY3LDUyLjk5NC0uMDY3LDc5LjQ4MiwwLDcuOTg1LDIuMTkxLDE4LjYyMy01LjEwMSwyNC4yMzYtNS4wMjEsMy44Ny0xMi42ODUsNC40ODItMTguMTI2LDEuMTA5LTguNDQzLTUuMjQtNS45NzctMTcuMTM5LTUuOTc3LTI1LjQ0NnYtNDIuNzUzYy0xMy4zMDksMTkuNjMxLTI2LjYyMSwzOS4yNjktMzkuOTM1LDU4LjkwMi0zLjc1OSw1LjU1MS04LjU2NywxMS40LTE1LjgwNCwxMS44Ny02Ljk4MS40NTEtMTIuNzA4LTQuNzc0LTEzLjQ5LTExLjYwNC0yLjAyNy0xNy42MjctLjA3OS0zNi41NTMtLjA3OS01NC4zMDMtMTguMzY0LDI4LjAyOS0zNi43MjYsNTYuMDQzLTU1LjA5Myw4NC4wNzEtMTEuMDc3LDE2LjYxLTQxLjU3MiwxMC41MDYtMjcuOTA1LTEwLjUwMSw3LjI2LTExLjE2NiwxNC41NzUtMjIuMzA4LDIxLjg2MS0zMy40NTYsMTAuMzQ1LTE1LjgzOCwyMC42NTEtMzEuNzA1LDMwLjk2Ny00Ny41NTgsNy4zODgtMTEuMzUsMTQuNzcyLTIyLjY5NSwyMi4xNi0zNC4wNDcsNS44OTQtOS4wNzYsMTEuODI0LTE5Ljc2MiwyNC4xMi0xOS43NjIiLz4KICAgIDwvZz4KICAgIDxnPgogICAgICA8cGF0aCBkPSJNMjgxLjcsMjY4LjIxMWMtOC4xMjcsMC0xNS43OTQtNC4zMDMtMjAuNTE3LTExLjUxMi00Ljk0My03LjU2My01Ljc0Mi0xNi45OTgtMi4xNDItMjUuMjUsMy40MjYtNy44MTMsNy43MzUtMTUuMTQ0LDExLjUyOS0yMS42MDEsNS45NDctMTAuMTE2LDE5LjgxMy0zNC42ODcsMjMuODQ1LTQzLjQzM2wtNS4zMi0xOS4yMTEtMTQuNjI2LTUyLjg1OWMtMS44NDgtNi42ODgsMi4wMDItMTMuNjI3LDguNjY0LTE1LjYwM2wyNC4xNy03LjE1NGMxLjE4MS0uMzUsMi40MDItLjUyMiwzLjYwNS0uNTIyLDIuMjE1LDAsNC40MS41NzgsNi4zNjUsMS42OTYsMy4wMjUsMS43MzUsNS4xOTMsNC42NDEsNi4wMTksOC4wM2w0LjUwMiwxOC41NmM1Ljk5NC0xMy40MTMsMTIuMTExLTI3LjA3NiwxOC4yNTktNDAuNTMyLjk0NC0yLjA1OSwxLjg1Mi00LjE2NCwyLjc3NC02LjI5NywyLjg0Ni02LjU3OCw1Ljc5NS0xMy4zODksOS44NjUtMTkuODE2LDQuNTMxLTcuMTg0LDExLjc0Mi0xMS4yOTksMTkuNzczLTExLjI5OXMxNS44NzksNC4xMzEsMjAuOTEzLDExLjA0OGM0Ljk0Miw2Ljc5LDYuMzI5LDE1LjE1MiwzLjgxLDIyLjk0NC0uMTQ3LjQ0Ni0uMzA2Ljg4Ni0uNDk5LDEuMzExbC0zMi42MDMsNzIuMzU5Yy02Ljc3OCwxNC41OC0xMy45NDcsMjkuMTk3LTIxLjk2OSw0NC44MjUtLjk4NCwxLjkwNy0yLjM5OCw0LjcyNi00LjEyNyw4LjE2MS0yMC40NTksNDAuNjQ0LTM1LjkyNCw2OS41NjEtNDQuODgxLDc4LjU2Ni00Ljg2MSw0Ljg5My0xMS4wNDcsNy41ODgtMTcuNDExLDcuNTg4aDBaIi8+CiAgICAgIDxwYXRoIGNsYXNzPSJjbHMtMiIgZD0iTTM1OC40NzcsMTIzLjgzOWMtNi45MzMsMTQuODk1LTE0LjE4NSwyOS42MzQtMjEuNjg3LDQ0LjIzOS02Ljk4NiwxMy41OTktMzUuODAzLDcyLjYwMy00Ni43MDEsODMuNTY0LTEwLjUzOCwxMC41OTQtMjQuNzQ3LTIuODExLTE5LjM4MS0xNS4wOTYsMy4wNi02Ljk2OSw2Ljk5NC0xMy42OTcsMTAuODQ4LTIwLjI1MiwxLjQ0Ni0yLjQ2NywyNi45OTItNDYuNTYzLDI2LjE1Ni00OS41NzEtNi45OTQtMjUuMjU3LTEzLjk4NC01MC41MTMtMjAuOTcyLTc1Ljc3MmwyNC4xNzYtNy4xNTIsMTMuMzA2LDU0LjgyOGMxMS4xMjktMjQuODM4LDIyLjEwMi00OS43NSwzMy40MTYtNzQuNTA0LDMuNzIxLTguMTM3LDcuMDEyLTE3LjAxOSwxMS44MTQtMjQuNjA1LDcuOTU3LTEyLjU5NiwyNS43NDItLjc3MSwyMS42MTksMTEuOTYzbC0zMi41OTQsNzIuMzU4Ii8+CiAgICA8L2c+CiAgPC9nPgogIDxnPgogICAgPHBhdGggZD0iTTg0LjQxOSwzNjYuNjZoLTIwLjc4OXYzMy40NzloLTE4Ljg5OXYtOTQuNDk2aDQxLjMwOWMxNy44MTgsMCwzMi41MzQsOS44NTQsMzIuNTM0LDI5Ljk2OCwwLDIxLjg3LTE0LjU3OSwzMS4wNDktMzQuMTU0LDMxLjA0OVpNODUuMzY0LDMyNC4wMDNoLTIxLjczM3YyNC4yOTloMjIuMDAzYzguNzc2LDAsMTMuNS00LjA1MSwxMy41LTEyLjI4NXMtNS4zOTgtMTIuMDE0LTEzLjc3LTEyLjAxNFoiLz4KICAgIDxwYXRoIGQ9Ik0xMjkuNzgsNDAwLjEzOXYtOTQuNDk2aDE4Ljg5OXY3Ni4wMDJoNDcuMzg0djE4LjQ5NGgtNjYuMjgzWiIvPgogICAgPHBhdGggZD0iTTI3NC40NjYsNDAwLjEzOWwtNy40MjYtMjEuMDU5aC0zNC41NTlsLTcuNDI0LDIxLjA1OWgtMjAuMjVsMzYuMTgtOTQuNDk2aDE4LjM1OGwzNS45MDksOTQuNDk2aC0yMC43ODlaTTI1NC40ODcsMzQzLjk4MWMtMS44OTEtNS41MzQtMy43ODEtMTEuMjA1LTQuNzI2LTE0LjcxNS0uOTQ0LDMuNTEtMi44MzQsOS4xODEtNC43MjQsMTQuNzE1bC02LjA3NSwxNy4xNDVoMjEuNmwtNi4wNzQtMTcuMTQ1WiIvPgogICAgPHBhdGggZD0iTTM1My4xMTYsMzMzLjE4Yy0zLjM3NS02LjQ3OC04Ljc3NS0xMC4yNTgtMTcuMjc5LTEwLjI1OC0xNC4xNzUsMC0yMi4yNzMsMTIuNDE5LTIyLjI3MywyOS45NjgsMCwxNy4wMSw4LjIzMywyOS45NywyMi40MDgsMjkuOTcsOC41MDYsMCwxMy40OTktMy42NDQsMTguNDk0LTEyLjAxNmwxNS45Myw5LjQ1Yy02LjQ4LDEzLjM2NC0xNy44MTksMjEuMzI5LTM0Ljk2NCwyMS4zMjktMjQuNzAzLDAtNDEuMzA5LTE4Ljg5OC00MS4zMDktNDguNzMzLDAtMjguNzUzLDE3LjI3OS00OC43MzIsNDEuOTgzLTQ4LjczMiwxNy44MiwwLDI4LjYxOSw4LjY0LDM0LjU1OSwyMC45MjRsLTE3LjU0OSw4LjA5OVoiLz4KICAgIDxwYXRoIGQ9Ik0zODEuNTY3LDQwMC4xMzl2LTk0LjQ5Nmg2NS42MDd2MTguNDk0aC00Ni43MDd2MTYuMzM0aDI3LjEzM3YxOC4zNTloLTI3LjEzM3YyMi44MTRoNDguNzMzdjE4LjQ5NGgtNjcuNjMzWiIvPgogIDwvZz4KICA8Zz4KICAgIDxwYXRoIGNsYXNzPSJjbHMtMSIgZD0iTTE2OS41ODIsNDM4Ljk0djcuNTY3aDYuNjI4di03LjU2N2g1LjQ3OHYyMC40aC01LjQ3OHYtOC4wNWgtNi42Mjh2OC4wNWgtNS40Nzh2LTIwLjRoNS40NzhaIi8+CiAgICA8cGF0aCBjbGFzcz0iY2xzLTEiIGQ9Ik0yMDUuNzI2LDQ1OS42NzRjLTYuMzI2LDAtOS44MDctNC43NTMtOS44MDctMTAuNDEzLDAtNS45MzIsMy44NzQtMTAuNjUzLDEwLjE0LTEwLjY1Myw2LjU2OCwwLDkuODk3LDQuODcyLDkuODk3LDEwLjMyMSwwLDYuNTY4LTMuOTM1LDEwLjc0NS0xMC4yLDEwLjc0NWgtLjAzWk0yMDUuOTk4LDQ1NS4zNDZjMi42MzQsMCw0LjE3Ny0yLjU0Miw0LjE3Ny02LjIzNSwwLTMuNTEtMS41NzQtNi4xNzQtNC4yMzctNi4xNzQtMi42MzMsMC00LjIzNywyLjY2My00LjIzNyw2LjIwNC0uMDMsMy42NjMsMS42MDQsNi4yMDUsNC4yMzcsNi4yMDVoLjA2WiIvPgogICAgPHBhdGggY2xhc3M9ImNscy0xIiBkPSJNMjM0LjU2LDQ0My41NDJoLTUuMjA2di00LjYwMmgxNS45ODF2NC42MDJoLTUuMjk2djE1Ljc5OWgtNS40Nzh2LTE1Ljc5OVoiLz4KICAgIDxwYXRoIGNsYXNzPSJjbHMtMSIgZD0iTTI3Mi4zNjgsNDUxLjEwOGgtNy4zMjR2My43NTNoOC4yMDJ2NC40OGgtMTMuNjh2LTIwLjRoMTMuMjU3djQuNDhoLTcuNzc5djMuMjY5aDcuMzI0djQuNDE5WiIvPgogICAgPHBhdGggY2xhc3M9ImNscy0xIiBkPSJNMjg3LjYsNDM4Ljk0aDUuNDc4djE1LjgzaDcuODM5djQuNTdoLTEzLjMxN3YtMjAuNFoiLz4KICAgIDxwYXRoIGNsYXNzPSJjbHMtMSIgZD0iTTMxNi4xNzcsNDUzLjg5M2MxLjI0MS42MzYsMy4yMzksMS4yNzEsNS4yOTYsMS4yNzEsMS44NzcsMCwyLjc4NS0uNjM2LDIuNzg1LTEuNjY1LDAtLjk5OS0uOTA4LTEuNTQzLTMuMjA4LTIuMzMxLTMuNDUxLTEuMjQxLTUuNzUxLTMuMTE2LTUuNzUxLTYuMTQzLDAtMy42MDIsMy4wNTctNi4zODYsOC4yMDMtNi4zODYsMi40MjEsMCw0LjE3Ny40NTQsNS41MDksMS4wM2wtMS4xNSw0LjM4OGMtLjg3OC0uMzkzLTIuMzkxLS45NjgtNC40MTktLjk2OC0xLjY2NSwwLTIuNTczLjYwNS0yLjU3MywxLjUxMywwLDEuMDMsMS4wOSwxLjQyMiwzLjY2MywyLjM5MSwzLjY2MiwxLjM2Miw1LjI5NiwzLjI5OSw1LjI5Niw2LjE0MywwLDMuNTEyLTIuNzI0LDYuNTA3LTguNjg3LDYuNTA3LTIuNDUxLDAtNC44NDMtLjYzNi01Ljk5Mi0xLjI0bDEuMDI5LTQuNTFaIi8+CiAgPC9nPgogIDxwYXRoIGQ9Ik0yNDYuOTY2LDQxMS44ODljLTY2Ljk1NSwwLTEzMy45MTMsNi43NDMtMjAyLjIzNCwyMC4xODZ2Ny42NWM2OC40MTgtOS43MzksMTM1LjMyNi0xNC42MTMsMjAyLjIzNC0xNC42MTNzMTMzLjgxNiw0Ljg3NSwyMDIuMjMzLDE0LjYxM3YtNy42NWMtNjguMzItMTMuNDQzLTEzNS4yNzktMjAuMTg2LTIwMi4yMzMtMjAuMTg2WiIvPgogIDxwYXRoIGQ9Ik00NjUuNzU5LDMxNC44MzRjMCwzLjk5OS0zLjEzOSw3LjEzOC03LjIyNCw3LjEzOC00LjA0MiwwLTcuMjY3LTMuMTM5LTcuMjY3LTcuMTM4LDAtMy45MTMsMy4yMjUtNy4wNTIsNy4yNjctNy4wNTIsNC4wODUsMCw3LjIyNCwzLjEzOSw3LjIyNCw3LjA1MlpNNDUzLjA3NCwzMTQuODM0YzAsMy4xMzksMi4zMjIsNS42MzMsNS41MDQsNS42MzMsMy4wOTYsMCw1LjM3NS0yLjQ5NCw1LjM3NS01LjU5LDAtMy4xMzktMi4yNzktNS42NzYtNS40MTgtNS42NzZzLTUuNDYxLDIuNTM3LTUuNDYxLDUuNjMzWk00NTcuNDE3LDMxOC41MzJoLTEuNjM0di03LjA1MmMuNjQ1LS4xMjksMS41NDgtLjIxNSwyLjcwOS0uMjE1LDEuMzMzLDAsMS45MzUuMjE1LDIuNDUxLjUxNi4zODcuMzAxLjY4OC44Ni42ODgsMS41NDgsMCwuNzc0LS42MDIsMS4zNzYtMS40NjIsMS42MzR2LjA4NmMuNjg4LjI1OCwxLjA3NS43NzQsMS4yOSwxLjcyLjIxNSwxLjA3NS4zNDQsMS41MDUuNTE2LDEuNzYzaC0xLjc2M2MtLjIxNS0uMjU4LS4zNDQtLjkwMy0uNTU5LTEuNzItLjEyOS0uNzc0LS41NTktMS4xMTgtMS40NjItMS4xMThoLS43NzR2Mi44MzhaTTQ1Ny40NjEsMzE0LjUzM2guNzc0Yy45MDMsMCwxLjYzNC0uMzAxLDEuNjM0LTEuMDMyLDAtLjY0NS0uNDczLTEuMDc1LTEuNTA1LTEuMDc1LS40MywwLS43MzEuMDQzLS45MDMuMDg2djIuMDIxWiIvPgo8L3N2Zz4=" alt="My Place Hotels" style="height:48px; display:block;">
+      <div class="header-text">
+        <div class="header-eyebrow">My Place Hotels of America</div>
+        <h1>Performance Dashboard Portal</h1>
+        <div class="header-subtitle">Interactive reporting suite for leadership &amp; operations review</div>
+      </div>
+    </div>
+    <div class="header-meta">
+      <div class="updated-pill">Last updated: April 2026</div>
+    </div>
+  </div>
+</div>
+
+<div class="main">
+
+  <div class="info-bar">
+    <div class="info-icon">📊</div>
+    <div class="info-text">
+      <strong>Welcome to the My Place Hotels Dashboard Portal.</strong>
+      Select any dashboard below to explore detailed performance data. Each dashboard opens as a fully interactive report — click charts, sort tables, and toggle channels. Use the <strong>← Portal</strong> button in any dashboard header to return here.
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════ -->
+  <!-- WEBSITE & WIFI ANALYTICS                      -->
+  <!-- ═══════════════════════════════════════════════ -->
+  <div class="section-header">
+    <h2>Website & WiFi Analytics</h2>
+    <span class="section-count">4 dashboards</span>
+    <div class="section-divider"></div>
+  </div>
+
+  <div class="cards-grid">
+
+    <!-- GA4 2026 YTD -->
+    <div class="dash-card">
+      <div class="card-accent" style="background:#FF5F00;"></div>
+      <div class="card-body">
+        <div class="card-badges">
+          <span class="badge badge-period">2026 YTD vs 2025</span>
+        </div>
+        <div class="card-title">Website Analytics — GA4 2026 YTD</div>
+        <div class="card-desc">Year-to-date Google Analytics 4 dashboard comparing Q1 2026 (Jan 1–Mar 31) against the identical period in 2025. Sessions, revenue, reservations, and channel mix — same-period apples-to-apples comparison. Full 2025 monthly trend shown for context.</div>
+        <div class="card-kpis">
+          <div class="card-kpi">
+            <div class="card-kpi-label">2026 Q1 Sessions</div>
+            <div class="card-kpi-value">351.2K</div>
+          </div>
+          <div class="card-kpi">
+            <div class="card-kpi-label">Q1 Revenue</div>
+            <div class="card-kpi-value">$3.25M</div>
+          </div>
+          <div class="card-kpi">
+            <div class="card-kpi-label">YoY Revenue</div>
+            <div class="card-kpi-value">+26.2%</div>
+          </div>
+        </div>
+      </div>
+      <div class="card-footer">
+        <div class="card-source">myplacehotels.com · Google Analytics 4 · Q1 2026 (Jan 1–Mar 31)</div>
+        <a href="ga4-ytd-dashboard.html" class="open-btn">
+          Open Dashboard
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </a>
+      </div>
+    </div>
+
+    <!-- GA4 Website Analytics -->
+    <div class="dash-card">
+      <div class="card-accent" style="background:#7B2D8B;"></div>
+      <div class="card-body">
+        <div class="card-badges">
+          <span class="badge badge-period">Full Year 2024–2025</span>
+        </div>
+        <div class="card-title">Website Analytics — GA4 2024 vs 2025</div>
+        <div class="card-desc">Full-year Google Analytics 4 dashboard for myplacehotels.com. Sessions, website revenue, and reservations by acquisition channel. Includes monthly trends, channel mix, reservation rate by channel, and all 95 hotel property pages with 2024 vs 2025 comparison. Property WiFi excluded.</div>
+        <div class="card-kpis">
+          <div class="card-kpi">
+            <div class="card-kpi-label">2025 Sessions</div>
+            <div class="card-kpi-value">1.56M</div>
+          </div>
+          <div class="card-kpi">
+            <div class="card-kpi-label">Web Revenue</div>
+            <div class="card-kpi-value">$12.2M</div>
+          </div>
+          <div class="card-kpi">
+            <div class="card-kpi-label">YoY Sessions</div>
+            <div class="card-kpi-value">+64.1%</div>
+          </div>
+        </div>
+      </div>
+      <div class="card-footer">
+        <div class="card-source">myplacehotels.com · Google Analytics 4 · Jan 2024 – Dec 2025</div>
+        <a href="ga4-website-dashboard.html" class="open-btn">
+          Open Dashboard
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </a>
+      </div>
+    </div>
+
+    <!-- Property WiFi YTD -->
+    <div class="dash-card">
+      <div class="card-accent" style="background:#FF5F00;"></div>
+      <div class="card-body">
+        <div class="card-badges">
+          <span class="badge badge-period">2026 YTD vs 2025</span>
+        </div>
+        <div class="card-title">Property WiFi — GA4 2026 YTD</div>
+        <div class="card-desc">Year-to-date in-hotel digital concierge analytics comparing Q1 2026 (Jan 1–Mar 31) against the same period in 2025. Page views and active users per WiFi property. Full 2025 monthly trend shown for broader context.</div>
+        <div class="card-kpis">
+          <div class="card-kpi">
+            <div class="card-kpi-label">2026 Q1 Sessions</div>
+            <div class="card-kpi-value">75.3K</div>
+          </div>
+          <div class="card-kpi">
+            <div class="card-kpi-label">Properties</div>
+            <div class="card-kpi-value">77</div>
+          </div>
+          <div class="card-kpi">
+            <div class="card-kpi-label">YoY Sessions</div>
+            <div class="card-kpi-value">−38.5%</div>
+          </div>
+        </div>
+      </div>
+      <div class="card-footer">
+        <div class="card-source">myplacehotels.com/wifi · Google Analytics 4 · Q1 2026 (Jan 1–Mar 31)</div>
+        <a href="wifi-ytd-dashboard.html" class="open-btn">
+          Open Dashboard
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </a>
+      </div>
+    </div>
+
+    <!-- Property WiFi Analytics -->
+    <div class="dash-card">
+      <div class="card-accent" style="background:#4A7FC1;"></div>
+      <div class="card-body">
+        <div class="card-badges">
+          <span class="badge badge-period">Full Year 2024–2025</span>
+        </div>
+        <div class="card-title">Property WiFi Analytics — GA4 2024 vs 2025</div>
+        <div class="card-desc">In-property digital concierge page analytics. Tracks guest engagement on /wifi/ pages served when guests connect to hotel WiFi. Separate from website acquisition — reflects in-stay activity across all 75 properties.</div>
+        <div class="card-kpis">
+          <div class="card-kpi">
+            <div class="card-kpi-label">2025 WiFi Sessions</div>
+            <div class="card-kpi-value">511K</div>
+          </div>
+          <div class="card-kpi">
+            <div class="card-kpi-label">Properties</div>
+            <div class="card-kpi-value">75</div>
+          </div>
+          <div class="card-kpi">
+            <div class="card-kpi-label">YoY Sessions</div>
+            <div class="card-kpi-value">−3.5%</div>
+          </div>
+        </div>
+      </div>
+      <div class="card-footer">
+        <div class="card-source">myplacehotels.com/wifi · Google Analytics 4 · Jan 2024 – Dec 2025</div>
+        <a href="wifi-dashboard.html" class="open-btn">
+          Open Dashboard
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </a>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ═══════════════════════════════════════════════ -->
+  <!-- CHANNEL PERFORMANCE                            -->
+  <!-- ═══════════════════════════════════════════════ -->
+  <div class="section-header">
+    <h2>Channel Performance</h2>
+    <span class="section-count">3 dashboards</span>
+    <div class="section-divider"></div>
+  </div>
+
+  <div class="cards-grid">
+
+    <!-- Affiliate Channel Performance -->
+    <div class="dash-card">
+      <div class="card-accent" style="background:#FF5F00;"></div>
+      <div class="card-body">
+        <div class="card-badges">
+          <span class="badge badge-period">Sep 2025 – Mar 2026</span>
+          <span class="badge badge-new">New</span>
+        </div>
+        <div class="card-title">Affiliate Channel — Impact Platform</div>
+        <div class="card-desc">First 7 months of the affiliate program via Impact. Monthly revenue, bookings, clicks, and conversion trends. Partner-level performance table with Capital One as anchor partner driving 73% of revenue at 16.7x ROAS.</div>
+        <div class="card-kpis">
+          <div class="card-kpi">
+            <div class="card-kpi-label">Total Revenue</div>
+            <div class="card-kpi-value">$179.3K</div>
+          </div>
+          <div class="card-kpi">
+            <div class="card-kpi-label">Bookings</div>
+            <div class="card-kpi-value">488</div>
+          </div>
+          <div class="card-kpi">
+            <div class="card-kpi-label">ROAS</div>
+            <div class="card-kpi-value">17.5x</div>
+          </div>
+        </div>
+      </div>
+      <div class="card-footer">
+        <div class="card-source">Impact Platform · 63 affiliates · Sep 2025 – Mar 2026</div>
+        <a href="affiliate-performance-dashboard.html" class="open-btn">
+          Open Dashboard
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </a>
+      </div>
+    </div>
+
+    <!-- Channel Performance 2026 YTD -->
+    <div class="dash-card">
+      <div class="card-accent" style="background:#FF5F00;"></div>
+      <div class="card-body">
+        <div class="card-badges">
+          <span class="badge badge-period">2026 YTD</span>
+        </div>
+        <div class="card-title">Channel Performance — 2026 Year-to-Date</div>
+        <div class="card-desc">Q1 2026 channel mix (Jan–Mar) vs. same period in 2025. Monthly revenue and room night trends with live YoY variance. Updated each month as data becomes available — toggle channels on/off.</div>
+        <div class="card-kpis">
+          <div class="card-kpi">
+            <div class="card-kpi-label">Net Revenue</div>
+            <div class="card-kpi-value">$24.7M</div>
+          </div>
+          <div class="card-kpi">
+            <div class="card-kpi-label">Room Nights</div>
+            <div class="card-kpi-value">272.2K</div>
+          </div>
+          <div class="card-kpi">
+            <div class="card-kpi-label">YoY Rev</div>
+            <div class="card-kpi-value">+13.9%</div>
+          </div>
+        </div>
+      </div>
+      <div class="card-footer">
+        <div class="card-source">All properties · Q1 2026 (Jan–Mar) vs 2025</div>
+        <a href="channel-performance-dashboard-2026-ytd.html" class="open-btn">
+          Open Dashboard
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </a>
+      </div>
+    </div>
+
+    <!-- Channel Performance 2025 -->
+    <div class="dash-card">
+      <div class="card-accent" style="background:#1C355E;"></div>
+      <div class="card-body">
+        <div class="card-badges">
+          <span class="badge badge-period">Full Year 2025</span>
+        </div>
+        <div class="card-title">Channel Performance — 2025 Annual</div>
+        <div class="card-desc">Full-year channel mix analysis across all 12 booking channels. Monthly revenue and room night trends, ADR by channel, contribution % breakdown, and year-over-year comparison vs. 2024. Fully interactive — toggle channels on/off.</div>
+        <div class="card-kpis">
+          <div class="card-kpi">
+            <div class="card-kpi-label">Net Revenue</div>
+            <div class="card-kpi-value">$115.2M</div>
+          </div>
+          <div class="card-kpi">
+            <div class="card-kpi-label">Room Nights</div>
+            <div class="card-kpi-value">1.17M</div>
+          </div>
+          <div class="card-kpi">
+            <div class="card-kpi-label">YoY Rev</div>
+            <div class="card-kpi-value">+7.7%</div>
+          </div>
+        </div>
+      </div>
+      <div class="card-footer">
+        <div class="card-source">All properties · Jan – Dec 2025 vs 2024</div>
+        <a href="channel-performance-dashboard-2025.html" class="open-btn">
+          Open Dashboard
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </a>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ═══════════════════════════════════════════════ -->
+  <!-- STAY REWARDED MEMBER RATES PROGRAM             -->
+  <!-- ═══════════════════════════════════════════════ -->
+  <div class="section-header">
+    <h2>Stay Rewarded — Member Rates Program</h2>
+    <span class="section-count">5 dashboards</span>
+    <div class="section-divider"></div>
+  </div>
+
+  <div class="cards-grid">
+
+    <!-- Member Rates 2026 YTD -->
+    <div class="dash-card">
+      <div class="card-accent" style="background:#FF5F00;"></div>
+      <div class="card-body">
+        <div class="card-badges">
+          <span class="badge badge-period">2026 YTD</span>
+          <span class="badge badge-updated">Updated</span>
+        </div>
+        <div class="card-title">Member Rates Pilot — 2026 Year-to-Date</div>
+        <div class="card-desc">Q1 2026 performance through March 31. Tracks the continued expansion of the Member Rates Pilot across 32 properties with the same channel and member-type breakdowns as the 2025 annual report.</div>
+        <div class="card-kpis">
+          <div class="card-kpi">
+            <div class="card-kpi-label">Net Revenue</div>
+            <div class="card-kpi-value">$1.55M</div>
+          </div>
+          <div class="card-kpi">
+            <div class="card-kpi-label">Net Reservations</div>
+            <div class="card-kpi-value">5,403</div>
+          </div>
+          <div class="card-kpi">
+            <div class="card-kpi-label">Total Members</div>
+            <div class="card-kpi-value">4,098</div>
+          </div>
+        </div>
+      </div>
+      <div class="card-footer">
+        <div class="card-source">32 properties · Q1 2026 (Jan 1–Mar 31)</div>
+        <a href="2026-ytd-member-rates-dashboard-branded.html" class="open-btn">
+          Open Dashboard
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </a>
+      </div>
+    </div>
+
+    <!-- Member Rates 2025 -->
+    <div class="dash-card">
+      <div class="card-accent" style="background:#1C355E;"></div>
+      <div class="card-body">
+        <div class="card-badges">
+          <span class="badge badge-period">Full Year 2025</span>
+        </div>
+        <div class="card-title">Member Rates Pilot — 2025 Annual</div>
+        <div class="card-desc">Full-year performance of the Member Rates Pilot across all 31 properties. Breaks down revenue, reservations, ADR, length of stay, and cancellation rate by channel (PMS vs. Web) and member type (Current vs. New).</div>
+        <div class="card-kpis">
+          <div class="card-kpi">
+            <div class="card-kpi-label">Net Revenue</div>
+            <div class="card-kpi-value">$646K</div>
+          </div>
+          <div class="card-kpi">
+            <div class="card-kpi-label">Net Reservations</div>
+            <div class="card-kpi-value">3,083</div>
+          </div>
+          <div class="card-kpi">
+            <div class="card-kpi-label">Total Members</div>
+            <div class="card-kpi-value">2,371</div>
+          </div>
+        </div>
+      </div>
+      <div class="card-footer">
+        <div class="card-source">31 properties · Jan – Dec 2025</div>
+        <a href="2025-member-rates-dashboard-branded.html" class="open-btn">
+          Open Dashboard
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </a>
+      </div>
+    </div>
+
+    <!-- New Member Enrollments by Hotel -->
+    <div class="dash-card">
+      <div class="card-accent" style="background:#FF5F00;"></div>
+      <div class="card-body">
+        <div class="card-badges">
+          <span class="badge badge-period">2025 + 2026 Q1</span>
+          <span class="badge badge-new">New</span>
+        </div>
+        <div class="card-title">New Member Enrollments by Hotel</div>
+        <div class="card-desc">Property-level breakdown of new member sign-ups by channel (PMS vs. Web). Covers 2025 full year and 2026 Q1, with all-time totals. Non-Member enrollments folded into New Member per standing attribution rule.</div>
+        <div class="card-kpis">
+          <div class="card-kpi">
+            <div class="card-kpi-label">Total Enrollments</div>
+            <div class="card-kpi-value">3,341</div>
+          </div>
+          <div class="card-kpi">
+            <div class="card-kpi-label">PMS Sign-Ups</div>
+            <div class="card-kpi-value">1,915</div>
+          </div>
+          <div class="card-kpi">
+            <div class="card-kpi-label">WEB Sign-Ups</div>
+            <div class="card-kpi-value">1,426</div>
+          </div>
+        </div>
+      </div>
+      <div class="card-footer">
+        <div class="card-source">32 properties · 2025 Full Year + Q1 2026</div>
+        <a href="new-member-enrollments-by-hotel.html" class="open-btn">
+          Open Dashboard
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </a>
+      </div>
+    </div>
+
+    <!-- Member Conversion Behavior -->
+    <div class="dash-card">
+      <div class="card-accent" style="background:#2E8B57;"></div>
+      <div class="card-body">
+        <div class="card-badges">
+          <span class="badge badge-period">Through Mar 2026</span>
+          <span class="badge badge-new">New</span>
+        </div>
+        <div class="card-title">New Member Conversion Behavior</div>
+        <div class="card-desc">Prior booking analysis of Stay Rewarded members. Shows what percentage had previous stays, their channel mix (48% OTA before → 0% after), and ADR lift (+$14.92) — proving the program drives new business without cannibalizing rate.</div>
+        <div class="card-kpis">
+          <div class="card-kpi">
+            <div class="card-kpi-label">Total Members</div>
+            <div class="card-kpi-value">3,280</div>
+          </div>
+          <div class="card-kpi">
+            <div class="card-kpi-label">New-to-Brand</div>
+            <div class="card-kpi-value">93.1%</div>
+          </div>
+          <div class="card-kpi">
+            <div class="card-kpi-label">ADR Lift</div>
+            <div class="card-kpi-value">+15.7%</div>
+          </div>
+        </div>
+      </div>
+      <div class="card-footer">
+        <div class="card-source">3,280 new members · Prior booking analysis through March 31, 2026</div>
+        <a href="member-conversion-behavior.html" class="open-btn">
+          Open Dashboard
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </a>
+      </div>
+    </div>
+
+    <!-- SR Property Enrollments -->
+    <div class="dash-card">
+      <div class="card-accent" style="background:#FF5F00;"></div>
+      <div class="card-body">
+        <div class="card-badges">
+          <span class="badge badge-period">Through Mar 2026</span>
+          <span class="badge badge-new">New</span>
+        </div>
+        <div class="card-title">Property Enrollment Performance</div>
+        <div class="card-desc">Combined view of two enrollment streams: in-property sign-ups (check-in &amp; OTA conversion) and member rate program bookings (PMS + Web). Compares Non-Legacy vs Legacy cohorts across 32 participating hotels.</div>
+        <div class="card-kpis">
+          <div class="card-kpi">
+            <div class="card-kpi-label">Combined Enrollments</div>
+            <div class="card-kpi-value">21,508</div>
+          </div>
+          <div class="card-kpi">
+            <div class="card-kpi-label">Property Sign-Ups</div>
+            <div class="card-kpi-value">18,167</div>
+          </div>
+          <div class="card-kpi">
+            <div class="card-kpi-label">Member Rate</div>
+            <div class="card-kpi-value">3,341</div>
+          </div>
+        </div>
+      </div>
+      <div class="card-footer">
+        <div class="card-source">32 properties · Jun 2025 – Mar 2026</div>
+        <a href="sr-property-enrollments-dashboard.html" class="open-btn">
+          Open Dashboard
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </a>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ═══════════════════════════════════════════════ -->
+  <!-- COMING SOON                                    -->
+  <!-- ═══════════════════════════════════════════════ -->
+  <div class="section-header">
+    <h2>Coming Soon</h2>
+    <span class="section-count">planned</span>
+    <div class="section-divider"></div>
+  </div>
+
+  <div class="cards-grid">
+
+    <div class="dash-card coming-soon">
+      <div class="card-accent" style="background:#8ba0bf;"></div>
+      <div class="card-body">
+        <div class="card-badges">
+          <span class="badge badge-coming">Coming Soon</span>
+        </div>
+        <div class="card-title">Google Ads Performance</div>
+        <div class="card-desc">Paid search and display campaign performance. Planned after Coupler.io integration is complete for automated Google Ads data refresh.</div>
+        <div class="card-kpis">
+          <div class="card-kpi">
+            <div class="card-kpi-label">Status</div>
+            <div class="card-kpi-value">Planned</div>
+          </div>
+          <div class="card-kpi">
+            <div class="card-kpi-label">Data Source</div>
+            <div class="card-kpi-value">Google Ads</div>
+          </div>
+          <div class="card-kpi">
+            <div class="card-kpi-label">Integration</div>
+            <div class="card-kpi-value">Coupler.io</div>
+          </div>
+        </div>
+      </div>
+      <div class="card-footer">
+        <div class="card-source">Pending Coupler.io integration</div>
+        <a href="#" class="open-btn">Coming Soon</a>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<div class="footer">
+  My Place Hotels of America &nbsp;·&nbsp; Performance Dashboard Portal &nbsp;·&nbsp; Confidential — Internal Use Only
+</div>
+
+</body>
+</html>

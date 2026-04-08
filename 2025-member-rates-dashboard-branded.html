@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>2025 Member Rates Pilot — Executive Dashboard</title>
+<style>
+  :root {
+    --bg:           #EEF1F6;
+    --card:         #FFFFFF;
+    --card-hover:   #F4F7FB;
+    --border:       #D0D8E8;
+    --text:         #1C355E;
+    --muted:        #5A6B84;
+    --accent:       #1C355E;   /* PMS — Navy Blue */
+    --accent2:      #2E8B57;   /* WEB — Forest Green */
+    --accent3:      #E11B22;   /* Alert Red */
+    --accent4:      #FF5F00;   /* Orange — highlights */
+    --positive:     #2E8B57;
+    --negative:     #E11B22;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif;
+         background: var(--bg); color: var(--text); min-height:100vh; }
+
+  /* ── Top Brand Bar ── */
+  .brand-bar { background: #FF5F00; height: 5px; }
+
+  /* ── Header ── */
+  .header { padding: 24px 32px 18px; background: #1C355E;
+            border-bottom: 3px solid #FF5F00; }
+  .header h1 { font-size: 22px; font-weight: 700; letter-spacing: -0.3px;
+               color: #FFFFFF; }
+  .header .subtitle { color: rgba(255,255,255,0.72); font-size: 13px; margin-top: 4px; }
+  .pilot-badge { display: inline-block;
+                 background: linear-gradient(135deg, #FF5F00, #cc4800);
+                 color: white; font-size: 11px; font-weight: 700;
+                 padding: 3px 10px; border-radius: 12px;
+                 margin-left: 12px; vertical-align: middle; }
+
+  /* ── Dashboard Layout ── */
+  .dashboard { padding: 24px 32px; max-width: 1440px; margin: 0 auto; }
+
+  /* ── KPI Cards ── */
+  .kpi-row { display: grid; grid-template-columns: repeat(6, 1fr);
+             gap: 14px; margin-bottom: 24px; }
+  .kpi-card { background: var(--card); border: 1px solid var(--border);
+              border-top: 3px solid #1C355E;
+              border-radius: 8px; padding: 18px 16px;
+              transition: box-shadow 0.2s;
+              box-shadow: 0 1px 4px rgba(28,53,94,0.07); }
+  .kpi-card:hover { box-shadow: 0 4px 14px rgba(28,53,94,0.12);
+                    background: var(--card-hover); }
+  .kpi-label { font-size: 10px; text-transform: uppercase; letter-spacing: 1px;
+               color: var(--muted); font-weight: 700; margin-bottom: 8px; }
+  .kpi-value { font-size: 26px; font-weight: 700; letter-spacing: -0.5px;
+               color: #1C355E; }
+  .kpi-sub { font-size: 11px; color: var(--muted); margin-top: 6px; }
+  .kpi-sub span { font-weight: 600; }
+  .kpi-sub .pms { color: #1C355E; }
+  .kpi-sub .web { color: #2E8B57; }
+
+  /* ── Section Titles ── */
+  .section-title { font-size: 14px; font-weight: 700; margin-bottom: 14px;
+                   display: flex; align-items: center; gap: 8px;
+                   color: #1C355E; }
+  .section-title .dot { width: 8px; height: 8px; border-radius: 50%; }
+
+  /* ── Grids ── */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr;
+             gap: 16px; margin-bottom: 24px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr;
+             gap: 16px; margin-bottom: 24px; }
+
+  /* ── Chart Cards ── */
+  .chart-card { background: var(--card); border: 1px solid var(--border);
+                border-radius: 8px; padding: 20px;
+                box-shadow: 0 1px 4px rgba(28,53,94,0.06); }
+  .chart-card h3 { font-size: 12px; font-weight: 700; margin-bottom: 6px;
+                   color: var(--muted); text-transform: uppercase;
+                   letter-spacing: 0.6px; border-bottom: 2px solid #FF5F00;
+                   padding-bottom: 8px; }
+  .chart-desc { font-size: 11px; color: #8ba0bf; font-style: italic;
+                margin-bottom: 14px; line-height: 1.5; }
+
+  /* ── Bar Charts ── */
+  .bar-group { margin-bottom: 14px; }
+  .bar-label { font-size: 12px; color: var(--text); margin-bottom: 5px;
+               display: flex; justify-content: space-between; }
+  .bar-track { height: 22px; background: #E4EAF3; border-radius: 6px;
+               overflow: hidden; position: relative; }
+  .bar-fill { height: 100%; border-radius: 6px; transition: width 0.8s ease;
+              display: flex; align-items: center; padding-left: 8px;
+              font-size: 10px; font-weight: 600; color: white; }
+
+  /* ── Donut Charts ── */
+  .donut-container { display: flex; align-items: center; gap: 24px; }
+  .donut-legend { flex: 1; }
+  .legend-item { display: flex; align-items: center; gap: 8px;
+                 margin-bottom: 10px; font-size: 13px; }
+  .legend-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+  .legend-value { margin-left: auto; font-weight: 600; font-size: 13px;
+                  color: #1C355E; }
+
+  /* ── Hotel Table ── */
+  .table-container { background: var(--card); border: 1px solid var(--border);
+                     border-radius: 8px; overflow: hidden; margin-bottom: 24px;
+                     box-shadow: 0 1px 4px rgba(28,53,94,0.06); }
+  .table-header-bar { padding: 14px 20px; display: flex;
+                      justify-content: space-between; align-items: center;
+                      border-bottom: 2px solid #FF5F00;
+                      background: #1C355E; }
+  .table-header-bar h3 { font-size: 12px; font-weight: 700; color: #FFFFFF;
+                          text-transform: uppercase; letter-spacing: 0.5px; }
+  .sort-controls { display: flex; gap: 6px; }
+  .sort-btn { background: transparent; border: 1px solid rgba(255,255,255,0.4);
+              color: rgba(255,255,255,0.8); font-size: 11px; padding: 4px 10px;
+              border-radius: 6px; cursor: pointer; transition: all 0.2s;
+              font-family: Arial, sans-serif; }
+  .sort-btn:hover, .sort-btn.active { background: #FF5F00; color: white;
+                                       border-color: #FF5F00; }
+
+  table { width: 100%; border-collapse: collapse; }
+  thead th { text-align: left; font-size: 9px; text-transform: uppercase;
+             letter-spacing: 0.3px; color: #FFFFFF; font-weight: 700;
+             padding: 6px 6px; border-bottom: 1px solid rgba(255,255,255,0.2);
+             cursor: pointer; user-select: none; white-space: nowrap; }
+  thead th:hover { color: #FFDD00; }
+  thead th.sorted-asc::after  { content: ' ▲'; font-size: 8px; }
+  thead th.sorted-desc::after { content: ' ▼'; font-size: 9px; }
+  thead th.group-pms { border-bottom: 3px solid #8BAAD0; }
+  thead th.group-web { border-bottom: 3px solid #7DC9A0; }
+  thead th.group-summary { border-bottom: 3px solid #FF5F00; }
+  thead tr { background: #1C355E; }
+  thead tr.super-header th { padding: 5px 6px; font-size: 10px;
+                              font-weight: 700; border-bottom: none; }
+  thead tr.super-header th.pms-header { color: #FFDD00; text-align: center; }
+  thead tr.super-header th.web-header { color: #90EEB8; text-align: center; }
+  thead tr.super-header th.summary-header { color: #FF5F00; text-align: center; }
+  tbody td { padding: 5px 6px; font-size: 11px;
+             border-bottom: 1px solid var(--border); white-space: nowrap;
+             color: #1C355E; }
+  tbody tr:nth-child(even) { background: #F5F8FC; }
+  tbody tr:hover { background: #E8F0FA; }
+  tbody tr:last-child td { border-bottom: none; }
+  .hotel-name { font-weight: 600; max-width: 180px; overflow: hidden;
+                text-overflow: ellipsis; }
+  .num { text-align: right; font-variant-numeric: tabular-nums; }
+  td.summary-col { background: rgba(255,95,0,0.04); }
+  tbody tr:nth-child(even) td.summary-col { background: rgba(255,95,0,0.07); }
+  td.pms-col { background: rgba(28,53,94,0.04); }
+  tbody tr:nth-child(even) td.pms-col { background: rgba(28,53,94,0.07); }
+  td.web-col { background: rgba(46,139,87,0.04); }
+  tbody tr:nth-child(even) td.web-col { background: rgba(46,139,87,0.07); }
+  .col-divider { border-left: 2px solid var(--border); }
+
+  /* ── Tooltip ── */
+  .tooltip { position: fixed; background: #FFFFFF;
+             border: 1px solid var(--border); border-radius: 8px;
+             padding: 10px 14px; font-size: 12px; pointer-events: none;
+             z-index: 100; display: none; max-width: 260px;
+             box-shadow: 0 6px 20px rgba(28,53,94,0.15);
+             color: #1C355E; }
+
+  /* ── Footer ── */
+  .footer { text-align: center; padding: 20px; color: var(--muted);
+            font-size: 11px; border-top: 3px solid #FF5F00;
+            background: #1C355E; color: rgba(255,255,255,0.6); }
+
+  /* ── Responsive ── */
+  @media (max-width: 1100px) {
+    .kpi-row { grid-template-columns: repeat(3, 1fr); }
+    .grid-2, .grid-3 { grid-template-columns: 1fr; }
+  }
+
+</style>
+</head>
+<body>
+
+<div class="brand-bar"></div>
+<div class="header">
+  <div style="margin-bottom:10px;">
+  <a href="index.html" style="display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3);color:rgba(255,255,255,0.85);font-size:11px;font-weight:700;padding:6px 14px;border-radius:20px;text-decoration:none;transition:background 0.2s;font-family:Arial,sans-serif;" onmouseover="this.style.background='rgba(255,95,0,0.7)'" onmouseout="this.style.background='rgba(255,255,255,0.15)'">&#8592; Dashboard Portal</a>
+  </div>
+  <img src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyBpZD0iTXlfUGxhY2VfSG90ZWxzX0xvZ28iIGRhdGEtbmFtZT0iTXkgUGxhY2UgSG90ZWxzIExvZ28iIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgdmlld0JveD0iMCAwIDQ5My45MzEgNDg4LjQ2OCI+CiAgPGRlZnM+CiAgICA8c3R5bGU+CiAgICAgIC5jbHMtMSB7CiAgICAgICAgZmlsbDogI2UxMWIyMjsKICAgICAgfQoKICAgICAgLmNscy0yIHsKICAgICAgICBmaWxsOiAjZmZmOwogICAgICB9CgogICAgICAuY2xzLTMgewogICAgICAgIGZpbGw6ICNmZDA7CiAgICAgIH0KICAgIDwvc3R5bGU+CiAgPC9kZWZzPgogIDxnPgogICAgPHBhdGggY2xhc3M9ImNscy0zIiBkPSJNMjQ2Ljk2Niw0ODAuOTY2Yy03Mi4xNiwwLTE0My41MjUtNS41MTgtMjE4LjE4NS0xNi44NzJsLTUuNDkxLS44MzUtLjgwMy01LjQ5OEMyLjUwMiwzMjEuMDA1LDIuNTAyLDE4Mi4zMTcsMjIuNDg3LDQ1LjU2bC44MDMtNS40OTcsNS40OTEtLjgzNWM3NC42NTktMTEuMzU2LDE0Ni4wMjQtMTYuODc2LDIxOC4xODUtMTYuODc2czE0My41MjQsNS41MTksMjE4LjE4MiwxNi44NzZsNS40OTIuODM1LjgwMyw1LjQ5N2MxOS45ODYsMTM2Ljc1NywxOS45ODYsMjc1LjQ0NCwwLDQxMi4ybC0uODAzLDUuNDk4LTUuNDkyLjgzNWMtNzQuNjU3LDExLjM1NS0xNDYuMDI0LDE2Ljg3Mi0yMTguMTgyLDE2Ljg3MmgwWiIvPgogICAgPHBhdGggZD0iTTI0Ni45NjQsMjkuODUzYzcxLjczMiwwLDE0My40NjMsNS41OTcsMjE3LjA1NywxNi43OSwxOS44NjgsMTM1Ljk1NSwxOS44NjgsMjc0LjA3OCwwLDQxMC4wMzMtNzMuNTk0LDExLjE5My0xNDUuMzI0LDE2Ljc5MS0yMTcuMDU2LDE2Ljc5MXMtMTQzLjQ2My01LjU5OC0yMTcuMDU2LTE2Ljc5MWMtMTkuODY3LTEzNS45NTUtMTkuODY3LTI3NC4wNzgsMC00MTAuMDMzLDczLjU5My0xMS4xOTMsMTQ1LjMyNC0xNi43OSwyMTcuMDU1LTE2Ljc5TTI0Ni45NjQsMTQuODUzYy03Mi41MzksMC0xNDQuMjc1LDUuNTQ4LTIxOS4zMSwxNi45NmwtMTAuOTgsMS42Ny0xLjYwNiwxMC45OTFjLTIwLjA4OSwxMzcuNDc4LTIwLjA4OSwyNzYuODkzLDAsNDE0LjM3MmwxLjYwNiwxMC45ODksMTAuOTgsMS42NzFjNzUuMDM2LDExLjQxMywxNDYuNzczLDE2Ljk2MSwyMTkuMzExLDE2Ljk2MXMxNDQuMjc1LTUuNTQ4LDIxOS4zMTEtMTYuOTYxbDEwLjk4LTEuNjcxLDEuNjA1LTEwLjk4OWMyMC4wOTEtMTM3LjQ3OSwyMC4wOTEtMjc2Ljg5NCwwLTQxNC4zNzJsLTEuNjA1LTEwLjk5MS0xMC45OC0xLjY3Yy03NS4wMzUtMTEuNDEyLTE0Ni43NzItMTYuOTYtMjE5LjMxMi0xNi45NmgwWiIvPgogIDwvZz4KICA8Zz4KICAgIDxwYXRoIGNsYXNzPSJjbHMtMSIgZD0iTTM4Ni4yODksMTQ3LjE2MmMwLDc2LjgwMi02Mi4yNTQsMTM5LjA1Ny0xMzkuMDYyLDEzOS4wNTdzLTEzOS4wNTItNjIuMjU1LTEzOS4wNTItMTM5LjA1N1MxNzAuNDI4LDguMTAxLDI0Ny4yMjcsOC4xMDFzMTM5LjA2Miw2Mi4yNTQsMTM5LjA2MiwxMzkuMDYxWiIvPgogICAgPHBhdGggZD0iTTk5LjMyNywxNDYuOTQxQzk5LjMyNyw2NS43NzgsMTY1LjExMywwLDI0Ni4yNzIsMGgwYzgxLjE2MSwwLDE0Ni45MzksNjUuNzc4LDE0Ni45NDMsMTQ2Ljk0MWgwYy0uMDA0LDgxLjE2NC02NS43ODIsMTQ2LjkzNy0xNDYuOTQzLDE0Ni45NTFoMGMtODEuMTU4LS4wMTUtMTQ2Ljk0NC02NS43ODctMTQ2Ljk0NC0xNDYuOTUxaDBaTTExNS4xMDcsMTQ2Ljk0MWMuMTI4LDcyLjQ0Myw1OC43MjIsMTMxLjAzMywxMzEuMTY1LDEzMS4xNjZoMGM3Mi40NDEtLjEzMywxMzEuMDMzLTU4LjcyMywxMzEuMTc0LTEzMS4xNjZoMGMtLjE0MS03Mi40NDctNTguNzMyLTEzMS4wMzUtMTMxLjE3NC0xMzEuMTY2aDBjLTcyLjQ0My4xMzEtMTMxLjAzNyw1OC43MTktMTMxLjE2NSwxMzEuMTY2aDBaIi8+CiAgICA8Zz4KICAgICAgPHBhdGggZD0iTTg2LjQ4OSwyNTMuMzcyYy0xMC4zNjIsMC0xOS4wNzgtNC42NjctMjMuMzEzLTEyLjQ5NS0yLjUyMi00LjYzOS01LjQ5LTE0LjM0MiwyLjg4Mi0yNy4yMjEsNS42NDctOC42NzEsMTEuMzE5LTE3LjMyMiwxNi45NzItMjUuOTgybDQuOTA3LTcuNDg4YzguMDkyLTEyLjM4NywxNi4xNTctMjQuOCwyNC4yMzMtMzcuMjA0bDYuNzE3LTEwLjMzNiwxMS4wODgtMTcuMDE2LDExLjA3Ni0xNy4wMjgsMS4xODctMS44NWM2LjA2My05LjQzOSwxNS4yMDUtMjMuNywzMy42MDctMjMuNyw2LjA1OSwwLDI1LjgyNSwyLjE2MSwyNS44MjUsMzAuMDE2djQuNzI0YzMuNzM2LTUuMzksNy40NjctMTAuNzc0LDExLjIwNi0xNi4xNjcsNy44MTktMTAuOTM0LDE5LjY0Ny0xNy42NDMsMzAuOTc5LTE3LjY0Myw3LjE2NSwwLDEzLjc3NCwyLjY5MywxOC42Miw3LjU2NSwzLjk1MiwzLjk4Miw4LjY0NSwxMS4zOTcsOC41NjcsMjQuMDc2LS4xMjUsMTguOTYxLS4xMTIsMzguMjY4LS4wODYsNTYuOTNsLjAyMSwyMi40NzNjMCwxLjI3LjA3NSwyLjYxNS4xMzQsMy45OTIuMzgsOC4xMTMsMS4wMjMsMjEuNjkxLTEwLjE5NCwzMC4zMjgtNC45OSwzLjg0Ny0xMS4zMTQsNS45NjItMTcuODI0LDUuOTYyLTUuMzM2LDAtMTAuNDUzLTEuNDI0LTE0Ljc5MS00LjExOS0xMy4zMTItOC4yNTYtMTIuNTc2LTIzLjIyNC0xMi4xNDMtMzIuMTcxLjA3OS0xLjQyMi4xNDgtMi44MDkuMTQ4LTQuMDk4di0xLjI4MWwtMTYuNjY5LDI0LjU5MmMtMy4wNSw0LjQ5OC0xMS4xNjIsMTYuNDkxLTI1LjUxNSwxNy40MTQtLjU1OS4wMzktMS4xMTUuMDYxLTEuNjc2LjA2MS0xMi45MTQsMC0yMy43ODMtOS44NDQtMjUuMjk1LTIyLjkxMy0uNDU5LTMuOTc2LS43MzItNy45ODYtLjg2NS0xMS45OTRsLTMwLjk5LDQ3LjI4OWMtNi4zMTUsOS40NjUtMTcuMzQsMTUuMjg2LTI4LjgxLDE1LjI4NmgwWiIvPgogICAgICA8cGF0aCBjbGFzcz0iY2xzLTIiIGQ9Ik0xNzUuODQyLDg1Ljc4M2MxMC44NjcsMCwxMy4wOTMsOC4wOSwxMy4wOTMsMTcuMjgzdjQ1LjQ3OWMxMS40NjItMTYuNTU3LDIyLjkzNC0zMy4xMTcsMzQuNDA1LTQ5LjY3NiwxMS45MjUtMTYuNjYxLDM1LjEzNS0xNy43NjksMzQuOTcsNi42NzItLjE3OSwyNi40OS0uMDY3LDUyLjk5NC0uMDY3LDc5LjQ4MiwwLDcuOTg1LDIuMTkxLDE4LjYyMy01LjEwMSwyNC4yMzYtNS4wMjEsMy44Ny0xMi42ODUsNC40ODItMTguMTI2LDEuMTA5LTguNDQzLTUuMjQtNS45NzctMTcuMTM5LTUuOTc3LTI1LjQ0NnYtNDIuNzUzYy0xMy4zMDksMTkuNjMxLTI2LjYyMSwzOS4yNjktMzkuOTM1LDU4LjkwMi0zLjc1OSw1LjU1MS04LjU2NywxMS40LTE1LjgwNCwxMS44Ny02Ljk4MS40NTEtMTIuNzA4LTQuNzc0LTEzLjQ5LTExLjYwNC0yLjAyNy0xNy42MjctLjA3OS0zNi41NTMtLjA3OS01NC4zMDMtMTguMzY0LDI4LjAyOS0zNi43MjYsNTYuMDQzLTU1LjA5Myw4NC4wNzEtMTEuMDc3LDE2LjYxLTQxLjU3MiwxMC41MDYtMjcuOTA1LTEwLjUwMSw3LjI2LTExLjE2NiwxNC41NzUtMjIuMzA4LDIxLjg2MS0zMy40NTYsMTAuMzQ1LTE1LjgzOCwyMC42NTEtMzEuNzA1LDMwLjk2Ny00Ny41NTgsNy4zODgtMTEuMzUsMTQuNzcyLTIyLjY5NSwyMi4xNi0zNC4wNDcsNS44OTQtOS4wNzYsMTEuODI0LTE5Ljc2MiwyNC4xMi0xOS43NjIiLz4KICAgIDwvZz4KICAgIDxnPgogICAgICA8cGF0aCBkPSJNMjgxLjcsMjY4LjIxMWMtOC4xMjcsMC0xNS43OTQtNC4zMDMtMjAuNTE3LTExLjUxMi00Ljk0My03LjU2My01Ljc0Mi0xNi45OTgtMi4xNDItMjUuMjUsMy40MjYtNy44MTMsNy43MzUtMTUuMTQ0LDExLjUyOS0yMS42MDEsNS45NDctMTAuMTE2LDE5LjgxMy0zNC42ODcsMjMuODQ1LTQzLjQzM2wtNS4zMi0xOS4yMTEtMTQuNjI2LTUyLjg1OWMtMS44NDgtNi42ODgsMi4wMDItMTMuNjI3LDguNjY0LTE1LjYwM2wyNC4xNy03LjE1NGMxLjE4MS0uMzUsMi40MDItLjUyMiwzLjYwNS0uNTIyLDIuMjE1LDAsNC40MS41NzgsNi4zNjUsMS42OTYsMy4wMjUsMS43MzUsNS4xOTMsNC42NDEsNi4wMTksOC4wM2w0LjUwMiwxOC41NmM1Ljk5NC0xMy40MTMsMTIuMTExLTI3LjA3NiwxOC4yNTktNDAuNTMyLjk0NC0yLjA1OSwxLjg1Mi00LjE2NCwyLjc3NC02LjI5NywyLjg0Ni02LjU3OCw1Ljc5NS0xMy4zODksOS44NjUtMTkuODE2LDQuNTMxLTcuMTg0LDExLjc0Mi0xMS4yOTksMTkuNzczLTExLjI5OXMxNS44NzksNC4xMzEsMjAuOTEzLDExLjA0OGM0Ljk0Miw2Ljc5LDYuMzI5LDE1LjE1MiwzLjgxLDIyLjk0NC0uMTQ3LjQ0Ni0uMzA2Ljg4Ni0uNDk5LDEuMzExbC0zMi42MDMsNzIuMzU5Yy02Ljc3OCwxNC41OC0xMy45NDcsMjkuMTk3LTIxLjk2OSw0NC44MjUtLjk4NCwxLjkwNy0yLjM5OCw0LjcyNi00LjEyNyw4LjE2MS0yMC40NTksNDAuNjQ0LTM1LjkyNCw2OS41NjEtNDQuODgxLDc4LjU2Ni00Ljg2MSw0Ljg5My0xMS4wNDcsNy41ODgtMTcuNDExLDcuNTg4aDBaIi8+CiAgICAgIDxwYXRoIGNsYXNzPSJjbHMtMiIgZD0iTTM1OC40NzcsMTIzLjgzOWMtNi45MzMsMTQuODk1LTE0LjE4NSwyOS42MzQtMjEuNjg3LDQ0LjIzOS02Ljk4NiwxMy41OTktMzUuODAzLDcyLjYwMy00Ni43MDEsODMuNTY0LTEwLjUzOCwxMC41OTQtMjQuNzQ3LTIuODExLTE5LjM4MS0xNS4wOTYsMy4wNi02Ljk2OSw2Ljk5NC0xMy42OTcsMTAuODQ4LTIwLjI1MiwxLjQ0Ni0yLjQ2NywyNi45OTItNDYuNTYzLDI2LjE1Ni00OS41NzEtNi45OTQtMjUuMjU3LTEzLjk4NC01MC41MTMtMjAuOTcyLTc1Ljc3MmwyNC4xNzYtNy4xNTIsMTMuMzA2LDU0LjgyOGMxMS4xMjktMjQuODM4LDIyLjEwMi00OS43NSwzMy40MTYtNzQuNTA0LDMuNzIxLTguMTM3LDcuMDEyLTE3LjAxOSwxMS44MTQtMjQuNjA1LDcuOTU3LTEyLjU5NiwyNS43NDItLjc3MSwyMS42MTksMTEuOTYzbC0zMi41OTQsNzIuMzU4Ii8+CiAgICA8L2c+CiAgPC9nPgogIDxnPgogICAgPHBhdGggZD0iTTg0LjQxOSwzNjYuNjZoLTIwLjc4OXYzMy40NzloLTE4Ljg5OXYtOTQuNDk2aDQxLjMwOWMxNy44MTgsMCwzMi41MzQsOS44NTQsMzIuNTM0LDI5Ljk2OCwwLDIxLjg3LTE0LjU3OSwzMS4wNDktMzQuMTU0LDMxLjA0OVpNODUuMzY0LDMyNC4wMDNoLTIxLjczM3YyNC4yOTloMjIuMDAzYzguNzc2LDAsMTMuNS00LjA1MSwxMy41LTEyLjI4NXMtNS4zOTgtMTIuMDE0LTEzLjc3LTEyLjAxNFoiLz4KICAgIDxwYXRoIGQ9Ik0xMjkuNzgsNDAwLjEzOXYtOTQuNDk2aDE4Ljg5OXY3Ni4wMDJoNDcuMzg0djE4LjQ5NGgtNjYuMjgzWiIvPgogICAgPHBhdGggZD0iTTI3NC40NjYsNDAwLjEzOWwtNy40MjYtMjEuMDU5aC0zNC41NTlsLTcuNDI0LDIxLjA1OWgtMjAuMjVsMzYuMTgtOTQuNDk2aDE4LjM1OGwzNS45MDksOTQuNDk2aC0yMC43ODlaTTI1NC40ODcsMzQzLjk4MWMtMS44OTEtNS41MzQtMy43ODEtMTEuMjA1LTQuNzI2LTE0LjcxNS0uOTQ0LDMuNTEtMi44MzQsOS4xODEtNC43MjQsMTQuNzE1bC02LjA3NSwxNy4xNDVoMjEuNmwtNi4wNzQtMTcuMTQ1WiIvPgogICAgPHBhdGggZD0iTTM1My4xMTYsMzMzLjE4Yy0zLjM3NS02LjQ3OC04Ljc3NS0xMC4yNTgtMTcuMjc5LTEwLjI1OC0xNC4xNzUsMC0yMi4yNzMsMTIuNDE5LTIyLjI3MywyOS45NjgsMCwxNy4wMSw4LjIzMywyOS45NywyMi40MDgsMjkuOTcsOC41MDYsMCwxMy40OTktMy42NDQsMTguNDk0LTEyLjAxNmwxNS45Myw5LjQ1Yy02LjQ4LDEzLjM2NC0xNy44MTksMjEuMzI5LTM0Ljk2NCwyMS4zMjktMjQuNzAzLDAtNDEuMzA5LTE4Ljg5OC00MS4zMDktNDguNzMzLDAtMjguNzUzLDE3LjI3OS00OC43MzIsNDEuOTgzLTQ4LjczMiwxNy44MiwwLDI4LjYxOSw4LjY0LDM0LjU1OSwyMC45MjRsLTE3LjU0OSw4LjA5OVoiLz4KICAgIDxwYXRoIGQ9Ik0zODEuNTY3LDQwMC4xMzl2LTk0LjQ5Nmg2NS42MDd2MTguNDk0aC00Ni43MDd2MTYuMzM0aDI3LjEzM3YxOC4zNTloLTI3LjEzM3YyMi44MTRoNDguNzMzdjE4LjQ5NGgtNjcuNjMzWiIvPgogIDwvZz4KICA8Zz4KICAgIDxwYXRoIGNsYXNzPSJjbHMtMSIgZD0iTTE2OS41ODIsNDM4Ljk0djcuNTY3aDYuNjI4di03LjU2N2g1LjQ3OHYyMC40aC01LjQ3OHYtOC4wNWgtNi42Mjh2OC4wNWgtNS40Nzh2LTIwLjRoNS40NzhaIi8+CiAgICA8cGF0aCBjbGFzcz0iY2xzLTEiIGQ9Ik0yMDUuNzI2LDQ1OS42NzRjLTYuMzI2LDAtOS44MDctNC43NTMtOS44MDctMTAuNDEzLDAtNS45MzIsMy44NzQtMTAuNjUzLDEwLjE0LTEwLjY1Myw2LjU2OCwwLDkuODk3LDQuODcyLDkuODk3LDEwLjMyMSwwLDYuNTY4LTMuOTM1LDEwLjc0NS0xMC4yLDEwLjc0NWgtLjAzWk0yMDUuOTk4LDQ1NS4zNDZjMi42MzQsMCw0LjE3Ny0yLjU0Miw0LjE3Ny02LjIzNSwwLTMuNTEtMS41NzQtNi4xNzQtNC4yMzctNi4xNzQtMi42MzMsMC00LjIzNywyLjY2My00LjIzNyw2LjIwNC0uMDMsMy42NjMsMS42MDQsNi4yMDUsNC4yMzcsNi4yMDVoLjA2WiIvPgogICAgPHBhdGggY2xhc3M9ImNscy0xIiBkPSJNMjM0LjU2LDQ0My41NDJoLTUuMjA2di00LjYwMmgxNS45ODF2NC42MDJoLTUuMjk2djE1Ljc5OWgtNS40Nzh2LTE1Ljc5OVoiLz4KICAgIDxwYXRoIGNsYXNzPSJjbHMtMSIgZD0iTTI3Mi4zNjgsNDUxLjEwOGgtNy4zMjR2My43NTNoOC4yMDJ2NC40OGgtMTMuNjh2LTIwLjRoMTMuMjU3djQuNDhoLTcuNzc5djMuMjY5aDcuMzI0djQuNDE5WiIvPgogICAgPHBhdGggY2xhc3M9ImNscy0xIiBkPSJNMjg3LjYsNDM4Ljk0aDUuNDc4djE1LjgzaDcuODM5djQuNTdoLTEzLjMxN3YtMjAuNFoiLz4KICAgIDxwYXRoIGNsYXNzPSJjbHMtMSIgZD0iTTMxNi4xNzcsNDUzLjg5M2MxLjI0MS42MzYsMy4yMzksMS4yNzEsNS4yOTYsMS4yNzEsMS44NzcsMCwyLjc4NS0uNjM2LDIuNzg1LTEuNjY1LDAtLjk5OS0uOTA4LTEuNTQzLTMuMjA4LTIuMzMxLTMuNDUxLTEuMjQxLTUuNzUxLTMuMTE2LTUuNzUxLTYuMTQzLDAtMy42MDIsMy4wNTctNi4zODYsOC4yMDMtNi4zODYsMi40MjEsMCw0LjE3Ny40NTQsNS41MDksMS4wM2wtMS4xNSw0LjM4OGMtLjg3OC0uMzkzLTIuMzkxLS45NjgtNC40MTktLjk2OC0xLjY2NSwwLTIuNTczLjYwNS0yLjU3MywxLjUxMywwLDEuMDMsMS4wOSwxLjQyMiwzLjY2MywyLjM5MSwzLjY2MiwxLjM2Miw1LjI5NiwzLjI5OSw1LjI5Niw2LjE0MywwLDMuNTEyLTIuNzI0LDYuNTA3LTguNjg3LDYuNTA3LTIuNDUxLDAtNC44NDMtLjYzNi01Ljk5Mi0xLjI0bDEuMDI5LTQuNTFaIi8+CiAgPC9nPgogIDxwYXRoIGQ9Ik0yNDYuOTY2LDQxMS44ODljLTY2Ljk1NSwwLTEzMy45MTMsNi43NDMtMjAyLjIzNCwyMC4xODZ2Ny42NWM2OC40MTgtOS43MzksMTM1LjMyNi0xNC42MTMsMjAyLjIzNC0xNC42MTNzMTMzLjgxNiw0Ljg3NSwyMDIuMjMzLDE0LjYxM3YtNy42NWMtNjguMzItMTMuNDQzLTEzNS4yNzktMjAuMTg2LTIwMi4yMzMtMjAuMTg2WiIvPgogIDxwYXRoIGQ9Ik00NjUuNzU5LDMxNC44MzRjMCwzLjk5OS0zLjEzOSw3LjEzOC03LjIyNCw3LjEzOC00LjA0MiwwLTcuMjY3LTMuMTM5LTcuMjY3LTcuMTM4LDAtMy45MTMsMy4yMjUtNy4wNTIsNy4yNjctNy4wNTIsNC4wODUsMCw3LjIyNCwzLjEzOSw3LjIyNCw3LjA1MlpNNDUzLjA3NCwzMTQuODM0YzAsMy4xMzksMi4zMjIsNS42MzMsNS41MDQsNS42MzMsMy4wOTYsMCw1LjM3NS0yLjQ5NCw1LjM3NS01LjU5LDAtMy4xMzktMi4yNzktNS42NzYtNS40MTgtNS42NzZzLTUuNDYxLDIuNTM3LTUuNDYxLDUuNjMzWk00NTcuNDE3LDMxOC41MzJoLTEuNjM0di03LjA1MmMuNjQ1LS4xMjksMS41NDgtLjIxNSwyLjcwOS0uMjE1LDEuMzMzLDAsMS45MzUuMjE1LDIuNDUxLjUxNi4zODcuMzAxLjY4OC44Ni42ODgsMS41NDgsMCwuNzc0LS42MDIsMS4zNzYtMS40NjIsMS42MzR2LjA4NmMuNjg4LjI1OCwxLjA3NS43NzQsMS4yOSwxLjcyLjIxNSwxLjA3NS4zNDQsMS41MDUuNTE2LDEuNzYzaC0xLjc2M2MtLjIxNS0uMjU4LS4zNDQtLjkwMy0uNTU5LTEuNzItLjEyOS0uNzc0LS41NTktMS4xMTgtMS40NjItMS4xMThoLS43NzR2Mi44MzhaTTQ1Ny40NjEsMzE0LjUzM2guNzc0Yy45MDMsMCwxLjYzNC0uMzAxLDEuNjM0LTEuMDMyLDAtLjY0NS0uNDczLTEuMDc1LTEuNTA1LTEuMDc1LS40MywwLS43MzEuMDQzLS45MDMuMDg2djIuMDIxWiIvPgo8L3N2Zz4=" alt="My Place Hotels" style="height:44px; display:block; margin-bottom:12px;">
+  <h1><span style="color:#FFD080;font-size:13px;font-weight:400;display:block;letter-spacing:2px;text-transform:uppercase;margin-bottom:3px;">My Place Hotels</span>Member Rates Pilot <span class="pilot-badge">2025 PILOT</span></h1>
+  <div class="subtitle">Full-year performance report · Jan 1 – Dec 31, 2025 · Pilot launched Jun 7 (7 hotels) · Expanded Nov 13 (31 hotels)</div>
+</div>
+
+<div class="dashboard">
+
+  <!-- KPI CARDS -->
+  <div class="kpi-row" id="kpiRow"></div>
+
+  <!-- CHANNEL & MEMBER TYPE CHARTS -->
+  <div class="grid-2">
+    <div class="chart-card">
+      <h3>Net Revenue by Channel</h3>
+      <p class="chart-desc">Revenue split between PMS (property-booked) and Web (website-booked) booking channels.</p>
+      <div class="donut-container">
+        <canvas id="channelDonut" width="220" height="220"></canvas>
+        <div class="donut-legend" id="channelLegend"></div>
+      </div>
+    </div>
+    <div class="chart-card">
+      <h3>Net Reservations by Member Type</h3>
+      <p class="chart-desc">Reservation share split between returning Current Members and newly enrolled New Members.</p>
+      <div class="donut-container">
+        <canvas id="memberDonut" width="220" height="220"></canvas>
+        <div class="donut-legend" id="memberLegend"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- METRIC COMPARISON BARS -->
+  <div class="grid-3">
+    <div class="chart-card">
+      <h3>ADR Comparison</h3>
+      <p class="chart-desc">Average Daily Rate by channel and member type, showing rate differences between booking paths.</p>
+      <div id="adrBars"></div>
+    </div>
+    <div class="chart-card">
+      <h3>Revenue per Booking</h3>
+      <p class="chart-desc">Average net revenue per reservation across channels and member types — reflects stay length and rate combined.</p>
+      <div id="rpbBars"></div>
+    </div>
+    <div class="chart-card">
+      <h3>Avg Length of Stay</h3>
+      <p class="chart-desc">Mean number of nights per stay, segmented by booking channel and member type.</p>
+      <div id="losBars"></div>
+    </div>
+  </div>
+
+  <!-- NEW MEMBER SIGN-UPS WIDGET -->
+  <div class="chart-card" style="margin-bottom:24px;" id="newMemberWidget">
+    <h3>New Member Sign-Ups by Channel</h3>
+    <p class="chart-desc">Total new member enrollments generated through each booking channel during the pilot period.</p>
+    <div id="newMemberContent"></div>
+  </div>
+
+  <!-- CANCEL RATE & NEW VS CURRENT -->
+  <div class="grid-2">
+    <div class="chart-card">
+      <h3>Cancellation Rate by Channel & Type</h3>
+      <p class="chart-desc">Percentage of reservations that were cancelled, broken down by booking channel and member type.</p>
+      <div id="cancelBars"></div>
+    </div>
+    <div class="chart-card">
+      <h3>New Member vs Current Member — Key Metrics</h3>
+      <p class="chart-desc">Side-by-side comparison of ADR, revenue per booking, and length of stay between newly enrolled and returning members.</p>
+      <div id="newVsCurrent"></div>
+    </div>
+  </div>
+
+  <!-- HOTEL TABLE -->
+  <div class="table-container">
+    <div class="table-header-bar">
+      <div>
+        <h3>Hotel-by-Hotel Breakdown — PMS & Web by Member Type (All 31 Properties)</h3>
+        <p style="font-size:11px;color:rgba(255,255,255,0.55);font-style:italic;margin-top:3px;">Revenue, reservations, ADR, and length of stay for every pilot property — sortable by any column.</p>
+      </div>
+      <div class="sort-controls">
+        <button class="sort-btn active" onclick="sortTable('total_rev')">Total Revenue</button>
+        <button class="sort-btn" onclick="sortTable('pms_cm_rev')">PMS CM Rev</button>
+        <button class="sort-btn" onclick="sortTable('web_cm_rev')">Web CM Rev</button>
+        <button class="sort-btn" onclick="sortTable('name')">A–Z</button>
+      </div>
+    </div>
+    <div style="overflow-x:auto;">
+      <table>
+        <thead>
+          <tr class="super-header">
+            <th rowspan="2" onclick="sortTable('name')" style="vertical-align:bottom;">Property</th>
+            <th rowspan="2" onclick="sortTable('guests')" class="num" style="vertical-align:bottom;">Guests</th>
+            <th colspan="4" class="pms-header col-divider">PMS (Property)</th>
+            <th colspan="4" class="web-header col-divider">WEB (Website)</th>
+            <th colspan="4" class="summary-header col-divider">Totals</th>
+          </tr>
+          <tr>
+            <th onclick="sortTable('pms_cm_rev')" class="num group-pms col-divider">CM Rev</th>
+            <th onclick="sortTable('pms_nm_rev')" class="num group-pms">NM Rev</th>
+            <th onclick="sortTable('pms_cm_res')" class="num group-pms">CM Res</th>
+            <th onclick="sortTable('pms_nm_res')" class="num group-pms">NM Res</th>
+            <th onclick="sortTable('web_cm_rev')" class="num group-web col-divider">CM Rev</th>
+            <th onclick="sortTable('web_nm_rev')" class="num group-web">NM Rev</th>
+            <th onclick="sortTable('web_cm_res')" class="num group-web">CM Res</th>
+            <th onclick="sortTable('web_nm_res')" class="num group-web">NM Res</th>
+            <th onclick="sortTable('total_rev')" class="num group-summary col-divider">Revenue</th>
+            <th onclick="sortTable('total_res')" class="num group-summary">Res</th>
+            <th onclick="sortTable('net_adr')" class="num group-summary">ADR</th>
+            <th onclick="sortTable('rev_per_res')" class="num group-summary">RpR</th>
+          </tr>
+        </thead>
+        <tbody id="hotelTableBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<div class="footer">
+  Member Rates Pilot Dashboard · Data source: 2025 production reports · Rate codes: MEMBER RATE, MEMBER RATE HOTEL · Excludes cancelled reservations
+</div>
+
+<div class="tooltip" id="tooltip"></div>
+
+<script>
+// ===== DATA =====
+const summary = {
+  pms: { total: {guests:1305,gross_res:2018,net_res:1778,gross_rn:4271,net_rn:3810,gross_rev:419857,net_rev:370005,gross_adr:98.3,net_adr:97.11,net_rpb:269.27,net_los:2.87,cancel_rate:0.1189},
+         current: {guests:671,net_res:999,net_rn:2203,net_rev:210749,net_adr:95.66,net_rpb:268.06,net_los:2.89,cancel_rate:0.1151},
+         new_mem: {guests:677,net_res:779,net_rn:1607,net_rev:159256,net_adr:99.10,net_rpb:204.44,net_los:2.61,cancel_rate:0.0793}},
+  web: { total: {guests:1105,gross_res:1547,net_res:1305,gross_rn:2772,net_rn:2332,gross_rev:333993,net_rev:276177,gross_adr:120.49,net_adr:118.43,net_rpb:215.08,net_los:1.81,cancel_rate:0.1564},
+         current: {guests:632,net_res:780,net_rn:1433,net_rev:171081,net_adr:119.39,net_rpb:223.35,net_los:1.87,cancel_rate:0.154},
+         new_mem: {guests:503,net_res:525,net_rn:898,net_rev:105096,net_adr:117.03,net_rpb:200.18,net_los:1.73,cancel_rate:0.1412}},
+  grand: {guests:2371,gross_res:3565,net_res:3083,gross_rn:7043,net_rn:6142,gross_rev:753850,net_rev:646182,gross_adr:107.04,net_adr:105.21,net_rpb:246.33,net_los:2.42,cancel_rate:0.1352}
+};
+
+const hotels = [
+  {name:"Aberdeen, SD",guests:101,pms_cm_rev:20349,pms_cm_res:53,pms_nm_rev:11134,pms_nm_res:35,web_cm_rev:12467,web_cm_res:27,web_nm_rev:4166,web_nm_res:11,net_adr:182.95},
+  {name:"Anchorage, AK",guests:24,pms_cm_rev:602,pms_cm_res:3,pms_nm_rev:636,pms_nm_res:3,web_cm_rev:5691,web_cm_res:12,web_nm_rev:4747,web_nm_res:9,net_adr:163.38},
+  {name:"Atlanta West/Lithia Springs, GA",guests:11,pms_cm_rev:1004,pms_cm_res:3,pms_nm_rev:2513,pms_nm_res:4,web_cm_rev:637,web_cm_res:4,web_nm_rev:377,web_nm_res:2,net_adr:102.97},
+  {name:"Billings, MT",guests:52,pms_cm_rev:2135,pms_cm_res:15,pms_nm_rev:4587,pms_nm_res:30,web_cm_rev:1270,web_cm_res:11,web_nm_rev:567,web_nm_res:5,net_adr:92.72},
+  {name:"Bismarck, ND",guests:106,pms_cm_rev:5122,pms_cm_res:41,pms_nm_rev:6249,pms_nm_res:54,web_cm_rev:1507,web_cm_res:11,web_nm_rev:1787,web_nm_res:16,net_adr:85.98},
+  {name:"Boise/Nampa, ID",guests:129,pms_cm_rev:237,pms_cm_res:2,pms_nm_rev:0,pms_nm_res:0,web_cm_rev:11605,web_cm_res:70,web_nm_rev:13546,web_nm_res:67,net_adr:126.88},
+  {name:"Colorado Springs, CO",guests:102,pms_cm_rev:5829,pms_cm_res:46,pms_nm_rev:8851,pms_nm_res:52,web_cm_rev:3781,web_cm_res:15,web_nm_rev:3939,web_nm_res:22,net_adr:87.84},
+  {name:"Davenport/Quad Cities, IA",guests:85,pms_cm_rev:1545,pms_cm_res:15,pms_nm_rev:940,pms_nm_res:8,web_cm_rev:7167,web_cm_res:53,web_nm_rev:3652,web_nm_res:27,net_adr:94.93},
+  {name:"Dickinson, ND",guests:22,pms_cm_rev:756,pms_cm_res:6,pms_nm_rev:1202,pms_nm_res:7,web_cm_rev:321,web_cm_res:3,web_nm_rev:1355,web_nm_res:11,net_adr:78.62},
+  {name:"Fargo, ND",guests:27,pms_cm_rev:2244,pms_cm_res:14,pms_nm_rev:174,pms_nm_res:1,web_cm_rev:4746,web_cm_res:16,web_nm_rev:1331,web_nm_res:7,net_adr:104.88},
+  {name:"Fort Pierre, SD",guests:54,pms_cm_rev:2939,pms_cm_res:13,pms_nm_rev:5476,pms_nm_res:26,web_cm_rev:5025,web_cm_res:16,web_nm_rev:1287,web_nm_res:3,net_adr:144.38},
+  {name:"Grand Forks, ND",guests:9,pms_cm_rev:4041,pms_cm_res:3,pms_nm_rev:316,pms_nm_res:3,web_cm_rev:183,web_cm_res:2,web_nm_rev:924,web_nm_res:3,net_adr:101.18},
+  {name:"Grand Rapids, MN",guests:17,pms_cm_rev:1082,pms_cm_res:6,pms_nm_rev:823,pms_nm_res:3,web_cm_rev:782,web_cm_res:5,web_nm_rev:1471,web_nm_res:5,net_adr:153.97},
+  {name:"Indianapolis Airport, IN",guests:39,pms_cm_rev:3090,pms_cm_res:8,pms_nm_rev:901,pms_nm_res:8,web_cm_rev:1954,web_cm_res:13,web_nm_rev:1307,web_nm_res:14,net_adr:86.33},
+  {name:"Jacksonville/Camp Lejeune, NC",guests:344,pms_cm_rev:51137,pms_cm_res:299,pms_nm_rev:31723,pms_nm_res:215,web_cm_rev:19519,web_cm_res:94,web_nm_rev:9345,web_nm_res:58,net_adr:79.88},
+  {name:"Jamestown, ND",guests:40,pms_cm_rev:780,pms_cm_res:6,pms_nm_rev:2522,pms_nm_res:16,web_cm_rev:2436,web_cm_res:11,web_nm_rev:1916,web_nm_res:15,net_adr:107.34},
+  {name:"Kalispell, MT",guests:244,pms_cm_rev:25443,pms_cm_res:66,pms_nm_rev:26856,pms_nm_res:98,web_cm_rev:27372,web_cm_res:102,web_nm_rev:19160,web_nm_res:79,net_adr:101.83},
+  {name:"Kansas City East, MO",guests:80,pms_cm_rev:5689,pms_cm_res:27,pms_nm_rev:8264,pms_nm_res:46,web_cm_rev:1717,web_cm_res:18,web_nm_rev:5326,web_nm_res:16,net_adr:93.79},
+  {name:"Ketchikan, AK",guests:64,pms_cm_rev:11276,pms_cm_res:42,pms_nm_rev:4849,pms_nm_res:14,web_cm_rev:5909,web_cm_res:14,web_nm_rev:1642,web_nm_res:6,net_adr:175.38},
+  {name:"Loveland, CO",guests:18,pms_cm_rev:906,pms_cm_res:6,pms_nm_rev:5045,pms_nm_res:8,web_cm_rev:404,web_cm_res:4,web_nm_rev:505,web_nm_res:3,net_adr:93.98},
+  {name:"Marion, OH",guests:34,pms_cm_rev:2161,pms_cm_res:13,pms_nm_rev:352,pms_nm_res:4,web_cm_rev:3348,web_cm_res:16,web_nm_rev:3082,web_nm_res:13,net_adr:95.34},
+  {name:"Phoenix West/Buckeye, AZ",guests:277,pms_cm_rev:23290,pms_cm_res:97,pms_nm_rev:32105,pms_nm_res:153,web_cm_rev:16818,web_cm_res:45,web_nm_rev:10066,web_nm_res:48,net_adr:130.45},
+  {name:"Pittsburgh North/Monaca, PA",guests:16,pms_cm_rev:1307,pms_cm_res:7,pms_nm_rev:287,pms_nm_res:3,web_cm_rev:1049,web_cm_res:5,web_nm_rev:88,web_nm_res:1,net_adr:88.11},
+  {name:"Portland East, OR",guests:32,pms_cm_rev:2003,pms_cm_res:13,pms_nm_rev:950,pms_nm_res:5,web_cm_rev:2457,web_cm_res:16,web_nm_rev:1524,web_nm_res:5,net_adr:93.71},
+  {name:"Redding, CA",guests:26,pms_cm_rev:2937,pms_cm_res:6,pms_nm_rev:5693,pms_nm_res:15,web_cm_rev:1090,web_cm_res:4,web_nm_rev:716,web_nm_res:4,net_adr:137.31},
+  {name:"Sioux Falls, SD",guests:33,pms_cm_rev:3181,pms_cm_res:23,pms_nm_rev:95,pms_nm_res:1,web_cm_rev:1178,web_cm_res:12,web_nm_rev:357,web_nm_res:4,net_adr:94.61},
+  {name:"Tucson North-Marana, AZ",guests:88,pms_cm_rev:5168,pms_cm_res:26,pms_nm_rev:9294,pms_nm_res:33,web_cm_rev:6183,web_cm_res:31,web_nm_rev:2039,web_nm_res:15,net_adr:99.49},
+  {name:"Tucson South, AZ",guests:100,pms_cm_rev:3162,pms_cm_res:27,pms_nm_rev:4896,pms_nm_res:32,web_cm_rev:6800,web_cm_res:44,web_nm_rev:2575,web_nm_res:18,net_adr:97.43},
+  {name:"Vancouver, WA",guests:93,pms_cm_rev:11714,pms_cm_res:56,pms_nm_rev:5060,pms_nm_res:28,web_cm_rev:4101,web_cm_res:20,web_nm_rev:732,web_nm_res:6,net_adr:94.77},
+  {name:"Watertown, SD",guests:121,pms_cm_rev:4817,pms_cm_res:34,pms_nm_rev:2001,pms_nm_res:16,web_cm_rev:11497,web_cm_res:71,web_nm_rev:7165,web_nm_res:39,net_adr:104.36},
+  {name:"Wixom/Novi/Detroit, MI",guests:41,pms_cm_rev:4806,pms_cm_res:23,pms_nm_rev:0,pms_nm_res:0,web_cm_rev:2068,web_cm_res:15,web_nm_rev:1332,web_nm_res:9,net_adr:87.3}
+];
+
+// ===== KPI CARDS =====
+function renderKPIs() {
+  const g = summary.grand;
+  const kpis = [
+    {label:'Net Revenue', value:'$'+fmt(g.net_rev), sub:`<span class="pms">PMS $${fmt(summary.pms.total.net_rev)}</span> · <span class="web">Web $${fmt(summary.web.total.net_rev)}</span>`},
+    {label:'Net Reservations', value:fmt(g.net_res), sub:`<span class="pms">PMS ${fmt(summary.pms.total.net_res)}</span> · <span class="web">Web ${fmt(summary.web.total.net_res)}</span>`},
+    {label:'Total Guests', value:fmt(g.guests), sub:`<span class="pms">PMS ${fmt(summary.pms.total.guests)}</span> · <span class="web">Web ${fmt(summary.web.total.guests)}</span>`},
+    {label:'Net ADR', value:'$'+g.net_adr.toFixed(2), sub:`<span class="pms">PMS $${summary.pms.total.net_adr.toFixed(2)}</span> · <span class="web">Web $${summary.web.total.net_adr.toFixed(2)}</span>`},
+    {label:'Rev per Reservation', value:'$'+(g.net_rev/g.net_res).toFixed(2), sub:`<span class="pms">PMS $${(summary.pms.total.net_rev/summary.pms.total.net_res).toFixed(2)}</span> · <span class="web">Web $${(summary.web.total.net_rev/summary.web.total.net_res).toFixed(2)}</span>`},
+    {label:'Cancel Rate', value:(g.cancel_rate*100).toFixed(1)+'%', sub:`<span class="pms">PMS ${(summary.pms.total.cancel_rate*100).toFixed(1)}%</span> · <span class="web">Web ${(summary.web.total.cancel_rate*100).toFixed(1)}%</span>`}
+  ];
+  document.getElementById('kpiRow').innerHTML = kpis.map(k=>`
+    <div class="kpi-card">
+      <div class="kpi-label">${k.label}</div>
+      <div class="kpi-value">${k.value}</div>
+      <div class="kpi-sub">${k.sub}</div>
+    </div>`).join('');
+}
+
+// ===== DONUT CHARTS =====
+function drawDonut(canvasId, data, colors) {
+  const canvas = document.getElementById(canvasId);
+  const ctx = canvas.getContext('2d');
+  const cx = canvas.width/2, cy = canvas.height/2, r = 90, inner = 68;
+  const total = data.reduce((s,d)=>s+d.value,0);
+  let start = -Math.PI/2;
+
+  data.forEach((d,i) => {
+    const angle = (d.value/total)*Math.PI*2;
+    ctx.beginPath();
+    ctx.arc(cx, cy, r, start, start+angle);
+    ctx.arc(cx, cy, inner, start+angle, start, true);
+    ctx.closePath();
+    ctx.fillStyle = colors[i];
+    ctx.fill();
+    start += angle;
+  });
+
+  // Center text
+  ctx.fillStyle = '#1C355E';
+  ctx.font = 'bold 22px Arial';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('$'+fmt(total), cx, cy-8);
+  ctx.font = '11px Arial';
+  ctx.fillStyle = '#5A6B84';
+  ctx.fillText('NET REVENUE', cx, cy+13);
+}
+
+function renderChannelDonut() {
+  const data = [
+    {label:'PMS (Property)', value: summary.pms.total.net_rev},
+    {label:'Web', value: summary.web.total.net_rev}
+  ];
+  const colors = ['#1C355E','#2E8B57'];
+  drawDonut('channelDonut', data, colors);
+
+  const total = data.reduce((s,d)=>s+d.value,0);
+  document.getElementById('channelLegend').innerHTML = data.map((d,i)=>`
+    <div class="legend-item">
+      <div class="legend-dot" style="background:${colors[i]}"></div>
+      <span>${d.label}</span>
+      <span class="legend-value">$${fmt(d.value)} (${(d.value/total*100).toFixed(1)}%)</span>
+    </div>`).join('');
+}
+
+function renderMemberDonut() {
+  const curr = summary.pms.current.guests + summary.web.current.guests;
+  const newm = summary.pms.new_mem.guests + summary.web.new_mem.guests;
+  const data = [
+    {label:'Current Members', value: curr},
+    {label:'New Members', value: newm}
+  ];
+  const colors = ['#1C355E','#2E8B57'];
+
+  const canvas = document.getElementById('memberDonut');
+  const ctx = canvas.getContext('2d');
+  const cx = canvas.width/2, cy = canvas.height/2, r = 90, inner = 68;
+  const total = data.reduce((s,d)=>s+d.value,0);
+  let start = -Math.PI/2;
+
+  data.forEach((d,i) => {
+    const angle = (d.value/total)*Math.PI*2;
+    ctx.beginPath();
+    ctx.arc(cx, cy, r, start, start+angle);
+    ctx.arc(cx, cy, inner, start+angle, start, true);
+    ctx.closePath();
+    ctx.fillStyle = colors[i];
+    ctx.fill();
+    start += angle;
+  });
+
+  ctx.fillStyle = '#1C355E';
+  ctx.font = 'bold 22px Arial';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(fmt(total), cx, cy-8);
+  ctx.font = '11px Arial';
+  ctx.fillStyle = '#5A6B84';
+  ctx.fillText('NET RESERVATIONS', cx, cy+13);
+
+  document.getElementById('memberLegend').innerHTML = data.map((d,i)=>`
+    <div class="legend-item">
+      <div class="legend-dot" style="background:${colors[i]}"></div>
+      <span>${d.label}</span>
+      <span class="legend-value">${fmt(d.value)} (${(d.value/total*100).toFixed(1)}%)</span>
+    </div>`).join('');
+}
+
+// ===== BAR CHARTS =====
+function renderBars(containerId, items, maxVal, prefix='', suffix='') {
+  const colors = {'PMS — Current Member':'#1C355E','PMS — New Member':'#4A72A8','PMS — Total':'#1C355E',
+                   'Web — Current Member':'#2E8B57','Web — New Member':'#5AB87E','Web — Total':'#2E8B57'};
+  document.getElementById(containerId).innerHTML = items.map(d => {
+    const pct = (d.value/maxVal*100).toFixed(1);
+    const color = colors[d.label] || '#1C355E';
+    return `<div class="bar-group">
+      <div class="bar-label"><span>${d.label}</span><span>${prefix}${d.value.toFixed(2)}${suffix}</span></div>
+      <div class="bar-track"><div class="bar-fill" style="width:${pct}%;background:${color}"></div></div>
+    </div>`;
+  }).join('');
+}
+
+function renderMetricBars() {
+  const p = summary.pms, w = summary.web;
+
+  // ADR
+  const adrItems = [
+    {label:'PMS — Current Member', value: p.current.net_adr},
+    {label:'PMS — New Member', value: p.new_mem.net_adr},
+    {label:'Web — Current Member', value: w.current.net_adr},
+    {label:'Web — New Member', value: w.new_mem.net_adr}
+  ];
+  renderBars('adrBars', adrItems, 130, '$');
+
+  // RpB
+  const rpbItems = [
+    {label:'PMS — Current Member', value: p.current.net_rpb},
+    {label:'PMS — New Member', value: p.new_mem.net_rpb},
+    {label:'Web — Current Member', value: w.current.net_rpb},
+    {label:'Web — New Member', value: w.new_mem.net_rpb}
+  ];
+  renderBars('rpbBars', rpbItems, 300, '$');
+
+  // LoS
+  const losItems = [
+    {label:'PMS — Current Member', value: p.current.net_los},
+    {label:'PMS — New Member', value: p.new_mem.net_los},
+    {label:'Web — Current Member', value: w.current.net_los},
+    {label:'Web — New Member', value: w.new_mem.net_los}
+  ];
+  renderBars('losBars', losItems, 3.5, '', ' nights');
+}
+
+// Cancel rate bars
+function renderCancelBars() {
+  const p = summary.pms, w = summary.web;
+  const items = [
+    {label:'PMS — Current Member', value: p.current.cancel_rate*100},
+    {label:'PMS — New Member', value: p.new_mem.cancel_rate*100},
+    {label:'Web — Current Member', value: w.current.cancel_rate*100},
+    {label:'Web — New Member', value: w.new_mem.cancel_rate*100}
+  ];
+  const maxVal = 25;
+  const colors = {'PMS — Current Member':'#1C355E','PMS — New Member':'#4A72A8','Web — Current Member':'#2E8B57','Web — New Member':'#5AB87E'};
+  document.getElementById('cancelBars').innerHTML = items.map(d => {
+    const pct = (d.value/maxVal*100).toFixed(1);
+    const color = colors[d.label] || '#1C355E';
+    return `<div class="bar-group">
+      <div class="bar-label"><span>${d.label}</span><span>${d.value.toFixed(1)}%</span></div>
+      <div class="bar-track"><div class="bar-fill" style="width:${pct}%;background:${color}"></div></div>
+    </div>`;
+  }).join('');
+}
+
+// New Member Sign-Ups Widget
+function renderNewMemberWidget() {
+  const p = summary.pms.new_mem;
+  const w = summary.web.new_mem;
+  const totalSignups = p.guests + w.guests;
+  const totalRes = p.net_res + w.net_res;
+  const totalRev = p.net_rev + w.net_rev;
+  const pmsPct = (p.guests / totalSignups * 100).toFixed(1);
+  const webPct = (w.guests / totalSignups * 100).toFixed(1);
+
+  document.getElementById('newMemberContent').innerHTML = `
+    <div style="display:grid;grid-template-columns:1fr 2fr 1fr;gap:24px;align-items:center;">
+      <div style="text-align:center;padding:16px;background:#E4EAF3;border-radius:10px;border:1px solid var(--border);">
+        <div style="font-size:11px;text-transform:uppercase;letter-spacing:0.8px;color:var(--accent);font-weight:600;margin-bottom:8px;">PMS (Property)</div>
+        <div style="font-size:36px;font-weight:700;color:var(--accent);letter-spacing:-1px;">${fmt(p.guests)}</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:4px;">New Member Sign-Ups</div>
+        <div style="margin-top:12px;display:flex;justify-content:space-around;">
+          <div style="text-align:center;">
+            <div style="font-size:14px;font-weight:600;">${fmt(p.net_res)}</div>
+            <div style="font-size:10px;color:var(--muted);">Reservations</div>
+          </div>
+          <div style="text-align:center;">
+            <div style="font-size:14px;font-weight:600;">$${fmt(p.net_rev)}</div>
+            <div style="font-size:10px;color:var(--muted);">Net Revenue</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="text-align:center;">
+        <div style="font-size:11px;text-transform:uppercase;letter-spacing:0.8px;color:var(--muted);font-weight:600;margin-bottom:6px;">Total New Member Sign-Ups</div>
+        <div style="font-size:48px;font-weight:700;letter-spacing:-2px;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;">${fmt(totalSignups)}</div>
+        <div style="font-size:13px;color:var(--muted);margin-top:2px;">${fmt(totalRes)} reservations · $${fmt(totalRev)} net revenue</div>
+        <div style="margin-top:14px;">
+          <div style="height:12px;border-radius:6px;overflow:hidden;display:flex;background:#D0D8E8;">
+            <div style="width:${pmsPct}%;background:var(--accent);transition:width 0.8s ease;"></div>
+            <div style="width:${webPct}%;background:var(--accent2);transition:width 0.8s ease;"></div>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--muted);margin-top:4px;">
+            <span style="color:var(--accent);">▌ PMS ${pmsPct}%</span>
+            <span style="color:var(--accent2);">WEB (Website) ${webPct}% ▌</span>
+          </div>
+        </div>
+      </div>
+
+      <div style="text-align:center;padding:16px;background:#E4EAF3;border-radius:10px;border:1px solid var(--border);">
+        <div style="font-size:11px;text-transform:uppercase;letter-spacing:0.8px;color:var(--accent2);font-weight:600;margin-bottom:8px;">WEB (Website)</div>
+        <div style="font-size:36px;font-weight:700;color:var(--accent2);letter-spacing:-1px;">${fmt(w.guests)}</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:4px;">New Member Sign-Ups</div>
+        <div style="margin-top:12px;display:flex;justify-content:space-around;">
+          <div style="text-align:center;">
+            <div style="font-size:14px;font-weight:600;">${fmt(w.net_res)}</div>
+            <div style="font-size:10px;color:var(--muted);">Reservations</div>
+          </div>
+          <div style="text-align:center;">
+            <div style="font-size:14px;font-weight:600;">$${fmt(w.net_rev)}</div>
+            <div style="font-size:10px;color:var(--muted);">Net Revenue</div>
+          </div>
+        </div>
+      </div>
+    </div>`;
+}
+
+// New vs Current comparison
+function renderNewVsCurrent() {
+  const currRev = summary.pms.current.net_rev + summary.web.current.net_rev;
+  const newRev = summary.pms.new_mem.net_rev + summary.web.new_mem.net_rev;
+  const currRes = summary.pms.current.net_res + summary.web.current.net_res;
+  const newRes = summary.pms.new_mem.net_res + summary.web.new_mem.net_res;
+  const currGuests = summary.pms.current.guests + summary.web.current.guests;
+  const newGuests = summary.pms.new_mem.guests + summary.web.new_mem.guests;
+
+  const metrics = [
+    {label:'Net Revenue', current:'$'+fmt(currRev), new_m:'$'+fmt(newRev), currPct: currRev/(currRev+newRev)*100, newPct: newRev/(currRev+newRev)*100},
+    {label:'Net Reservations', current:fmt(currRes), new_m:fmt(newRes), currPct: currRes/(currRes+newRes)*100, newPct: newRes/(currRes+newRes)*100},
+    {label:'Guests', current:fmt(currGuests), new_m:fmt(newGuests), currPct: currGuests/(currGuests+newGuests)*100, newPct: newGuests/(currGuests+newGuests)*100}
+  ];
+
+  document.getElementById('newVsCurrent').innerHTML = metrics.map(m => `
+    <div class="bar-group">
+      <div class="bar-label"><span>${m.label}</span><span style="color:var(--accent)">Current Member: ${m.current}</span></div>
+      <div class="bar-track" style="display:flex">
+        <div style="width:${m.currPct}%;background:#1C355E;height:100%;border-radius:6px 0 0 6px;"></div>
+        <div style="width:${m.newPct}%;background:#2E8B57;height:100%;border-radius:0 6px 6px 0;"></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--muted);margin-top:2px;">
+        <span>Current Member ${m.currPct.toFixed(0)}%</span>
+        <span style="color:var(--accent2)">New Member: ${m.new_m} (${m.newPct.toFixed(0)}%)</span>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ===== HOTEL TABLE =====
+// Add computed total_rev to each hotel
+// Add computed totals to each hotel
+hotels.forEach(h => {
+  h.total_rev = h.pms_cm_rev + h.pms_nm_rev + h.web_cm_rev + h.web_nm_rev;
+  h.total_res = h.pms_cm_res + h.pms_nm_res + h.web_cm_res + h.web_nm_res;
+  h.rev_per_res = h.total_res > 0 ? h.total_rev / h.total_res : 0;
+});
+
+let currentSort = 'total_rev';
+let sortDir = 'desc';
+
+function sortTable(field) {
+  document.querySelectorAll('.sort-btn').forEach(b => b.classList.remove('active'));
+  const btn = event?.target;
+  if (btn?.classList) btn.classList.add('active');
+
+  if (currentSort === field) sortDir = sortDir === 'desc' ? 'asc' : 'desc';
+  else { currentSort = field; sortDir = field === 'name' ? 'asc' : 'desc'; }
+
+  renderHotelTable();
+}
+
+function renderHotelTable() {
+  const sorted = [...hotels].sort((a,b) => {
+    let va = a[currentSort], vb = b[currentSort];
+    if (currentSort === 'name') { return sortDir === 'asc' ? va.localeCompare(vb) : vb.localeCompare(va); }
+    return sortDir === 'desc' ? vb - va : va - vb;
+  });
+
+  // Use authoritative summary totals (matches KPI cards) for the TOTALS row
+  const g = summary.grand;
+  const t = {
+    guests: g.guests,
+    pms_cm_rev: summary.pms.current.net_rev,
+    pms_nm_rev: summary.pms.new_mem.net_rev,
+    pms_cm_res: summary.pms.current.net_res,
+    pms_nm_res: summary.pms.new_mem.net_res,
+    web_cm_rev: summary.web.current.net_rev,
+    web_nm_rev: summary.web.new_mem.net_rev,
+    web_cm_res: summary.web.current.net_res,
+    web_nm_res: summary.web.new_mem.net_res,
+    total_rev: g.net_rev,
+    total_res: g.net_res
+  };
+  const t_adr = g.net_adr;
+  const t_rpr = g.net_res > 0 ? g.net_rev / g.net_res : 0;
+
+  document.getElementById('hotelTableBody').innerHTML = sorted.map(h => {
+    return `<tr>
+      <td class="hotel-name">${h.name}</td>
+      <td class="num">${fmt(h.guests)}</td>
+      <td class="num pms-col col-divider">$${fmt(h.pms_cm_rev)}</td>
+      <td class="num pms-col">$${fmt(h.pms_nm_rev)}</td>
+      <td class="num pms-col">${fmt(h.pms_cm_res)}</td>
+      <td class="num pms-col">${fmt(h.pms_nm_res)}</td>
+      <td class="num web-col col-divider">$${fmt(h.web_cm_rev)}</td>
+      <td class="num web-col">$${fmt(h.web_nm_rev)}</td>
+      <td class="num web-col">${fmt(h.web_cm_res)}</td>
+      <td class="num web-col">${fmt(h.web_nm_res)}</td>
+      <td class="num summary-col col-divider" style="font-weight:600">$${fmt(h.total_rev)}</td>
+      <td class="num summary-col">${fmt(h.total_res)}</td>
+      <td class="num summary-col">$${h.net_adr.toFixed(2)}</td>
+      <td class="num summary-col" style="font-weight:600">$${h.rev_per_res.toFixed(2)}</td>
+    </tr>`;
+  }).join('') + `<tr style="font-weight:700;background:#1C355E;border-top:2px solid #FF5F00;">
+      <td style="color:#fff;">TOTALS</td>
+      <td class="num" style="color:#fff;">${fmt(t.guests)}</td>
+      <td class="num col-divider" style="color:#fff;">$${fmt(t.pms_cm_rev)}</td>
+      <td class="num" style="color:#fff;">$${fmt(t.pms_nm_rev)}</td>
+      <td class="num" style="color:#fff;">${fmt(t.pms_cm_res)}</td>
+      <td class="num" style="color:#fff;">${fmt(t.pms_nm_res)}</td>
+      <td class="num col-divider" style="color:#fff;">$${fmt(t.web_cm_rev)}</td>
+      <td class="num" style="color:#fff;">$${fmt(t.web_nm_rev)}</td>
+      <td class="num" style="color:#fff;">${fmt(t.web_cm_res)}</td>
+      <td class="num" style="color:#fff;">${fmt(t.web_nm_res)}</td>
+      <td class="num col-divider" style="color:#fff;">$${fmt(t.total_rev)}</td>
+      <td class="num" style="color:#fff;">${fmt(t.total_res)}</td>
+      <td class="num" style="color:#fff;">$${t_adr.toFixed(2)}</td>
+      <td class="num" style="color:#fff;">$${t_rpr.toFixed(2)}</td>
+    </tr>`;
+}
+
+// ===== UTILS =====
+function fmt(n) {
+  if (n >= 1000) return n.toLocaleString('en-US', {maximumFractionDigits:0});
+  return n.toString();
+}
+
+// ===== INIT =====
+renderKPIs();
+renderChannelDonut();
+renderMemberDonut();
+renderMetricBars();
+renderNewMemberWidget();
+renderCancelBars();
+renderNewVsCurrent();
+renderHotelTable();
+</script>
+</body>
+</html>

@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Channel Performance — 2026 YTD vs 2025</title>
+<style>
+  :root {
+    --bg:#EEF1F6; --card:#FFFFFF; --border:#D0D8E8;
+    --text:#1C355E; --muted:#5A6B84; --navy:#1C355E;
+    --orange:#FF5F00; --green:#2E8B57;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:Arial,'Helvetica Neue',Helvetica,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+
+  .brand-bar{background:#FF5F00;height:5px;}
+  .header{padding:22px 32px 16px;background:#1C355E;border-bottom:3px solid #FF5F00;}
+  .header-inner{display:flex;justify-content:space-between;align-items:flex-start;}
+  .header h1{font-size:22px;font-weight:700;color:#FFFFFF;}
+  .header-eyebrow{font-size:13px;font-weight:400;color:#FFD080;display:block;letter-spacing:2px;text-transform:uppercase;margin-bottom:3px;}
+  .header .subtitle{color:rgba(255,255,255,0.70);font-size:13px;margin-top:4px;}
+  .ytd-badge{background:linear-gradient(135deg,#2E8B57,#1a6640);color:#fff;font-size:11px;font-weight:700;padding:3px 12px;border-radius:12px;margin-top:6px;display:inline-block;}
+  .update-badge{font-size:10px;color:rgba(255,255,255,0.55);margin-top:4px;}
+
+  .dashboard{padding:22px 32px;max-width:1600px;margin:0 auto;}
+
+  .kpi-row{display:grid;grid-template-columns:repeat(6,1fr);gap:14px;margin-bottom:22px;}
+  .kpi-card{background:var(--card);border:1px solid var(--border);border-top:3px solid #1C355E;border-radius:8px;padding:16px;box-shadow:0 1px 4px rgba(28,53,94,0.07);}
+  .kpi-card.accent{border-top-color:#FF5F00;}
+  .kpi-card.green{border-top-color:#2E8B57;}
+  .kpi-label{font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);font-weight:700;margin-bottom:6px;}
+  .kpi-value{font-size:24px;font-weight:700;color:#1C355E;}
+  .kpi-sub{font-size:11px;color:var(--muted);margin-top:4px;}
+  .kpi-yoy{font-size:11px;margin-top:5px;}
+
+  .chart-card{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:18px 20px;box-shadow:0 1px 4px rgba(28,53,94,0.06);margin-bottom:22px;}
+  .chart-card h3{font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.6px;border-bottom:2px solid #FF5F00;padding-bottom:8px;margin-bottom:8px;}
+  .chart-desc{font-size:11px;color:var(--muted);margin-bottom:14px;line-height:1.5;}
+
+  .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:22px;}
+
+  .donut-wrap{display:flex;align-items:center;gap:20px;}
+  .donut-legend{flex:1;}
+  .leg-item{display:flex;align-items:center;gap:7px;margin-bottom:7px;font-size:12px;}
+  .leg-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+  .leg-val{margin-left:auto;font-weight:700;font-size:12px;color:#1C355E;}
+
+  .hbar-group{margin-bottom:10px;}
+  .hbar-label{font-size:11px;color:var(--text);margin-bottom:3px;display:flex;justify-content:space-between;}
+  .hbar-track{height:20px;background:#E4EAF3;border-radius:5px;overflow:hidden;}
+  .hbar-fill{height:100%;border-radius:5px;display:flex;align-items:center;padding-left:7px;font-size:10px;font-weight:700;color:white;}
+
+  .tbl-wrap{overflow-x:auto;}
+  table{width:100%;border-collapse:collapse;font-size:11px;}
+  thead th{text-align:right;background:#1C355E;color:#fff;font-weight:700;padding:7px 9px;white-space:nowrap;position:sticky;top:0;}
+  thead th:first-child{text-align:left;position:sticky;left:0;z-index:2;background:#1C355E;}
+  thead th.month-hdr{font-size:10px;}
+  tbody td{padding:6px 9px;text-align:right;border-bottom:1px solid var(--border);white-space:nowrap;color:#1C355E;}
+  tbody td:first-child{text-align:left;font-weight:700;position:sticky;left:0;background:var(--card);z-index:1;}
+  tbody tr:nth-child(even) td{background:#F5F8FC;}
+  tbody tr:nth-child(even) td:first-child{background:#F5F8FC;}
+  tbody tr:hover td{background:#E8F0FA;}
+  tbody tr.total-row td{background:#1C355E;color:#fff;font-weight:700;}
+  tbody tr.total-row td:first-child{background:#1C355E;}
+
+  .yoy-bar-group{margin-bottom:12px;}
+  .yoy-bar-label{font-size:11px;color:var(--text);margin-bottom:4px;display:flex;justify-content:space-between;align-items:center;}
+  .yoy-bar-row{display:flex;gap:4px;align-items:center;margin-bottom:3px;}
+  .yoy-bar-pill{font-size:9px;font-weight:700;color:var(--muted);min-width:32px;text-align:right;margin-right:4px;}
+  .bar-26{height:14px;border-radius:3px;background:#1C355E;min-width:2px;}
+  .bar-25{height:14px;border-radius:3px;background:#FF5F00;opacity:0.65;min-width:2px;}
+
+  .legend-chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px;align-items:center;}
+  .chip{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text);background:var(--card);border:1px solid var(--border);border-radius:12px;padding:3px 10px;cursor:pointer;user-select:none;transition:all 0.15s;}
+  .chip .chip-dot{width:8px;height:8px;border-radius:50%;}
+  .chip.inactive{opacity:0.35;}
+  .chip-ctrl{display:flex;align-items:center;gap:5px;margin-right:6px;border-right:1px solid var(--border);padding-right:10px;}
+  .ctrl-btn{font-size:10px;font-weight:700;padding:3px 10px;border-radius:12px;cursor:pointer;border:1px solid var(--border);background:var(--card);color:var(--muted);transition:all 0.15s;white-space:nowrap;}
+  .ctrl-btn:hover{background:#1C355E;color:#fff;border-color:#1C355E;}
+  .solo-label{font-size:10px;font-weight:700;color:#FF5F00;padding:3px 10px;border-radius:12px;background:rgba(255,95,0,0.08);border:1px solid rgba(255,95,0,0.3);display:none;}
+  .solo-label.visible{display:inline-flex;align-items:center;gap:5px;}
+
+  .year-legend{display:flex;gap:16px;margin-bottom:14px;font-size:11px;font-weight:700;}
+  .yl-item{display:flex;align-items:center;gap:5px;}
+  .yl-swatch{width:28px;height:10px;border-radius:3px;}
+
+  .footer{text-align:center;padding:18px 32px;border-top:3px solid #FF5F00;background:#1C355E;color:rgba(255,255,255,0.6);font-size:11px;}
+
+  @media(max-width:1100px){
+    .kpi-row{grid-template-columns:repeat(3,1fr);}
+    .grid-2{grid-template-columns:1fr;}
+  }
+</style>
+</head>
+<body>
+
+<div class="brand-bar"></div>
+<div class="header">
+  <div style="margin-bottom:10px;">
+    <a href="index.html" style="display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3);color:rgba(255,255,255,0.85);font-size:11px;font-weight:700;padding:6px 14px;border-radius:20px;text-decoration:none;font-family:Arial,sans-serif;" onmouseover="this.style.background='rgba(255,95,0,0.7)'" onmouseout="this.style.background='rgba(255,255,255,0.15)'">&#8592; Dashboard Portal</a>
+  </div>
+  <img src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyBpZD0iTXlfUGxhY2VfSG90ZWxzX0xvZ28iIGRhdGEtbmFtZT0iTXkgUGxhY2UgSG90ZWxzIExvZ28iIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgdmlld0JveD0iMCAwIDQ5My45MzEgNDg4LjQ2OCI+CiAgPGRlZnM+CiAgICA8c3R5bGU+CiAgICAgIC5jbHMtMSB7CiAgICAgICAgZmlsbDogI2UxMWIyMjsKICAgICAgfQoKICAgICAgLmNscy0yIHsKICAgICAgICBmaWxsOiAjZmZmOwogICAgICB9CgogICAgICAuY2xzLTMgewogICAgICAgIGZpbGw6ICNmZDA7CiAgICAgIH0KICAgIDwvc3R5bGU+CiAgPC9kZWZzPgogIDxnPgogICAgPHBhdGggY2xhc3M9ImNscy0zIiBkPSJNMjQ2Ljk2Niw0ODAuOTY2Yy03Mi4xNiwwLTE0My41MjUtNS41MTgtMjE4LjE4NS0xNi44NzJsLTUuNDkxLS44MzUtLjgwMy01LjQ5OEMyLjUwMiwzMjEuMDA1LDIuNTAyLDE4Mi4zMTcsMjIuNDg3LDQ1LjU2bC44MDMtNS40OTcsNS40OTEtLjgzNWM3NC42NTktMTEuMzU2LDE0Ni4wMjQtMTYuODc2LDIxOC4xODUtMTYuODc2czE0My41MjQsNS41MTksMjE4LjE4MiwxNi44NzZsNS40OTIuODM1LjgwMyw1LjQ5N2MxOS45ODYsMTM2Ljc1NywxOS45ODYsMjc1LjQ0NCwwLDQxMi4ybC0uODAzLDUuNDk4LTUuNDkyLjgzNWMtNzQuNjU3LDExLjM1NS0xNDYuMDI0LDE2Ljg3Mi0yMTguMTgyLDE2Ljg3MmgwWiIvPgogICAgPHBhdGggZD0iTTI0Ni45NjQsMjkuODUzYzcxLjczMiwwLDE0My40NjMsNS41OTcsMjE3LjA1NywxNi43OSwxOS44NjgsMTM1Ljk1NSwxOS44NjgsMjc0LjA3OCwwLDQxMC4wMzMtNzMuNTk0LDExLjE5My0xNDUuMzI0LDE2Ljc5MS0yMTcuMDU2LDE2Ljc5MXMtMTQzLjQ2My01LjU5OC0yMTcuMDU2LTE2Ljc5MWMtMTkuODY3LTEzNS45NTUtMTkuODY3LTI3NC4wNzgsMC00MTAuMDMzLDczLjU5My0xMS4xOTMsMTQ1LjMyNC0xNi43OSwyMTcuMDU1LTE2Ljc5TTI0Ni45NjQsMTQuODUzYy03Mi41MzksMC0xNDQuMjc1LDUuNTQ4LTIxOS4zMSwxNi45NmwtMTAuOTgsMS42Ny0xLjYwNiwxMC45OTFjLTIwLjA4OSwxMzcuNDc4LTIwLjA4OSwyNzYuODkzLDAsNDE0LjM3MmwxLjYwNiwxMC45ODksMTAuOTgsMS42NzFjNzUuMDM2LDExLjQxMywxNDYuNzczLDE2Ljk2MSwyMTkuMzExLDE2Ljk2MXMxNDQuMjc1LTUuNTQ4LDIxOS4zMTEtMTYuOTYxbDEwLjk4LTEuNjcxLDEuNjA1LTEwLjk4OWMyMC4wOTEtMTM3LjQ3OSwyMC4wOTEtMjc2Ljg5NCwwLTQxNC4zNzJsLTEuNjA1LTEwLjk5MS0xMC45OC0xLjY3Yy03NS4wMzUtMTEuNDEyLTE0Ni43NzItMTYuOTYtMjE5LjMxMi0xNi45NmgwWiIvPgogIDwvZz4KICA8Zz4KICAgIDxwYXRoIGNsYXNzPSJjbHMtMSIgZD0iTTM4Ni4yODksMTQ3LjE2MmMwLDc2LjgwMi02Mi4yNTQsMTM5LjA1Ny0xMzkuMDYyLDEzOS4wNTdzLTEzOS4wNTItNjIuMjU1LTEzOS4wNTItMTM5LjA1N1MxNzAuNDI4LDguMTAxLDI0Ny4yMjcsOC4xMDFzMTM5LjA2Miw2Mi4yNTQsMTM5LjA2MiwxMzkuMDYxWiIvPgogICAgPHBhdGggZD0iTTk5LjMyNywxNDYuOTQxQzk5LjMyNyw2NS43NzgsMTY1LjExMywwLDI0Ni4yNzIsMGgwYzgxLjE2MSwwLDE0Ni45MzksNjUuNzc4LDE0Ni45NDMsMTQ2Ljk0MWgwYy0uMDA0LDgxLjE2NC02NS43ODIsMTQ2LjkzNy0xNDYuOTQzLDE0Ni45NTFoMGMtODEuMTU4LS4wMTUtMTQ2Ljk0NC02NS43ODctMTQ2Ljk0NC0xNDYuOTUxaDBaTTExNS4xMDcsMTQ2Ljk0MWMuMTI4LDcyLjQ0Myw1OC43MjIsMTMxLjAzMywxMzEuMTY1LDEzMS4xNjZoMGM3Mi40NDEtLjEzMywxMzEuMDMzLTU4LjcyMywxMzEuMTc0LTEzMS4xNjZoMGMtLjE0MS03Mi40NDctNTguNzMyLTEzMS4wMzUtMTMxLjE3NC0xMzEuMTY2aDBjLTcyLjQ0My4xMzEtMTMxLjAzNyw1OC43MTktMTMxLjE2NSwxMzEuMTY2aDBaIi8+CiAgICA8Zz4KICAgICAgPHBhdGggZD0iTTg2LjQ4OSwyNTMuMzcyYy0xMC4zNjIsMC0xOS4wNzgtNC42NjctMjMuMzEzLTEyLjQ5NS0yLjUyMi00LjYzOS01LjQ5LTE0LjM0MiwyLjg4Mi0yNy4yMjEsNS42NDctOC42NzEsMTEuMzE5LTE3LjMyMiwxNi45NzItMjUuOTgybDQuOTA3LTcuNDg4YzguMDkyLTEyLjM4NywxNi4xNTctMjQuOCwyNC4yMzMtMzcuMjA0bDYuNzE3LTEwLjMzNiwxMS4wODgtMTcuMDE2LDExLjA3Ni0xNy4wMjgsMS4xODctMS44NWM2LjA2My05LjQzOSwxNS4yMDUtMjMuNywzMy42MDctMjMuNyw2LjA1OSwwLDI1LjgyNSwyLjE2MSwyNS44MjUsMzAuMDE2djQuNzI0YzMuNzM2LTUuMzksNy40NjctMTAuNzc0LDExLjIwNi0xNi4xNjcsNy44MTktMTAuOTM0LDE5LjY0Ny0xNy42NDMsMzAuOTc5LTE3LjY0Myw3LjE2NSwwLDEzLjc3NCwyLjY5MywxOC42Miw3LjU2NSwzLjk1MiwzLjk4Miw4LjY0NSwxMS4zOTcsOC41NjcsMjQuMDc2LS4xMjUsMTguOTYxLS4xMTIsMzguMjY4LS4wODYsNTYuOTNsLjAyMSwyMi40NzNjMCwxLjI3LjA3NSwyLjYxNS4xMzQsMy45OTIuMzgsOC4xMTMsMS4wMjMsMjEuNjkxLTEwLjE5NCwzMC4zMjgtNC45OSwzLjg0Ny0xMS4zMTQsNS45NjItMTcuODI0LDUuOTYyLTUuMzM2LDAtMTAuNDUzLTEuNDI0LTE0Ljc5MS00LjExOS0xMy4zMTItOC4yNTYtMTIuNTc2LTIzLjIyNC0xMi4xNDMtMzIuMTcxLjA3OS0xLjQyMi4xNDgtMi44MDkuMTQ4LTQuMDk4di0xLjI4MWwtMTYuNjY5LDI0LjU5MmMtMy4wNSw0LjQ5OC0xMS4xNjIsMTYuNDkxLTI1LjUxNSwxNy40MTQtLjU1OS4wMzktMS4xMTUuMDYxLTEuNjc2LjA2MS0xMi45MTQsMC0yMy43ODMtOS44NDQtMjUuMjk1LTIyLjkxMy0uNDU5LTMuOTc2LS43MzItNy45ODYtLjg2NS0xMS45OTRsLTMwLjk5LDQ3LjI4OWMtNi4zMTUsOS40NjUtMTcuMzQsMTUuMjg2LTI4LjgxLDE1LjI4NmgwWiIvPgogICAgICA8cGF0aCBjbGFzcz0iY2xzLTIiIGQ9Ik0xNzUuODQyLDg1Ljc4M2MxMC44NjcsMCwxMy4wOTMsOC4wOSwxMy4wOTMsMTcuMjgzdjQ1LjQ3OWMxMS40NjItMTYuNTU3LDIyLjkzNC0zMy4xMTcsMzQuNDA1LTQ5LjY3NiwxMS45MjUtMTYuNjYxLDM1LjEzNS0xNy43NjksMzQuOTcsNi42NzItLjE3OSwyNi40OS0uMDY3LDUyLjk5NC0uMDY3LDc5LjQ4MiwwLDcuOTg1LDIuMTkxLDE4LjYyMy01LjEwMSwyNC4yMzYtNS4wMjEsMy44Ny0xMi42ODUsNC40ODItMTguMTI2LDEuMTA5LTguNDQzLTUuMjQtNS45NzctMTcuMTM5LTUuOTc3LTI1LjQ0NnYtNDIuNzUzYy0xMy4zMDksMTkuNjMxLTI2LjYyMSwzOS4yNjktMzkuOTM1LDU4LjkwMi0zLjc1OSw1LjU1MS04LjU2NywxMS40LTE1LjgwNCwxMS44Ny02Ljk4MS40NTEtMTIuNzA4LTQuNzc0LTEzLjQ5LTExLjYwNC0yLjAyNy0xNy42MjctLjA3OS0zNi41NTMtLjA3OS01NC4zMDMtMTguMzY0LDI4LjAyOS0zNi43MjYsNTYuMDQzLTU1LjA5Myw4NC4wNzEtMTEuMDc3LDE2LjYxLTQxLjU3MiwxMC41MDYtMjcuOTA1LTEwLjUwMSw3LjI2LTExLjE2NiwxNC41NzUtMjIuMzA4LDIxLjg2MS0zMy40NTYsMTAuMzQ1LTE1LjgzOCwyMC42NTEtMzEuNzA1LDMwLjk2Ny00Ny41NTgsNy4zODgtMTEuMzUsMTQuNzcyLTIyLjY5NSwyMi4xNi0zNC4wNDcsNS44OTQtOS4wNzYsMTEuODI0LTE5Ljc2MiwyNC4xMi0xOS43NjIiLz4KICAgIDwvZz4KICAgIDxnPgogICAgICA8cGF0aCBkPSJNMjgxLjcsMjY4LjIxMWMtOC4xMjcsMC0xNS43OTQtNC4zMDMtMjAuNTE3LTExLjUxMi00Ljk0My03LjU2My01Ljc0Mi0xNi45OTgtMi4xNDItMjUuMjUsMy40MjYtNy44MTMsNy43MzUtMTUuMTQ0LDExLjUyOS0yMS42MDEsNS45NDctMTAuMTE2LDE5LjgxMy0zNC42ODcsMjMuODQ1LTQzLjQzM2wtNS4zMi0xOS4yMTEtMTQuNjI2LTUyLjg1OWMtMS44NDgtNi42ODgsMi4wMDItMTMuNjI3LDguNjY0LTE1LjYwM2wyNC4xNy03LjE1NGMxLjE4MS0uMzUsMi40MDItLjUyMiwzLjYwNS0uNTIyLDIuMjE1LDAsNC40MS41NzgsNi4zNjUsMS42OTYsMy4wMjUsMS43MzUsNS4xOTMsNC42NDEsNi4wMTksOC4wM2w0LjUwMiwxOC41NmM1Ljk5NC0xMy40MTMsMTIuMTExLTI3LjA3NiwxOC4yNTktNDAuNTMyLjk0NC0yLjA1OSwxLjg1Mi00LjE2NCwyLjc3NC02LjI5NywyLjg0Ni02LjU3OCw1Ljc5NS0xMy4zODksOS44NjUtMTkuODE2LDQuNTMxLTcuMTg0LDExLjc0Mi0xMS4yOTksMTkuNzczLTExLjI5OXMxNS44NzksNC4xMzEsMjAuOTEzLDExLjA0OGM0Ljk0Miw2Ljc5LDYuMzI5LDE1LjE1MiwzLjgxLDIyLjk0NC0uMTQ3LjQ0Ni0uMzA2Ljg4Ni0uNDk5LDEuMzExbC0zMi42MDMsNzIuMzU5Yy02Ljc3OCwxNC41OC0xMy45NDcsMjkuMTk3LTIxLjk2OSw0NC44MjUtLjk4NCwxLjkwNy0yLjM5OCw0LjcyNi00LjEyNyw4LjE2MS0yMC40NTksNDAuNjQ0LTM1LjkyNCw2OS41NjEtNDQuODgxLDc4LjU2Ni00Ljg2MSw0Ljg5My0xMS4wNDcsNy41ODgtMTcuNDExLDcuNTg4aDBaIi8+CiAgICAgIDxwYXRoIGNsYXNzPSJjbHMtMiIgZD0iTTM1OC40NzcsMTIzLjgzOWMtNi45MzMsMTQuODk1LTE0LjE4NSwyOS42MzQtMjEuNjg3LDQ0LjIzOS02Ljk4NiwxMy41OTktMzUuODAzLDcyLjYwMy00Ni43MDEsODMuNTY0LTEwLjUzOCwxMC41OTQtMjQuNzQ3LTIuODExLTE5LjM4MS0xNS4wOTYsMy4wNi02Ljk2OSw2Ljk5NC0xMy42OTcsMTAuODQ4LTIwLjI1MiwxLjQ0Ni0yLjQ2NywyNi45OTItNDYuNTYzLDI2LjE1Ni00OS41NzEtNi45OTQtMjUuMjU3LTEzLjk4NC01MC41MTMtMjAuOTcyLTc1Ljc3MmwyNC4xNzYtNy4xNTIsMTMuMzA2LDU0LjgyOGMxMS4xMjktMjQuODM4LDIyLjEwMi00OS43NSwzMy40MTYtNzQuNTA0LDMuNzIxLTguMTM3LDcuMDEyLTE3LjAxOSwxMS44MTQtMjQuNjA1LDcuOTU3LTEyLjU5NiwyNS43NDItLjc3MSwyMS42MTksMTEuOTYzbC0zMi41OTQsNzIuMzU4Ii8+CiAgICA8L2c+CiAgPC9nPgogIDxnPgogICAgPHBhdGggZD0iTTg0LjQxOSwzNjYuNjZoLTIwLjc4OXYzMy40NzloLTE4Ljg5OXYtOTQuNDk2aDQxLjMwOWMxNy44MTgsMCwzMi41MzQsOS44NTQsMzIuNTM0LDI5Ljk2OCwwLDIxLjg3LTE0LjU3OSwzMS4wNDktMzQuMTU0LDMxLjA0OVpNODUuMzY0LDMyNC4wMDNoLTIxLjczM3YyNC4yOTloMjIuMDAzYzguNzc2LDAsMTMuNS00LjA1MSwxMy41LTEyLjI4NXMtNS4zOTgtMTIuMDE0LTEzLjc3LTEyLjAxNFoiLz4KICAgIDxwYXRoIGQ9Ik0xMjkuNzgsNDAwLjEzOXYtOTQuNDk2aDE4Ljg5OXY3Ni4wMDJoNDcuMzg0djE4LjQ5NGgtNjYuMjgzWiIvPgogICAgPHBhdGggZD0iTTI3NC40NjYsNDAwLjEzOWwtNy40MjYtMjEuMDU5aC0zNC41NTlsLTcuNDI0LDIxLjA1OWgtMjAuMjVsMzYuMTgtOTQuNDk2aDE4LjM1OGwzNS45MDksOTQuNDk2aC0yMC43ODlaTTI1NC40ODcsMzQzLjk4MWMtMS44OTEtNS41MzQtMy43ODEtMTEuMjA1LTQuNzI2LTE0LjcxNS0uOTQ0LDMuNTEtMi44MzQsOS4xODEtNC43MjQsMTQuNzE1bC02LjA3NSwxNy4xNDVoMjEuNmwtNi4wNzQtMTcuMTQ1WiIvPgogICAgPHBhdGggZD0iTTM1My4xMTYsMzMzLjE4Yy0zLjM3NS02LjQ3OC04Ljc3NS0xMC4yNTgtMTcuMjc5LTEwLjI1OC0xNC4xNzUsMC0yMi4yNzMsMTIuNDE5LTIyLjI3MywyOS45NjgsMCwxNy4wMSw4LjIzMywyOS45NywyMi40MDgsMjkuOTcsOC41MDYsMCwxMy40OTktMy42NDQsMTguNDk0LTEyLjAxNmwxNS45Myw5LjQ1Yy02LjQ4LDEzLjM2NC0xNy44MTksMjEuMzI5LTM0Ljk2NCwyMS4zMjktMjQuNzAzLDAtNDEuMzA5LTE4Ljg5OC00MS4zMDktNDguNzMzLDAtMjguNzUzLDE3LjI3OS00OC43MzIsNDEuOTgzLTQ4LjczMiwxNy44MiwwLDI4LjYxOSw4LjY0LDM0LjU1OSwyMC45MjRsLTE3LjU0OSw4LjA5OVoiLz4KICAgIDxwYXRoIGQ9Ik0zODEuNTY3LDQwMC4xMzl2LTk0LjQ5Nmg2NS42MDd2MTguNDk0aC00Ni43MDd2MTYuMzM0aDI3LjEzM3YxOC4zNTloLTI3LjEzM3YyMi44MTRoNDguNzMzdjE4LjQ5NGgtNjcuNjMzWiIvPgogIDwvZz4KICA8Zz4KICAgIDxwYXRoIGNsYXNzPSJjbHMtMSIgZD0iTTE2OS41ODIsNDM4Ljk0djcuNTY3aDYuNjI4di03LjU2N2g1LjQ3OHYyMC40aC01LjQ3OHYtOC4wNWgtNi42Mjh2OC4wNWgtNS40Nzh2LTIwLjRoNS40NzhaIi8+CiAgICA8cGF0aCBjbGFzcz0iY2xzLTEiIGQ9Ik0yMDUuNzI2LDQ1OS42NzRjLTYuMzI2LDAtOS44MDctNC43NTMtOS44MDctMTAuNDEzLDAtNS45MzIsMy44NzQtMTAuNjUzLDEwLjE0LTEwLjY1Myw2LjU2OCwwLDkuODk3LDQuODcyLDkuODk3LDEwLjMyMSwwLDYuNTY4LTMuOTM1LDEwLjc0NS0xMC4yLDEwLjc0NWgtLjAzWk0yMDUuOTk4LDQ1NS4zNDZjMi42MzQsMCw0LjE3Ny0yLjU0Miw0LjE3Ny02LjIzNSwwLTMuNTEtMS41NzQtNi4xNzQtNC4yMzctNi4xNzQtMi42MzMsMC00LjIzNywyLjY2My00LjIzNyw2LjIwNC0uMDMsMy42NjMsMS42MDQsNi4yMDUsNC4yMzcsNi4yMDVoLjA2WiIvPgogICAgPHBhdGggY2xhc3M9ImNscy0xIiBkPSJNMjM0LjU2LDQ0My41NDJoLTUuMjA2di00LjYwMmgxNS45ODF2NC42MDJoLTUuMjk2djE1Ljc5OWgtNS40Nzh2LTE1Ljc5OVoiLz4KICAgIDxwYXRoIGNsYXNzPSJjbHMtMSIgZD0iTTI3Mi4zNjgsNDUxLjEwOGgtNy4zMjR2My43NTNoOC4yMDJ2NC40OGgtMTMuNjh2LTIwLjRoMTMuMjU3djQuNDhoLTcuNzc5djMuMjY5aDcuMzI0djQuNDE5WiIvPgogICAgPHBhdGggY2xhc3M9ImNscy0xIiBkPSJNMjg3LjYsNDM4Ljk0aDUuNDc4djE1LjgzaDcuODM5djQuNTdoLTEzLjMxN3YtMjAuNFoiLz4KICAgIDxwYXRoIGNsYXNzPSJjbHMtMSIgZD0iTTMxNi4xNzcsNDUzLjg5M2MxLjI0MS42MzYsMy4yMzksMS4yNzEsNS4yOTYsMS4yNzEsMS44NzcsMCwyLjc4NS0uNjM2LDIuNzg1LTEuNjY1LDAtLjk5OS0uOTA4LTEuNTQzLTMuMjA4LTIuMzMxLTMuNDUxLTEuMjQxLTUuNzUxLTMuMTE2LTUuNzUxLTYuMTQzLDAtMy42MDIsMy4wNTctNi4zODYsOC4yMDMtNi4zODYsMi40MjEsMCw0LjE3Ny40NTQsNS41MDksMS4wM2wtMS4xNSw0LjM4OGMtLjg3OC0uMzkzLTIuMzkxLS45NjgtNC40MTktLjk2OC0xLjY2NSwwLTIuNTczLjYwNS0yLjU3MywxLjUxMywwLDEuMDMsMS4wOSwxLjQyMiwzLjY2MywyLjM5MSwzLjY2MiwxLjM2Miw1LjI5NiwzLjI5OSw1LjI5Niw2LjE0MywwLDMuNTEyLTIuNzI0LDYuNTA3LTguNjg3LDYuNTA3LTIuNDUxLDAtNC44NDMtLjYzNi01Ljk5Mi0xLjI0bDEuMDI5LTQuNTFaIi8+CiAgPC9nPgogIDxwYXRoIGQ9Ik0yNDYuOTY2LDQxMS44ODljLTY2Ljk1NSwwLTEzMy45MTMsNi43NDMtMjAyLjIzNCwyMC4xODZ2Ny42NWM2OC40MTgtOS43MzksMTM1LjMyNi0xNC42MTMsMjAyLjIzNC0xNC42MTNzMTMzLjgxNiw0Ljg3NSwyMDIuMjMzLDE0LjYxM3YtNy42NWMtNjguMzItMTMuNDQzLTEzNS4yNzktMjAuMTg2LTIwMi4yMzMtMjAuMTg2WiIvPgogIDxwYXRoIGQ9Ik00NjUuNzU5LDMxNC44MzRjMCwzLjk5OS0zLjEzOSw3LjEzOC03LjIyNCw3LjEzOC00LjA0MiwwLTcuMjY3LTMuMTM5LTcuMjY3LTcuMTM4LDAtMy45MTMsMy4yMjUtNy4wNTIsNy4yNjctNy4wNTIsNC4wODUsMCw3LjIyNCwzLjEzOSw3LjIyNCw3LjA1MlpNNDUzLjA3NCwzMTQuODM0YzAsMy4xMzksMi4zMjIsNS42MzMsNS41MDQsNS42MzMsMy4wOTYsMCw1LjM3NS0yLjQ5NCw1LjM3NS01LjU5LDAtMy4xMzktMi4yNzktNS42NzYtNS40MTgtNS42NzZzLTUuNDYxLDIuNTM3LTUuNDYxLDUuNjMzWk00NTcuNDE3LDMxOC41MzJoLTEuNjM0di03LjA1MmMuNjQ1LS4xMjksMS41NDgtLjIxNSwyLjcwOS0uMjE1LDEuMzMzLDAsMS45MzUuMjE1LDIuNDUxLjUxNi4zODcuMzAxLjY4OC44Ni42ODgsMS41NDgsMCwuNzc0LS42MDIsMS4zNzYtMS40NjIsMS42MzR2LjA4NmMuNjg4LjI1OCwxLjA3NS43NzQsMS4yOSwxLjcyLjIxNSwxLjA3NS4zNDQsMS41MDUuNTE2LDEuNzYzaC0xLjc2M2MtLjIxNS0uMjU4LS4zNDQtLjkwMy0uNTU5LTEuNzItLjEyOS0uNzc0LS41NTktMS4xMTgtMS40NjItMS4xMThoLS43NzR2Mi44MzhaTTQ1Ny40NjEsMzE0LjUzM2guNzc0Yy45MDMsMCwxLjYzNC0uMzAxLDEuNjM0LTEuMDMyLDAtLjY0NS0uNDczLTEuMDc1LTEuNTA1LTEuMDc1LS40MywwLS43MzEuMDQzLS45MDMuMDg2djIuMDIxWiIvPgo8L3N2Zz4=" alt="My Place Hotels" style="height:44px;display:block;margin-bottom:12px;">
+  <div class="header-inner">
+    <div>
+      <h1><span class="header-eyebrow">My Place Hotels</span>Channel Performance Dashboard — 2026 YTD</h1>
+      <div class="subtitle">Jan – Mar 2026 · Stay Date · All Properties · Excludes Cancelled Reservations · Compared vs same period 2025</div>
+      <div class="update-badge">Last updated: April 1, 2026 · Data through Mar 2026 (3 of 12 months)</div>
+    </div>
+    <div>
+      <div class="ytd-badge">2026 YTD · Q1</div>
+    </div>
+  </div>
+</div>
+
+<div class="dashboard">
+
+  <!-- KPI CARDS -->
+  <div class="kpi-row">
+    <div class="kpi-card">
+      <div class="kpi-label">2026 YTD Net Revenue</div>
+      <div class="kpi-value">$14.99M</div>
+      <div class="kpi-sub">2025 same period: $13.00M</div>
+      <div class="kpi-yoy"><span style="color:#2E8B57;font-size:11px;font-weight:700;">▲ 15.4% vs 2025</span></div>
+    </div>
+    <div class="kpi-card green">
+      <div class="kpi-label">2026 YTD Net Room Nights</div>
+      <div class="kpi-value">169,421</div>
+      <div class="kpi-sub">2025 same period: 144,512</div>
+      <div class="kpi-yoy"><span style="color:#2E8B57;font-size:11px;font-weight:700;">▲ 17.2% vs 2025</span></div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">2026 YTD Blended ADR</div>
+      <div class="kpi-value">$88.48</div>
+      <div class="kpi-sub">2025 same period: $89.93</div>
+      <div class="kpi-yoy"><span style="color:#C0392B;font-size:11px;font-weight:700;">▼ 1.6% vs 2025</span></div>
+    </div>
+    <div class="kpi-card accent">
+      <div class="kpi-label">Top Channel — 2026 YTD</div>
+      <div class="kpi-value">$8.49M</div>
+      <div class="kpi-sub">PMS · 56.7% of YTD total</div>
+      <div class="kpi-yoy"><span style="color:#2E8B57;font-size:11px;font-weight:700;">▲ 21.1% vs 2025</span></div>
+    </div>
+    <div class="kpi-card green">
+      <div class="kpi-label">Best Month — 2026 YTD</div>
+      <div class="kpi-value">Feb</div>
+      <div class="kpi-sub">$7.90M · 86,776 RNs</div>
+      <div class="kpi-yoy"><span style="color:#2E8B57;font-size:11px;font-weight:700;">▲ 16.4% vs 2025</span></div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">2026 Online Channels YTD</div>
+      <div class="kpi-value">$6.50M</div>
+      <div class="kpi-sub">43.3% of YTD total</div>
+      <div class="kpi-yoy"><span style="color:#2E8B57;font-size:11px;font-weight:700;">▲ 8.7% vs 2025</span></div>
+    </div>
+  </div>
+
+  <!-- REVENUE CHART 2026 -->
+  <div class="chart-card">
+    <h3>Monthly Net Revenue by Channel — 2026 YTD (Jan – Mar 2026)</h3>
+    <p class="chart-desc">Stacked monthly net revenue by booking channel for 2026 YTD. Updated each month as new data becomes available. Use <strong>All Off</strong> + a single chip to isolate and analyze any individual channel.</p>
+    <div class="legend-chips" id="revLegend26"><span class="solo-label" id="revSoloLabel26"></span></div>
+    <canvas id="revChart26" height="320" style="width:100%;"></canvas>
+  </div>
+
+  <!-- REVENUE CHART 2025 (same period) -->
+  <div class="chart-card">
+    <h3>Monthly Net Revenue by Channel — 2025 Same Period (Jan – Mar 2026)</h3>
+    <p class="chart-desc">2025 revenue for the same 2-month window (Jan – Mar 2026), shown for direct apples-to-apples comparison. Channel toggles are shared across all charts.</p>
+    <div class="legend-chips" id="revLegend25"><span class="solo-label" id="revSoloLabel25"></span></div>
+    <canvas id="revChart25" height="320" style="width:100%;"></canvas>
+  </div>
+
+  <!-- RN CHART 2026 -->
+  <div class="chart-card">
+    <h3>Monthly Net Room Nights by Channel — 2026 YTD (Jan – Mar 2026)</h3>
+    <p class="chart-desc">Monthly room night production by booking channel for 2026 YTD. Reflects demand volume and channel mix. The total above each bar is the combined room nights for all active channels.</p>
+    <div class="legend-chips" id="rnLegend26"><span class="solo-label" id="rnSoloLabel26"></span></div>
+    <canvas id="rnChart26" height="280" style="width:100%;"></canvas>
+  </div>
+
+  <!-- RN CHART 2025 (same period) -->
+  <div class="chart-card">
+    <h3>Monthly Net Room Nights by Channel — 2025 Same Period (Jan – Feb 2026)</h3>
+    <p class="chart-desc">2025 room night volume for the same 2-month window. Compare against 2026 to identify which channels are driving volume growth year-over-year.</p>
+    <div class="legend-chips" id="rnLegend25"><span class="solo-label" id="rnSoloLabel25"></span></div>
+    <canvas id="rnChart25" height="280" style="width:100%;"></canvas>
+  </div>
+
+  <!-- CONTRIBUTION % 2026 -->
+  <div class="chart-card">
+    <h3>Monthly Revenue Contribution % by Channel — 2026 YTD</h3>
+    <p class="chart-desc">Each bar totals 100% and shows each channel's proportional share of total monthly revenue for 2026. Useful for spotting early shifts in channel mix vs the prior year.</p>
+    <canvas id="pctChart26" height="260" style="width:100%;"></canvas>
+    <div class="legend-chips" id="pctLegend26" style="margin-top:14px;margin-bottom:0;"></div>
+  </div>
+
+  <!-- CONTRIBUTION % 2025 same period -->
+  <div class="chart-card">
+    <h3>Monthly Revenue Contribution % by Channel — 2025 Same Period</h3>
+    <p class="chart-desc">2025 channel mix for the same 2-month window. Compare against 2026 above to identify which channels are gaining or losing share.</p>
+    <canvas id="pctChart25" height="260" style="width:100%;"></canvas>
+    <div class="legend-chips" id="pctLegend25" style="margin-top:14px;margin-bottom:0;"></div>
+  </div>
+
+  <!-- DONUT — Revenue share -->
+  <div class="grid-2">
+    <div class="chart-card" style="margin-bottom:0;">
+      <h3>2026 YTD Revenue Share by Channel</h3>
+      <p class="chart-desc">Full YTD revenue distribution across all channels through Feb 2026.</p>
+      <div class="donut-wrap">
+        <canvas id="revDonut26" width="200" height="200"></canvas>
+        <div class="donut-legend" id="revDonutLeg26"></div>
+      </div>
+    </div>
+    <div class="chart-card" style="margin-bottom:0;">
+      <h3>2025 Same Period Revenue Share by Channel</h3>
+      <p class="chart-desc">2025 revenue distribution for Jan – Feb 2026. Compare channel mix proportions to see year-over-year share shifts.</p>
+      <div class="donut-wrap">
+        <canvas id="revDonut25" width="200" height="200"></canvas>
+        <div class="donut-legend" id="revDonutLeg25"></div>
+      </div>
+    </div>
+  </div>
+  <div style="height:22px;"></div>
+
+  <!-- DONUT — RN share -->
+  <div class="grid-2">
+    <div class="chart-card" style="margin-bottom:0;">
+      <h3>2026 YTD Room Night Share by Channel</h3>
+      <p class="chart-desc">Room night volume distribution by channel through Feb 2026. Compare against the revenue share donut to see which channels punch above or below their weight on ADR.</p>
+      <div class="donut-wrap">
+        <canvas id="rnDonut26" width="200" height="200"></canvas>
+        <div class="donut-legend" id="rnDonutLeg26"></div>
+      </div>
+    </div>
+    <div class="chart-card" style="margin-bottom:0;">
+      <h3>2025 Same Period Room Night Share by Channel</h3>
+      <p class="chart-desc">2025 room night mix for Jan – Feb 2026. Use alongside 2026 to identify channels that have gained or lost volume share.</p>
+      <div class="donut-wrap">
+        <canvas id="rnDonut25" width="200" height="200"></canvas>
+        <div class="donut-legend" id="rnDonutLeg25"></div>
+      </div>
+    </div>
+  </div>
+  <div style="height:22px;"></div>
+
+  <!-- ADR -->
+  <div class="grid-2">
+    <div class="chart-card" style="margin-bottom:0;">
+      <h3>YTD Net ADR by Channel — 2026 vs 2025</h3>
+      <p class="chart-desc">YTD average daily rate per channel with 2026 (solid) stacked above the 2025 comparison bar (faded). The ▲/▼ shows year-over-year rate movement.</p>
+      <div id="adrBars"></div>
+    </div>
+    <div class="chart-card" style="margin-bottom:0;">
+      <h3>Monthly Net ADR Trend — 2026 vs 2025</h3>
+      <p class="chart-desc">Blended portfolio ADR by month for 2026 (navy) vs 2025 (orange). Shows rate trends and divergences month-by-month.</p>
+      <canvas id="adrLine" height="220" style="width:100%;"></canvas>
+    </div>
+  </div>
+  <div style="height:22px;"></div>
+
+  <!-- YOY COMPARISON BARS -->
+  <div class="chart-card">
+    <h3>2026 vs 2025 — Monthly Net Revenue Comparison</h3>
+    <p class="chart-desc">Side-by-side monthly revenue for 2026 (navy) vs 2025 same period (orange). Both scale to the same maximum for direct visual comparison. The % indicates year-over-year growth or decline.</p>
+    <div class="year-legend">
+      <div class="yl-item"><div class="yl-swatch" style="background:#1C355E;"></div> 2026</div>
+      <div class="yl-item"><div class="yl-swatch" style="background:#FF5F00;opacity:0.65;"></div> 2025</div>
+    </div>
+    <div id="yoyBars"></div>
+  </div>
+
+  <!-- DETAIL TABLES -->
+  <div class="chart-card">
+    <h3>2026 YTD Monthly Net Revenue by Channel — Full Detail ($)</h3>
+    <p class="chart-desc">Month-by-month net revenue for every channel in 2026 YTD. The % sub-value shows each channel's share of total revenue for that month.</p>
+    <div class="tbl-wrap"><table id="detailTable26"></table></div>
+  </div>
+
+  <div class="chart-card">
+    <h3>2025 Same Period Monthly Net Revenue by Channel — Full Detail ($)</h3>
+    <p class="chart-desc">2025 channel revenue for Jan – Feb 2026. Use alongside the 2026 table above for a direct channel-level monthly comparison.</p>
+    <div class="tbl-wrap"><table id="detailTable25"></table></div>
+  </div>
+
+  <!-- MERGED RN TABLE -->
+  <div class="chart-card">
+    <h3>Monthly Net Room Nights by Channel — 2026 YTD with Variance vs 2025</h3>
+    <p class="chart-desc">Each cell shows <strong>2026 YTD room nights</strong> with the variance vs the same 2025 period below in <span style="color:#2E8B57;font-weight:700;">green (increase)</span> or <span style="color:#C0392B;font-weight:700;">red (decrease)</span>.</p>
+    <div class="tbl-wrap"><table id="rnTableMerged"></table></div>
+  </div>
+
+  <!-- MERGED PCT TABLE -->
+  <div class="chart-card">
+    <h3>Monthly Revenue Contribution % by Channel — 2026 YTD with Variance vs 2025</h3>
+    <p class="chart-desc">Each cell shows the channel's <strong>2026 % share</strong> of total net revenue with the percentage-point variance vs 2025 in <span style="color:#2E8B57;font-weight:700;">green (share gained)</span> or <span style="color:#C0392B;font-weight:700;">red (share lost)</span>.</p>
+    <div class="tbl-wrap"><table id="pctTableMerged"></table></div>
+  </div>
+
+</div>
+
+<div class="footer">
+  Channel Performance Dashboard · My Place Hotels · 2026 YTD vs 2025 Same Period · Jan – Feb 2026 · Stay-date reports · Excludes cancelled reservations · Last updated March 19, 2026
+</div>
+
+<script>
+const MONTHS  = ["Jan", "Feb", "Mar"];
+const CHANNELS = ["PMS", "Expedia", "Website", "Booking", "GDS", "Expedia Programs", "Other OTA", "Priceline/Agoda", "HotelBeds", "BnBerry", "Hotel Tonight", "Hopper"];
+const COLORS = {
+  'PMS':'#1C355E','Website':'#2E8B57','Expedia':'#E03030','Booking':'#FF5F00',
+  'GDS':'#6B4CA8','Expedia Programs':'#0088CC','Priceline/Agoda':'#D4822A',
+  'Other OTA':'#6B8CAD','HotelBeds':'#4DAA8C','Hopper':'#9B59B6',
+  'Hotel Tonight':'#C0392B','BnBerry':'#95A5A6',
+};
+
+const monthlyRev26={"PMS": [4201206.420000058, 4292448.450000056, 4962191.450000059], "Expedia": [925427.350000002, 1096166.7599999944, 1413179.7299999944], "Website": [659952.9599999951, 828363.1299999921, 1087190.169999996], "Booking": [551453.9899999984, 680638.7699999916, 917027.9399999931], "GDS": [294362.4000000009, 434461.6200000003, 494693.01000000024], "Expedia Programs": [220181.37, 287208.7499999999, 393355.80999999965], "Other OTA": [87443.73, 93605.47999999998, 136763.18], "Priceline/Agoda": [64537.37999999996, 76821.85000000003, 114040.09999999993], "HotelBeds": [45782.78999999999, 63893.91000000005, 89687.7], "BnBerry": [29760.99000000002, 38139.99999999998, 48162.55000000003], "Hotel Tonight": [5121.470000000001, 7580.1100000000015, 9152.479999999998], "Hopper": [1533.04, 3952.5600000000004, 5995.170000000001]}, monthlyRn26={"PMS": [48861, 48494, 54809], "Expedia": [11824, 12144, 14832], "Website": [6712, 8063, 10403], "Booking": [6206, 7000, 8886], "GDS": [3072, 4297, 4663], "Expedia Programs": [3033, 3401, 4503], "Other OTA": [1130, 1242, 1780], "Priceline/Agoda": [777, 818, 1223], "HotelBeds": [589, 771, 1028], "BnBerry": [360, 433, 482], "Hotel Tonight": [64, 74, 94], "Hopper": [17, 39, 65]}, monthlyAdr26={"PMS": [85.98281697059122, 88.515042067061, 90.53606980605483], "Expedia": [78.26685977672547, 90.26406126482168, 95.27910800970837], "Website": [98.32433849821142, 102.73634255239887, 104.50736998942574], "Booking": [88.85820012890724, 97.23410999999881, 103.19918298446918], "GDS": [95.82109375000029, 101.10812659995352, 106.0890006433627], "Expedia Programs": [72.59524233432245, 84.44832402234634, 87.35416611148116], "Other OTA": [77.38383185840708, 75.36673107890498, 76.83324719101124], "Priceline/Agoda": [83.05969111969107, 93.91424205378978, 93.24619787408008], "HotelBeds": [77.72969439728352, 82.87147859922185, 87.24484435797665], "BnBerry": [82.66941666666672, 88.0831408775981, 99.92230290456438], "Hotel Tonight": [80.02296875000002, 102.43391891891893, 97.36680851063828], "Hopper": [90.17882352941176, 101.34769230769231, 92.23338461538464]};
+const monthlyRev25={"PMS": [3530954.3900001515, 3485318.9900001334, 4623563.830000131], "Expedia": [872237.9499999982, 1098926.5300000014, 1372647.0699999924], "Website": [588456.2299999949, 704823.5599999913, 848694.5499999883], "Booking": [418201.0499999963, 570015.0699999925, 706686.1699999868], "GDS": [389599.8800000005, 441789.33000000037, 457630.3200000012], "Expedia Programs": [169248.76000000036, 221700.90000000034, 266925.89000000054], "Other OTA": [107035.36999999998, 113277.04000000001, 111361.25], "Priceline/Agoda": [94331.68999999974, 115449.03999999944, 179050.50000000026], "HotelBeds": [22317.719999999994, 19173.65, 70853.29000000004], "BnBerry": [0, 1009, 3928], "Hotel Tonight": [5222.609999999998, 8430.929999999998, 10861.769999999999], "Hopper": [7495.620000000001, 9743.889999999996, 8845.31]}, monthlyRn25={"PMS": [41203, 40074, 52116], "Expedia": [10040, 11863, 14873], "Website": [5883, 6532, 7831], "Booking": [4490, 5523, 6761], "GDS": [3813, 4180, 4180], "Expedia Programs": [2182, 2551, 3096], "Other OTA": [1330, 1419, 1409], "Priceline/Agoda": [1147, 1345, 1855], "HotelBeds": [329, 233, 770], "BnBerry": [0, 10, 23], "Hotel Tonight": [69, 75, 116], "Hopper": [98, 118, 104]}, monthlyAdr25={"PMS": [85.69653641725446, 86.97207640864724, 88.71678237009941], "Expedia": [86.87628984063717, 92.63479136811976, 92.29120352316227], "Website": [100.02655617881949, 107.90317819963121, 108.37626739879819], "Booking": [93.14054565701487, 103.20750860039703, 104.52391214317224], "GDS": [102.17673223183866, 105.69122727272739, 109.48093779904333], "Expedia Programs": [77.5658845096244, 86.90744805958454, 86.21637273901821], "Other OTA": [80.47772180451126, 79.82878083157154, 79.03566359119944], "Priceline/Agoda": [82.24210113339106, 85.83571747211853, 96.52318059299218], "HotelBeds": [67.83501519756837, 82.29034334763949, 92.01725974025975], "BnBerry": [0, 100.9, 170.7826086956522], "Hotel Tonight": [75.68999999999997, 112.41239999999998, 93.63594827586203], "Hopper": [76.48591836734694, 82.57533898305084, 85.0510576923077]};
+const moRev26=[7086763.890000055, 7903281.390000034, 9671439.290000042], moRn26=[82645, 86776, 102768], moAdr26=[85.75, 91.08, 94.11];
+const moRev25=[6205101.270000238, 6789657.930000293, 8661047.95000013], moRn25=[70584, 73923, 93134], moAdr25=[87.91, 91.85, 93.0];
+const annRev26={"PMS": 13455846.320000172, "Expedia": 3434773.8399999905, "Website": 2575506.259999983, "Booking": 2149120.699999983, "GDS": 1223517.0300000014, "Expedia Programs": 900745.9299999995, "Other OTA": 317812.38999999996, "Priceline/Agoda": 255399.3299999999, "HotelBeds": 199364.40000000002, "BnBerry": 116063.54000000002, "Hotel Tonight": 21854.059999999998, "Hopper": 11480.77}, annRn26={"PMS": 152164, "Expedia": 38800, "Website": 25178, "Booking": 22092, "GDS": 12032, "Expedia Programs": 10937, "Other OTA": 4152, "Priceline/Agoda": 2818, "HotelBeds": 2388, "BnBerry": 1275, "Hotel Tonight": 232, "Hopper": 121}, annAdr26={"PMS": 88.43, "Expedia": 88.53, "Website": 102.29, "Booking": 97.28, "GDS": 101.69, "Expedia Programs": 82.36, "Other OTA": 76.54, "Priceline/Agoda": 90.63, "HotelBeds": 83.49, "BnBerry": 91.03, "Hotel Tonight": 94.2, "Hopper": 94.88};
+const annRev25={"PMS": 11639837.210000416, "Expedia": 3343811.549999992, "Website": 2141974.3399999742, "Booking": 1694902.2899999756, "GDS": 1289019.5300000021, "Expedia Programs": 657875.5500000012, "Other OTA": 331673.66, "Priceline/Agoda": 388831.2299999994, "HotelBeds": 112344.66000000003, "BnBerry": 4937, "Hotel Tonight": 24515.309999999998, "Hopper": 26084.819999999992}, annRn25={"PMS": 133393, "Expedia": 36776, "Website": 20246, "Booking": 16774, "GDS": 12173, "Expedia Programs": 7829, "Other OTA": 4158, "Priceline/Agoda": 4347, "HotelBeds": 1332, "BnBerry": 33, "Hotel Tonight": 260, "Hopper": 320}, annAdr25={"PMS": 87.26, "Expedia": 90.92, "Website": 105.8, "Booking": 101.04, "GDS": 105.89, "Expedia Programs": 84.03, "Other OTA": 79.77, "Priceline/Agoda": 89.45, "HotelBeds": 84.34, "BnBerry": 149.61, "Hotel Tonight": 94.29, "Hopper": 81.52};
+const grandRev26=24661484, grandRn26=272189;
+const grandRev25=21655807, grandRn25=237641;
+
+function fmtM(v)  {return '$'+(v/1e6).toFixed(2)+'M';}
+function fmtK(v)  {return v>=1000?v.toLocaleString('en-US',{maximumFractionDigits:0}):v.toFixed(0);}
+function fmtD(v)  {return '$'+v.toFixed(2);}
+function fmtDol(v){return v>0?'$'+Math.round(v).toLocaleString():'—';}
+
+// ── Channel Toggles ───────────────────────────────────────────────────────────
+const activeChannels = new Set(CHANNELS);
+const ALL_LEGENDS = ['revLegend26','revLegend25','rnLegend26','rnLegend25','pctLegend26','pctLegend25'];
+const ALL_SOLOS   = ['revSoloLabel26','revSoloLabel25','rnSoloLabel26','rnSoloLabel25'];
+
+function refreshAllCharts() {
+  drawBar('revChart26',monthlyRev26,moRev26,fmtM);
+  drawBar('revChart25',monthlyRev25,moRev25,fmtM);
+  drawBar('rnChart26', monthlyRn26, moRn26, v=>fmtK(v));
+  drawBar('rnChart25', monthlyRn25, moRn25, v=>fmtK(v));
+  drawPct('pctChart26',monthlyRev26,moRev26);
+  drawPct('pctChart25',monthlyRev25,moRev25);
+}
+
+function updateSoloLabels() {
+  const active=CHANNELS.filter(c=>activeChannels.has(c));
+  const isSolo=active.length===1;
+  const name=isSolo?active[0]:'', col=isSolo?COLORS[name]:'#FF5F00';
+  ALL_SOLOS.forEach(id=>{
+    const el=document.getElementById(id); if(!el) return;
+    if(isSolo){
+      el.classList.add('visible'); el.style.color=col;
+      el.style.background=col+'15'; el.style.borderColor=col+'50';
+      el.innerHTML=`<span style="width:8px;height:8px;border-radius:50%;background:${col};display:inline-block;"></span> ${name} — solo view`;
+    } else el.classList.remove('visible');
+  });
+}
+
+function renderChips(id) {
+  const el=document.getElementById(id); if(!el) return;
+  const solo=el.querySelector('.solo-label');
+  el.innerHTML=`<div class="chip-ctrl">
+    <button class="ctrl-btn" onclick="selAll()">All On</button>
+    <button class="ctrl-btn" onclick="selNone()">All Off</button>
+  </div>`+CHANNELS.map(ch=>`
+    <div class="chip ${activeChannels.has(ch)?'':'inactive'}" onclick="toggle('${ch}')">
+      <div class="chip-dot" style="background:${COLORS[ch]}"></div>${ch}
+    </div>`).join('');
+  if(solo) el.appendChild(solo);
+}
+function selAll()  {CHANNELS.forEach(c=>activeChannels.add(c));   ALL_LEGENDS.forEach(renderChips); updateSoloLabels(); refreshAllCharts();}
+function selNone() {activeChannels.clear();                        ALL_LEGENDS.forEach(renderChips); updateSoloLabels(); refreshAllCharts();}
+function toggle(ch){activeChannels.has(ch)?activeChannels.delete(ch):activeChannels.add(ch); ALL_LEGENDS.forEach(renderChips); updateSoloLabels(); refreshAllCharts();}
+
+// ── Stacked Bar ───────────────────────────────────────────────────────────────
+function drawBar(canvasId, data, totals, fmtFn) {
+  const canvas=document.getElementById(canvasId); if(!canvas) return;
+  const dpr=window.devicePixelRatio||1, W=canvas.parentElement.clientWidth, H=parseInt(canvas.getAttribute('height'));
+  canvas.width=W*dpr; canvas.height=H*dpr; canvas.style.width=W+'px'; canvas.style.height=H+'px';
+  const ctx=canvas.getContext('2d'); ctx.scale(dpr,dpr);
+  const active=CHANNELS.filter(c=>activeChannels.has(c));
+  const isSolo=active.length===1, soloCh=isSolo?active[0]:null;
+  const actTots=MONTHS.map((_,mi)=>active.reduce((s,ch)=>s+(data[ch][mi]||0),0));
+  const maxVal=Math.max(...actTots,1)*1.14;
+  const PAD={l:62,r:20,t:14,b:40}, cW=W-PAD.l-PAD.r, cH=H-PAD.t-PAD.b;
+  const nB=MONTHS.length, barW=(cW/nB)*0.72, gap=(cW/nB)*0.28;
+
+  for(let i=0;i<=5;i++){
+    const y=PAD.t+cH-(i/5)*cH;
+    ctx.strokeStyle='#E4EAF3'; ctx.lineWidth=1;
+    ctx.beginPath(); ctx.moveTo(PAD.l,y); ctx.lineTo(PAD.l+cW,y); ctx.stroke();
+    ctx.fillStyle='#5A6B84'; ctx.font='10px Arial'; ctx.textAlign='right';
+    ctx.fillText(fmtFn(maxVal*i/5),PAD.l-5,y+3);
+  }
+
+  MONTHS.forEach((mo,mi)=>{
+    const x=PAD.l+mi*(barW+gap)+gap/2;
+    let yB=PAD.t+cH;
+    [...active].reverse().forEach(ch=>{
+      const val=data[ch][mi]||0, bH=(val/maxVal)*cH;
+      if(bH<0.5) return;
+      ctx.fillStyle=COLORS[ch]; ctx.fillRect(x,yB-bH,barW,bH);
+      if(isSolo&&bH>14){
+        ctx.fillStyle='rgba(255,255,255,0.92)'; ctx.font='bold 10px Arial'; ctx.textAlign='center';
+        ctx.fillText(fmtFn(val),x+barW/2,yB-bH/2+3);
+      }
+      yB-=bH;
+    });
+    ctx.fillStyle='#1C355E'; ctx.font='bold 11px Arial'; ctx.textAlign='center';
+    ctx.fillText(mo,x+barW/2,PAD.t+cH+16);
+    const tot=actTots[mi];
+    if(tot>0){
+      const topY=PAD.t+cH-(tot/maxVal)*cH;
+      const lbl=fmtFn(tot); ctx.font='bold 10px Arial'; ctx.textAlign='center';
+      const tw=ctx.measureText(lbl).width;
+      ctx.fillStyle='rgba(255,255,255,0.82)'; ctx.fillRect(x+barW/2-tw/2-2,topY-12,tw+4,13);
+      ctx.fillStyle=isSolo?COLORS[soloCh]:'#1C355E'; ctx.fillText(lbl,x+barW/2,topY-2);
+    }
+  });
+  ctx.strokeStyle='#D0D8E8'; ctx.lineWidth=1;
+  ctx.beginPath(); ctx.moveTo(PAD.l,PAD.t); ctx.lineTo(PAD.l,PAD.t+cH); ctx.stroke();
+  if(active.length===0){
+    ctx.fillStyle='#5A6B84'; ctx.font='13px Arial'; ctx.textAlign='center';
+    ctx.fillText('No channels selected — use the chips above to add channels',W/2,H/2);
+  }
+}
+
+// ── 100% Contribution Chart ───────────────────────────────────────────────────
+function drawPct(canvasId, rev, revTot) {
+  const canvas=document.getElementById(canvasId); if(!canvas) return;
+  const dpr=window.devicePixelRatio||1, W=canvas.parentElement.clientWidth, H=parseInt(canvas.getAttribute('height'));
+  canvas.width=W*dpr; canvas.height=H*dpr; canvas.style.width=W+'px'; canvas.style.height=H+'px';
+  const ctx=canvas.getContext('2d'); ctx.scale(dpr,dpr);
+  const PAD={l:46,r:20,t:16,b:36}, cW=W-PAD.l-PAD.r, cH=H-PAD.t-PAD.b;
+  const nB=MONTHS.length, barW=(cW/nB)*0.72, gap=(cW/nB)*0.28;
+  const active=CHANNELS.filter(c=>activeChannels.has(c));
+  [0,25,50,75,100].forEach(pct=>{
+    const y=PAD.t+cH-(pct/100)*cH;
+    ctx.strokeStyle='#E4EAF3'; ctx.lineWidth=1;
+    ctx.beginPath(); ctx.moveTo(PAD.l,y); ctx.lineTo(PAD.l+cW,y); ctx.stroke();
+    ctx.fillStyle='#5A6B84'; ctx.font='10px Arial'; ctx.textAlign='right';
+    ctx.fillText(pct+'%',PAD.l-4,y+3);
+  });
+  MONTHS.forEach((mo,mi)=>{
+    const moTot=revTot[mi]; if(moTot===0) return;
+    const x=PAD.l+mi*(barW+gap)+gap/2;
+    let yB=PAD.t+cH;
+    const actTot=active.reduce((s,ch)=>s+(rev[ch][mi]||0),0); if(actTot===0) return;
+    [...active].reverse().forEach(ch=>{
+      const val=rev[ch][mi]||0, bH=(val/actTot)*cH;
+      if(bH<0.5) return;
+      ctx.fillStyle=COLORS[ch]; ctx.fillRect(x,yB-bH,barW,bH);
+      if(bH>16){
+        ctx.fillStyle='rgba(255,255,255,0.92)'; ctx.font='bold 9px Arial'; ctx.textAlign='center';
+        ctx.fillText((val/actTot*100).toFixed(0)+'%',x+barW/2,yB-bH/2+3);
+      }
+      yB-=bH;
+    });
+    ctx.fillStyle='#1C355E'; ctx.font='bold 11px Arial'; ctx.textAlign='center';
+    ctx.fillText(mo,x+barW/2,PAD.t+cH+16);
+  });
+  ctx.strokeStyle='#D0D8E8'; ctx.lineWidth=1;
+  ctx.beginPath(); ctx.moveTo(PAD.l,PAD.t); ctx.lineTo(PAD.l,PAD.t+cH); ctx.stroke();
+}
+
+// ── ADR Line ──────────────────────────────────────────────────────────────────
+function drawAdrLine() {
+  const canvas=document.getElementById('adrLine'); if(!canvas) return;
+  const dpr=window.devicePixelRatio||1, W=canvas.parentElement.clientWidth, H=parseInt(canvas.getAttribute('height'));
+  canvas.width=W*dpr; canvas.height=H*dpr; canvas.style.width=W+'px'; canvas.style.height=H+'px';
+  const ctx=canvas.getContext('2d'); ctx.scale(dpr,dpr);
+  const PAD={l:55,r:20,t:20,b:36}, cW=W-PAD.l-PAD.r, cH=H-PAD.t-PAD.b;
+  const all=[...moAdr26,...moAdr25].filter(v=>v>0);
+  const minV=Math.min(...all)*0.95, maxV=Math.max(...all)*1.05;
+  const scY=v=>PAD.t+cH-(v-minV)/(maxV-minV)*cH;
+  const scX=i=>PAD.l+(MONTHS.length>1?i/(MONTHS.length-1):0.5)*cW;
+
+  for(let i=0;i<=5;i++){
+    const v=minV+(maxV-minV)*i/5, y=scY(v);
+    ctx.strokeStyle='#E4EAF3'; ctx.lineWidth=1;
+    ctx.beginPath(); ctx.moveTo(PAD.l,y); ctx.lineTo(PAD.l+cW,y); ctx.stroke();
+    ctx.fillStyle='#5A6B84'; ctx.font='10px Arial'; ctx.textAlign='right';
+    ctx.fillText('$'+v.toFixed(0),PAD.l-5,y+3);
+  }
+  // 2025 line
+  ctx.strokeStyle='rgba(255,95,0,0.55)'; ctx.lineWidth=2; ctx.lineJoin='round';
+  ctx.beginPath(); moAdr25.forEach((v,i)=>{const y=scY(v);i===0?ctx.moveTo(scX(i),y):ctx.lineTo(scX(i),y);});
+  ctx.stroke();
+  moAdr25.forEach((v,i)=>{ctx.fillStyle='#FF5F00';ctx.beginPath();ctx.arc(scX(i),scY(v),3,0,Math.PI*2);ctx.fill();});
+  // 2026 line
+  ctx.strokeStyle='#1C355E'; ctx.lineWidth=2.5; ctx.lineJoin='round';
+  ctx.beginPath(); moAdr26.forEach((v,i)=>{const y=scY(v);i===0?ctx.moveTo(scX(i),y):ctx.lineTo(scX(i),y);});
+  ctx.stroke();
+  moAdr26.forEach((v,i)=>{
+    ctx.fillStyle='#1C355E'; ctx.beginPath(); ctx.arc(scX(i),scY(v),4,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle='#1C355E'; ctx.font='bold 10px Arial'; ctx.textAlign='center';
+    ctx.fillText('$'+v.toFixed(0),scX(i),scY(v)-9);
+    ctx.fillStyle='#5A6B84'; ctx.font='10px Arial'; ctx.fillText(MONTHS[i],scX(i),PAD.t+cH+14);
+  });
+  ctx.fillStyle='#1C355E'; ctx.font='bold 10px Arial'; ctx.textAlign='left';
+  ctx.fillRect(PAD.l+10,PAD.t+6,20,3); ctx.fillText('2026',PAD.l+34,PAD.t+10);
+  ctx.fillStyle='rgba(255,95,0,0.65)'; ctx.fillRect(PAD.l+80,PAD.t+6,20,3);
+  ctx.fillStyle='#5A6B84'; ctx.font='10px Arial'; ctx.fillText('2025',PAD.l+104,PAD.t+10);
+}
+
+// ── Donut ─────────────────────────────────────────────────────────────────────
+function drawDonut(canvasId, data, legendId, label) {
+  const canvas=document.getElementById(canvasId); if(!canvas) return;
+  const ctx=canvas.getContext('2d'); ctx.clearRect(0,0,200,200);
+  const cx=100,cy=100,r=80,inner=58, total=data.reduce((s,d)=>s+d.v,0);
+  let start=-Math.PI/2;
+  data.forEach(d=>{
+    const angle=(d.v/total)*Math.PI*2;
+    ctx.beginPath(); ctx.arc(cx,cy,r,start,start+angle); ctx.arc(cx,cy,inner,start+angle,start,true);
+    ctx.closePath(); ctx.fillStyle=d.c; ctx.fill(); start+=angle;
+  });
+  ctx.fillStyle='#1C355E'; ctx.font='bold 14px Arial'; ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.fillText(label,cx,cy-7); ctx.font='10px Arial'; ctx.fillStyle='#5A6B84'; ctx.fillText('YTD',cx,cy+9);
+  document.getElementById(legendId).innerHTML=data.slice(0,6).map(d=>`
+    <div class="leg-item"><div class="leg-dot" style="background:${d.c}"></div>
+    <span>${d.label}</span><span class="leg-val">${d.pct}</span></div>`).join('')+
+    `<div class="leg-item" style="color:var(--muted);font-size:10px;">+ ${data.length-6} more</div>`;
+}
+
+function renderDonuts() {
+  const mk=(rev,grand,ch)=>CHANNELS.map(c=>{const v=rev[c]||0; return {label:c,v,c:COLORS[c],pct:(grand>0?(v/grand*100).toFixed(1)+'%':'—')};} );
+  const mkRn=(rn,grand,ch)=>CHANNELS.map(c=>{const v=rn[c]||0; return {label:c,v,c:COLORS[c],pct:(grand>0?(v/grand*100).toFixed(1)+'%':'—')};} );
+  drawDonut('revDonut26',mk(annRev26,grandRev26),'revDonutLeg26','2026');
+  drawDonut('revDonut25',mk(annRev25,grandRev25),'revDonutLeg25','2025');
+  drawDonut('rnDonut26', mkRn(annRn26,grandRn26),'rnDonutLeg26','2026');
+  drawDonut('rnDonut25', mkRn(annRn25,grandRn25),'rnDonutLeg25','2025');
+}
+
+// ── ADR Bars ──────────────────────────────────────────────────────────────────
+function renderAdrBars() {
+  const sorted=[...CHANNELS].sort((a,b)=>annAdr26[b]-annAdr26[a]);
+  const maxA=Math.max(...sorted.map(c=>Math.max(annAdr26[c]||0,annAdr25[c]||0)));
+  document.getElementById('adrBars').innerHTML=sorted.map(ch=>{
+    const v26=annAdr26[ch]||0, v25=annAdr25[ch]||0;
+    const delta=v25>0?((v26-v25)/v25*100):null;
+    const dStr=delta!==null?(delta>=0?`<span style="color:#2E8B57;font-size:10px;">▲${delta.toFixed(1)}%</span>`:`<span style="color:#C0392B;font-size:10px;">▼${Math.abs(delta).toFixed(1)}%</span>`):'';
+    return `<div class="hbar-group">
+      <div class="hbar-label">
+        <span style="display:flex;align-items:center;gap:6px;"><span style="width:8px;height:8px;border-radius:50%;background:${COLORS[ch]};display:inline-block;"></span>${ch}</span>
+        <span>${fmtD(v26)} <span style="color:#5A6B84;font-size:10px;">/ ${fmtD(v25).replace('$','')} 2025</span> ${dStr}</span>
+      </div>
+      <div class="hbar-track" style="margin-bottom:3px;"><div class="hbar-fill" style="width:${(v26/maxA*100).toFixed(1)}%;background:${COLORS[ch]};">2026</div></div>
+      <div class="hbar-track" style="height:14px;"><div class="hbar-fill" style="width:${(v25/maxA*100).toFixed(1)}%;background:${COLORS[ch]};opacity:0.5;height:100%;">2025</div></div>
+    </div>`;
+  }).join('');
+}
+
+// ── YoY Bars ──────────────────────────────────────────────────────────────────
+function renderYoyBars() {
+  const maxVal=Math.max(...moRev26,...moRev25);
+  document.getElementById('yoyBars').innerHTML=MONTHS.map((mo,i)=>{
+    const v26=moRev26[i], v25=moRev25[i];
+    const p26=(v26/maxVal*100).toFixed(1), p25=(v25/maxVal*100).toFixed(1);
+    const delta=v25>0?((v26-v25)/v25*100):null;
+    const dStr=delta!==null
+      ?(delta>=0?`<span style="color:#2E8B57;font-weight:700;">▲${delta.toFixed(1)}% YoY</span>`:`<span style="color:#C0392B;font-weight:700;">▼${Math.abs(delta).toFixed(1)}% YoY</span>`)
+      :'';
+    return `<div class="yoy-bar-group">
+      <div class="yoy-bar-label">
+        <span style="font-weight:700;min-width:36px;">${mo}</span>
+        <span style="color:#1C355E;font-weight:600;margin-left:8px;">2026: ${fmtM(v26)}</span>
+        <span style="color:#FF5F00;margin-left:8px;">2025: ${fmtM(v25)}</span>
+        <span style="margin-left:auto;">${dStr}</span>
+      </div>
+      <div class="yoy-bar-row"><div class="yoy-bar-pill">2026</div>
+        <div style="flex:1;overflow:hidden;"><div class="bar-26" style="width:${p26}%;"></div></div></div>
+      <div class="yoy-bar-row"><div class="yoy-bar-pill">2025</div>
+        <div style="flex:1;overflow:hidden;"><div class="bar-25" style="width:${p25}%;"></div></div></div>
+    </div>`;
+  }).join('');
+}
+
+// ── Detail Table ──────────────────────────────────────────────────────────────
+function renderTable(tableId, data, moTots, fmtFn, showPct) {
+  let html='<thead><tr><th>Channel</th>'+MONTHS.map(m=>`<th class="month-hdr">${m}</th>`).join('')+'<th>YTD Total</th>'+(showPct?'<th>YTD Share</th>':'')+' </tr></thead><tbody>';
+  const annTot=moTots.reduce((s,v)=>s+v,0);
+  CHANNELS.forEach(ch=>{
+    const annCh=data[ch].reduce((s,v)=>s+v,0);
+    html+=`<tr><td style="color:${COLORS[ch]}">● ${ch}</td>`+
+      data[ch].map((v,mi)=>{
+        const pct=moTots[mi]>0?(v/moTots[mi]*100).toFixed(1)+'%':'—';
+        return showPct?`<td><div style="font-size:11px;">${fmtFn(v)}</div><div style="font-size:9px;color:#5A6B84;">${pct}</div></td>`:`<td>${fmtFn(v)}</td>`;
+      }).join('')+
+      `<td style="font-weight:700;">${fmtFn(annCh)}</td>`+
+      (showPct?`<td style="font-weight:700;color:#FF5F00;">${annTot>0?(annCh/annTot*100).toFixed(1)+'%':'—'}</td>`:'')+
+      '</tr>';
+  });
+  html+='<tr class="total-row"><td>TOTAL</td>'+moTots.map(v=>`<td>${fmtFn(v)}</td>`).join('')+`<td>${fmtFn(annTot)}</td>`+(showPct?'<td>100%</td>':'')+' </tr></tbody>';
+  document.getElementById(tableId).innerHTML=html;
+}
+
+// ── Merged RN Table ───────────────────────────────────────────────────────────
+function renderMergedRnTable() {
+  let html='<thead><tr><th>Channel</th>'+MONTHS.map(m=>`<th class="month-hdr" style="min-width:72px;">${m}</th>`).join('')+'<th>YTD Total</th><th>Δ vs 2025</th></tr></thead><tbody>';
+  CHANNELS.forEach(ch=>{
+    const a26=monthlyRn26[ch].reduce((s,v)=>s+v,0), a25=monthlyRn25[ch].reduce((s,v)=>s+v,0);
+    const ad=a26-a25, ap=a25>0?((a26-a25)/a25*100):null;
+    html+=`<tr><td style="color:${COLORS[ch]}">● ${ch}</td>`+
+      monthlyRn26[ch].map((v26,mi)=>{
+        const v25=monthlyRn25[ch][mi]||0, d=v26-v25, p=v25>0?((v26-v25)/v25*100):null;
+        const ds=d>=0?`<div style="color:#2E8B57;font-size:9px;font-weight:700;">▲${Math.round(d).toLocaleString()}</div>`:`<div style="color:#C0392B;font-size:9px;font-weight:700;">▼${Math.round(Math.abs(d)).toLocaleString()}</div>`;
+        const ps=p!==null?(p>=0?`<span style="color:#2E8B57;font-size:8px;">(+${p.toFixed(0)}%)</span>`:`<span style="color:#C0392B;font-size:8px;">(${p.toFixed(0)}%)</span>`):'';
+        return `<td><div style="font-weight:600;">${v26>0?Math.round(v26).toLocaleString():'—'}</div>${(v25>0||v26>0)?ds+'<div>'+ps+'</div>':''}</td>`;
+      }).join('')+
+      `<td style="font-weight:700;">${a26>0?Math.round(a26).toLocaleString():'—'}</td>`+
+      `<td>${ad>=0?`<span style="color:#2E8B57;font-weight:700;font-size:10px;">▲${Math.round(ad).toLocaleString()}</span>`:`<span style="color:#C0392B;font-weight:700;font-size:10px;">▼${Math.round(Math.abs(ad)).toLocaleString()}</span>`}${ap!==null?`<br><span style="font-size:9px;color:${ap>=0?'#2E8B57':'#C0392B'};">${ap>=0?'+':''}${ap.toFixed(1)}%</span>`:''}</td></tr>`;
+  });
+  const t26=moRn26.reduce((s,v)=>s+v,0), t25=moRn25.reduce((s,v)=>s+v,0), td=t26-t25, tp=t25>0?((t26-t25)/t25*100):0;
+  html+='<tr class="total-row"><td>TOTAL</td>'+moRn26.map((v26,mi)=>{const d=v26-moRn25[mi],p=moRn25[mi]>0?((v26-moRn25[mi])/moRn25[mi]*100):0;return `<td><div>${Math.round(v26).toLocaleString()}</div><div style="font-size:9px;opacity:0.8;">${d>=0?'▲':'▼'}${Math.round(Math.abs(d)).toLocaleString()} (${p>=0?'+':''}${p.toFixed(0)}%)</div></td>`;}).join('')+`<td>${Math.round(t26).toLocaleString()}</td><td>${td>=0?'▲':'▼'}${Math.round(Math.abs(td)).toLocaleString()} (${tp>=0?'+':''}${tp.toFixed(1)}%)</td></tr></tbody>`;
+  document.getElementById('rnTableMerged').innerHTML=html;
+}
+
+// ── Merged Pct Table ──────────────────────────────────────────────────────────
+function renderMergedPctTable() {
+  let html='<thead><tr><th>Channel</th>'+MONTHS.map(m=>`<th class="month-hdr" style="min-width:72px;">${m}</th>`).join('')+'<th>YTD Share</th><th>Δ pp</th></tr></thead><tbody>';
+  const at26=moRev26.reduce((s,v)=>s+v,0), at25=moRev25.reduce((s,v)=>s+v,0);
+  CHANNELS.forEach(ch=>{
+    const ac26=monthlyRev26[ch].reduce((s,v)=>s+v,0), ac25=monthlyRev25[ch].reduce((s,v)=>s+v,0);
+    const as26=at26>0?(ac26/at26*100):0, as25=at25>0?(ac25/at25*100):0, adp=as26-as25;
+    html+=`<tr><td style="color:${COLORS[ch]}">● ${ch}</td>`+
+      monthlyRev26[ch].map((v26,mi)=>{
+        const mt26=moRev26[mi], mt25=moRev25[mi], v25=monthlyRev25[ch][mi]||0;
+        const p26=mt26>0?(v26/mt26*100):0, p25=mt25>0?(v25/mt25*100):0, dp=p26-p25;
+        const bg=p26>40?'rgba(28,53,94,0.12)':p26>20?'rgba(28,53,94,0.06)':'transparent';
+        return `<td style="background:${bg};font-weight:${p26>20?'700':'400'};"><div>${p26>0?p26.toFixed(1)+'%':'—'}</div><div style="color:${dp>=0?'#2E8B57':'#C0392B'};font-size:9px;font-weight:700;">${dp>=0?'+':''}${dp.toFixed(1)} pp</div></td>`;
+      }).join('')+
+      `<td style="font-weight:700;color:#FF5F00;">${as26.toFixed(1)}%</td>`+
+      `<td><span style="color:${adp>=0?'#2E8B57':'#C0392B'};font-weight:700;font-size:10px;">${adp>=0?'+':''}${adp.toFixed(1)} pp</span></td></tr>`;
+  });
+  html+='<tr class="total-row"><td>TOTAL</td>'+MONTHS.map(()=>'<td><div>100%</div><div style="font-size:9px;opacity:0.8;">— pp</div></td>').join('')+'<td>100%</td><td>— pp</td></tr></tbody>';
+  document.getElementById('pctTableMerged').innerHTML=html;
+}
+
+// ── Init ──────────────────────────────────────────────────────────────────────
+function init() {
+  ALL_LEGENDS.forEach(renderChips); updateSoloLabels();
+  drawBar('revChart26',monthlyRev26,moRev26,fmtM);
+  drawBar('revChart25',monthlyRev25,moRev25,fmtM);
+  drawBar('rnChart26', monthlyRn26, moRn26, v=>fmtK(v));
+  drawBar('rnChart25', monthlyRn25, moRn25, v=>fmtK(v));
+  drawPct('pctChart26',monthlyRev26,moRev26);
+  drawPct('pctChart25',monthlyRev25,moRev25);
+  drawAdrLine(); renderDonuts(); renderAdrBars(); renderYoyBars();
+  renderTable('detailTable26',monthlyRev26,moRev26,fmtDol,true);
+  renderTable('detailTable25',monthlyRev25,moRev25,fmtDol,true);
+  renderMergedRnTable(); renderMergedPctTable();
+}
+
+window.addEventListener('resize',()=>{
+  drawBar('revChart26',monthlyRev26,moRev26,fmtM); drawBar('revChart25',monthlyRev25,moRev25,fmtM);
+  drawBar('rnChart26',monthlyRn26,moRn26,v=>fmtK(v)); drawBar('rnChart25',monthlyRn25,moRn25,v=>fmtK(v));
+  drawPct('pctChart26',monthlyRev26,moRev26); drawPct('pctChart25',monthlyRev25,moRev25);
+  drawAdrLine();
+});
+window.addEventListener('load',init);
+</script>
+</body>
+</html>

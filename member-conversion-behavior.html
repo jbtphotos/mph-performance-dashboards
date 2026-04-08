@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>My Place Hotels — New Member Conversion Behavior</title>
+<style>
+:root {
+  --navy: #1C355E;
+  --orange: #FF5F00;
+  --blue: #4A7FC1;
+  --green: #2E8B57;
+  --red: #CC3333;
+  --light-bg: #F4F6FA;
+  --card-bg: #fff;
+  --border: #E2E8F0;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family: 'Segoe UI',system-ui,-apple-system,sans-serif; background:var(--light-bg); color:var(--navy); }
+.header { background:var(--navy); color:#fff; padding:24px 32px; display:flex; align-items:center; gap:20px; justify-content:space-between; }
+.header-left { display:flex; align-items:center; gap:20px; }
+.portal-btn { background:rgba(255,255,255,0.12); border:1px solid rgba(255,255,255,0.25); color:rgba(255,255,255,0.8);
+              font-size:12px; padding:6px 14px; border-radius:8px; text-decoration:none; font-weight:600; }
+.portal-btn:hover { background:rgba(255,255,255,0.2); color:#fff; }
+.header img { height:50px; }
+.header h1 { font-size:22px; font-weight:700; }
+.header .sub { font-size:13px; opacity:0.8; margin-top:2px; }
+.container { max-width:1200px; margin:0 auto; padding:24px; }
+
+/* KPI Row */
+.kpi-row { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:24px; }
+.kpi { background:var(--card-bg); border-radius:10px; padding:20px; text-align:center; border-left:4px solid var(--orange); box-shadow:0 1px 4px rgba(0,0,0,0.06); }
+.kpi .label { font-size:12px; text-transform:uppercase; letter-spacing:0.5px; color:#64748B; margin-bottom:6px; }
+.kpi .value { font-size:28px; font-weight:700; color:var(--navy); }
+.kpi .detail { font-size:12px; color:#64748B; margin-top:4px; }
+.kpi.highlight { border-left-color:var(--green); }
+.kpi.highlight .value { color:var(--green); }
+
+/* Section */
+.section { background:var(--card-bg); border-radius:10px; padding:24px; margin-bottom:24px; box-shadow:0 1px 4px rgba(0,0,0,0.06); }
+.section h2 { font-size:17px; font-weight:700; color:var(--navy); margin-bottom:16px; padding-bottom:8px; border-bottom:2px solid var(--orange); }
+.section h3 { font-size:14px; font-weight:600; color:var(--navy); margin:16px 0 10px; }
+
+/* Narrative cards */
+.narrative-row { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin-bottom:24px; }
+.narrative { background:var(--card-bg); border-radius:10px; padding:24px; box-shadow:0 1px 4px rgba(0,0,0,0.06); border-top:3px solid var(--orange); }
+.narrative .n-num { font-size:11px; text-transform:uppercase; letter-spacing:1px; color:var(--orange); font-weight:700; margin-bottom:6px; }
+.narrative .n-title { font-size:16px; font-weight:700; color:var(--navy); margin-bottom:8px; }
+.narrative .n-stat { font-size:32px; font-weight:700; color:var(--navy); margin-bottom:4px; }
+.narrative .n-desc { font-size:13px; color:#64748B; line-height:1.5; }
+
+/* Donut + bar containers */
+.chart-row { display:grid; grid-template-columns:1fr 1fr; gap:24px; }
+.chart-box { text-align:center; }
+.chart-box canvas { max-width:100%; }
+
+/* Channel comparison */
+.ch-compare { display:grid; grid-template-columns:1fr 1fr; gap:24px; }
+.ch-card { background:var(--light-bg); border-radius:8px; padding:20px; }
+.ch-card .ch-title { font-size:14px; font-weight:700; color:var(--navy); margin-bottom:12px; text-align:center; }
+.ch-bar-row { display:flex; align-items:center; gap:8px; margin-bottom:8px; }
+.ch-bar-label { width:70px; font-size:12px; font-weight:600; text-align:right; white-space:nowrap; }
+.ch-bar-track { flex:1; height:24px; background:#E2E8F0; border-radius:4px; overflow:hidden; position:relative; }
+.ch-bar-fill { height:100%; border-radius:4px; display:flex; align-items:center; padding-left:8px; font-size:11px; font-weight:600; color:#fff; min-width:30px; }
+.ch-bar-val { font-size:12px; font-weight:600; width:55px; text-align:left; }
+
+/* ADR comparison */
+.adr-compare { display:flex; align-items:center; justify-content:center; gap:32px; margin:20px 0; }
+.adr-box { text-align:center; padding:20px 32px; border-radius:10px; }
+.adr-box.before { background:#F1F5F9; }
+.adr-box.after { background:#ECFDF5; }
+.adr-box .adr-label { font-size:12px; text-transform:uppercase; letter-spacing:0.5px; color:#64748B; margin-bottom:4px; }
+.adr-box .adr-val { font-size:36px; font-weight:700; }
+.adr-box.before .adr-val { color:var(--navy); }
+.adr-box.after .adr-val { color:var(--green); }
+.adr-arrow { font-size:28px; color:var(--green); font-weight:700; }
+.adr-lift { text-align:center; margin-top:8px; }
+.adr-lift span { background:var(--green); color:#fff; padding:4px 12px; border-radius:20px; font-size:14px; font-weight:600; }
+
+/* Rate plan table */
+table { width:100%; border-collapse:collapse; table-layout:fixed; font-size:13px; }
+th { background:var(--navy); color:#fff; padding:10px 8px; text-align:left; font-size:12px; font-weight:600; text-transform:uppercase; letter-spacing:0.3px; cursor:pointer; }
+th.num { text-align:right; }
+td { padding:8px; border-bottom:1px solid var(--border); }
+td.num { text-align:right; font-variant-numeric:tabular-nums; }
+tr:hover { background:#F8FAFC; }
+.pct-bar { display:inline-block; height:6px; border-radius:3px; background:var(--orange); vertical-align:middle; margin-left:6px; }
+
+/* Footer */
+.footer { text-align:center; padding:20px; font-size:12px; color:#94A3B8; }
+
+@media(max-width:768px) {
+  .kpi-row { grid-template-columns:repeat(2,1fr); }
+  .narrative-row { grid-template-columns:1fr; }
+  .chart-row, .ch-compare { grid-template-columns:1fr; }
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-left">
+  <img src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyBpZD0iTXlfUGxhY2VfSG90ZWxzX0xvZ28iIGRhdGEtbmFtZT0iTXkgUGxhY2UgSG90ZWxzIExvZ28iIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgdmlld0JveD0iMCAwIDQ5My45MzEgNDg4LjQ2OCI+CiAgPGRlZnM+CiAgICA8c3R5bGU+CiAgICAgIC5jbHMtMSB7CiAgICAgICAgZmlsbDogI2UxMWIyMjsKICAgICAgfQoKICAgICAgLmNscy0yIHsKICAgICAgICBmaWxsOiAjZmZmOwogICAgICB9CgogICAgICAuY2xzLTMgewogICAgICAgIGZpbGw6ICNmZDA7CiAgICAgIH0KICAgIDwvc3R5bGU+CiAgPC9kZWZzPgogIDxnPgogICAgPHBhdGggY2xhc3M9ImNscy0zIiBkPSJNMjQ2Ljk2Niw0ODAuOTY2Yy03Mi4xNiwwLTE0My41MjUtNS41MTgtMjE4LjE4NS0xNi44NzJsLTUuNDkxLS44MzUtLjgwMy01LjQ5OEMyLjUwMiwzMjEuMDA1LDIuNTAyLDE4Mi4zMTcsMjIuNDg3LDQ1LjU2bC44MDMtNS40OTcsNS40OTEtLjgzNWM3NC42NTktMTEuMzU2LDE0Ni4wMjQtMTYuODc2LDIxOC4xODUtMTYuODc2czE0My41MjQsNS41MTksMjE4LjE4MiwxNi44NzZsNS40OTIuODM1LjgwMyw1LjQ5N2MxOS45ODYsMTM2Ljc1NywxOS45ODYsMjc1LjQ0NCwwLDQxMi4ybC0uODAzLDUuNDk4LTUuNDkyLjgzNWMtNzQuNjU3LDExLjM1NS0xNDYuMDI0LDE2Ljg3Mi0yMTguMTgyLDE2Ljg3MmgwWiIvPgogICAgPHBhdGggZD0iTTI0Ni45NjQsMjkuODUzYzcxLjczMiwwLDE0My40NjMsNS41OTcsMjE3LjA1NywxNi43OSwxOS44NjgsMTM1Ljk1NSwxOS44NjgsMjc0LjA3OCwwLDQxMC4wMzMtNzMuNTk0LDExLjE5My0xNDUuMzI0LDE2Ljc5MS0yMTcuMDU2LDE2Ljc5MXMtMTQzLjQ2My01LjU5OC0yMTcuMDU2LTE2Ljc5MWMtMTkuODY3LTEzNS45NTUtMTkuODY3LTI3NC4wNzgsMC00MTAuMDMzLDczLjU5My0xMS4xOTMsMTQ1LjMyNC0xNi43OSwyMTcuMDU1LTE2Ljc5TTI0Ni45NjQsMTQuODUzYy03Mi41MzksMC0xNDQuMjc1LDUuNTQ4LTIxOS4zMSwxNi45NmwtMTAuOTgsMS42Ny0xLjYwNiwxMC45OTFjLTIwLjA4OSwxMzcuNDc4LTIwLjA4OSwyNzYuODkzLDAsNDE0LjM3MmwxLjYwNiwxMC45ODksMTAuOTgsMS42NzFjNzUuMDM2LDExLjQxMywxNDYuNzczLDE2Ljk2MSwyMTkuMzExLDE2Ljk2MXMxNDQuMjc1LTUuNTQ4LDIxOS4zMTEtMTYuOTYxbDEwLjk4LTEuNjcxLDEuNjA1LTEwLjk4OWMyMC4wOTEtMTM3LjQ3OSwyMC4wOTEtMjc2Ljg5NCwwLTQxNC4zNzJsLTEuNjA1LTEwLjk5MS0xMC45OC0xLjY3Yy03NS4wMzUtMTEuNDEyLTE0Ni43NzItMTYuOTYtMjE5LjMxMi0xNi45NmgwWiIvPgogIDwvZz4KICA8Zz4KICAgIDxwYXRoIGNsYXNzPSJjbHMtMSIgZD0iTTM4Ni4yODksMTQ3LjE2MmMwLDc2LjgwMi02Mi4yNTQsMTM5LjA1Ny0xMzkuMDYyLDEzOS4wNTdzLTEzOS4wNTItNjIuMjU1LTEzOS4wNTItMTM5LjA1N1MxNzAuNDI4LDguMTAxLDI0Ny4yMjcsOC4xMDFzMTM5LjA2Miw2Mi4yNTQsMTM5LjA2MiwxMzkuMDYxWiIvPgogICAgPHBhdGggZD0iTTk5LjMyNywxNDYuOTQxQzk5LjMyNyw2NS43NzgsMTY1LjExMywwLDI0Ni4yNzIsMGgwYzgxLjE2MSwwLDE0Ni45MzksNjUuNzc4LDE0Ni45NDMsMTQ2Ljk0MWgwYy0uMDA0LDgxLjE2NC02NS43ODIsMTQ2LjkzNy0xNDYuOTQzLDE0Ni45NTFoMGMtODEuMTU4LS4wMTUtMTQ2Ljk0NC02NS43ODctMTQ2Ljk0NC0xNDYuOTUxaDBaTTExNS4xMDcsMTQ2Ljk0MWMuMTI4LDcyLjQ0Myw1OC43MjIsMTMxLjAzMywxMzEuMTY1LDEzMS4xNjZoMGM3Mi40NDEtLjEzMywxMzEuMDMzLTU4LjcyMywxMzEuMTc0LTEzMS4xNjZoMGMtLjE0MS03Mi40NDctNTguNzMyLTEzMS4wMzUtMTMxLjE3NC0xMzEuMTY2aDBjLTcyLjQ0My4xMzEtMTMxLjAzNyw1OC43MTktMTMxLjE2NSwxMzEuMTY2aDBaIi8+CiAgICA8Zz4KICAgICAgPHBhdGggZD0iTTg2LjQ4OSwyNTMuMzcyYy0xMC4zNjIsMC0xOS4wNzgtNC42NjctMjMuMzEzLTEyLjQ5NS0yLjUyMi00LjYzOS01LjQ5LTE0LjM0MiwyLjg4Mi0yNy4yMjEsNS42NDctOC42NzEsMTEuMzE5LTE3LjMyMiwxNi45NzItMjUuOTgybDQuOTA3LTcuNDg4YzguMDkyLTEyLjM4NywxNi4xNTctMjQuOCwyNC4yMzMtMzcuMjA0bDYuNzE3LTEwLjMzNiwxMS4wODgtMTcuMDE2LDExLjA3Ni0xNy4wMjgsMS4xODctMS44NWM2LjA2My05LjQzOSwxNS4yMDUtMjMuNywzMy42MDctMjMuNyw2LjA1OSwwLDI1LjgyNSwyLjE2MSwyNS44MjUsMzAuMDE2djQuNzI0YzMuNzM2LTUuMzksNy40NjctMTAuNzc0LDExLjIwNi0xNi4xNjcsNy44MTktMTAuOTM0LDE5LjY0Ny0xNy42NDMsMzAuOTc5LTE3LjY0Myw3LjE2NSwwLDEzLjc3NCwyLjY5MywxOC42Miw3LjU2NSwzLjk1MiwzLjk4Miw4LjY0NSwxMS4zOTcsOC41NjcsMjQuMDc2LS4xMjUsMTguOTYxLS4xMTIsMzguMjY4LS4wODYsNTYuOTNsLjAyMSwyMi40NzNjMCwxLjI3LjA3NSwyLjYxNS4xMzQsMy45OTIuMzgsOC4xMTMsMS4wMjMsMjEuNjkxLTEwLjE5NCwzMC4zMjgtNC45OSwzLjg0Ny0xMS4zMTQsNS45NjItMTcuODI0LDUuOTYyLTUuMzM2LDAtMTAuNDUzLTEuNDI0LTE0Ljc5MS00LjExOS0xMy4zMTItOC4yNTYtMTIuNTc2LTIzLjIyNC0xMi4xNDMtMzIuMTcxLjA3OS0xLjQyMi4xNDgtMi44MDkuMTQ4LTQuMDk4di0xLjI4MWwtMTYuNjY5LDI0LjU5MmMtMy4wNSw0LjQ5OC0xMS4xNjIsMTYuNDkxLTI1LjUxNSwxNy40MTQtLjU1OS4wMzktMS4xMTUuMDYxLTEuNjc2LjA2MS0xMi45MTQsMC0yMy43ODMtOS44NDQtMjUuMjk1LTIyLjkxMy0uNDU5LTMuOTc2LS43MzItNy45ODYtLjg2NS0xMS45OTRsLTMwLjk5LDQ3LjI4OWMtNi4zMTUsOS40NjUtMTcuMzQsMTUuMjg2LTI4LjgxLDE1LjI4NmgwWiIvPgogICAgICA8cGF0aCBjbGFzcz0iY2xzLTIiIGQ9Ik0xNzUuODQyLDg1Ljc4M2MxMC44NjcsMCwxMy4wOTMsOC4wOSwxMy4wOTMsMTcuMjgzdjQ1LjQ3OWMxMS40NjItMTYuNTU3LDIyLjkzNC0zMy4xMTcsMzQuNDA1LTQ5LjY3NiwxMS45MjUtMTYuNjYxLDM1LjEzNS0xNy43NjksMzQuOTcsNi42NzItLjE3OSwyNi40OS0uMDY3LDUyLjk5NC0uMDY3LDc5LjQ4MiwwLDcuOTg1LDIuMTkxLDE4LjYyMy01LjEwMSwyNC4yMzYtNS4wMjEsMy44Ny0xMi42ODUsNC40ODItMTguMTI2LDEuMTA5LTguNDQzLTUuMjQtNS45NzctMTcuMTM5LTUuOTc3LTI1LjQ0NnYtNDIuNzUzYy0xMy4zMDksMTkuNjMxLTI2LjYyMSwzOS4yNjktMzkuOTM1LDU4LjkwMi0zLjc1OSw1LjU1MS04LjU2NywxMS40LTE1LjgwNCwxMS44Ny02Ljk4MS40NTEtMTIuNzA4LTQuNzc0LTEzLjQ5LTExLjYwNC0yLjAyNy0xNy42MjctLjA3OS0zNi41NTMtLjA3OS01NC4zMDMtMTguMzY0LDI4LjAyOS0zNi43MjYsNTYuMDQzLTU1LjA5Myw4NC4wNzEtMTEuMDc3LDE2LjYxLTQxLjU3MiwxMC41MDYtMjcuOTA1LTEwLjUwMSw3LjI2LTExLjE2NiwxNC41NzUtMjIuMzA4LDIxLjg2MS0zMy40NTYsMTAuMzQ1LTE1LjgzOCwyMC42NTEtMzEuNzA1LDMwLjk2Ny00Ny41NTgsNy4zODgtMTEuMzUsMTQuNzcyLTIyLjY5NSwyMi4xNi0zNC4wNDcsNS44OTQtOS4wNzYsMTEuODI0LTE5Ljc2MiwyNC4xMi0xOS43NjIiLz4KICAgIDwvZz4KICAgIDxnPgogICAgICA8cGF0aCBkPSJNMjgxLjcsMjY4LjIxMWMtOC4xMjcsMC0xNS43OTQtNC4zMDMtMjAuNTE3LTExLjUxMi00Ljk0My03LjU2My01Ljc0Mi0xNi45OTgtMi4xNDItMjUuMjUsMy40MjYtNy44MTMsNy43MzUtMTUuMTQ0LDExLjUyOS0yMS42MDEsNS45NDctMTAuMTE2LDE5LjgxMy0zNC42ODcsMjMuODQ1LTQzLjQzM2wtNS4zMi0xOS4yMTEtMTQuNjI2LTUyLjg1OWMtMS44NDgtNi42ODgsMi4wMDItMTMuNjI3LDguNjY0LTE1LjYwM2wyNC4xNy03LjE1NGMxLjE4MS0uMzUsMi40MDItLjUyMiwzLjYwNS0uNTIyLDIuMjE1LDAsNC40MS41NzgsNi4zNjUsMS42OTYsMy4wMjUsMS43MzUsNS4xOTMsNC42NDEsNi4wMTksOC4wM2w0LjUwMiwxOC41NmM1Ljk5NC0xMy40MTMsMTIuMTExLTI3LjA3NiwxOC4yNTktNDAuNTMyLjk0NC0yLjA1OSwxLjg1Mi00LjE2NCwyLjc3NC02LjI5NywyLjg0Ni02LjU3OCw1Ljc5NS0xMy4zODksOS44NjUtMTkuODE2LDQuNTMxLTcuMTg0LDExLjc0Mi0xMS4yOTksMTkuNzczLTExLjI5OXMxNS44NzksNC4xMzEsMjAuOTEzLDExLjA0OGM0Ljk0Miw2Ljc5LDYuMzI5LDE1LjE1MiwzLjgxLDIyLjk0NC0uMTQ3LjQ0Ni0uMzA2Ljg4Ni0uNDk5LDEuMzExbC0zMi42MDMsNzIuMzU5Yy02Ljc3OCwxNC41OC0xMy45NDcsMjkuMTk3LTIxLjk2OSw0NC44MjUtLjk4NCwxLjkwNy0yLjM5OCw0LjcyNi00LjEyNyw4LjE2MS0yMC40NTksNDAuNjQ0LTM1LjkyNCw2OS41NjEtNDQuODgxLDc4LjU2Ni00Ljg2MSw0Ljg5My0xMS4wNDcsNy41ODgtMTcuNDExLDcuNTg4aDBaIi8+CiAgICAgIDxwYXRoIGNsYXNzPSJjbHMtMiIgZD0iTTM1OC40NzcsMTIzLjgzOWMtNi45MzMsMTQuODk1LTE0LjE4NSwyOS42MzQtMjEuNjg3LDQ0LjIzOS02Ljk4NiwxMy41OTktMzUuODAzLDcyLjYwMy00Ni43MDEsODMuNTY0LTEwLjUzOCwxMC41OTQtMjQuNzQ3LTIuODExLTE5LjM4MS0xNS4wOTYsMy4wNi02Ljk2OSw2Ljk5NC0xMy42OTcsMTAuODQ4LTIwLjI1MiwxLjQ0Ni0yLjQ2NywyNi45OTItNDYuNTYzLDI2LjE1Ni00OS41NzEtNi45OTQtMjUuMjU3LTEzLjk4NC01MC41MTMtMjAuOTcyLTc1Ljc3MmwyNC4xNzYtNy4xNTIsMTMuMzA2LDU0LjgyOGMxMS4xMjktMjQuODM4LDIyLjEwMi00OS43NSwzMy40MTYtNzQuNTA0LDMuNzIxLTguMTM3LDcuMDEyLTE3LjAxOSwxMS44MTQtMjQuNjA1LDcuOTU3LTEyLjU5NiwyNS43NDItLjc3MSwyMS42MTksMTEuOTYzbC0zMi41OTQsNzIuMzU4Ii8+CiAgICA8L2c+CiAgPC9nPgogIDxnPgogICAgPHBhdGggZD0iTTg0LjQxOSwzNjYuNjZoLTIwLjc4OXYzMy40NzloLTE4Ljg5OXYtOTQuNDk2aDQxLjMwOWMxNy44MTgsMCwzMi41MzQsOS44NTQsMzIuNTM0LDI5Ljk2OCwwLDIxLjg3LTE0LjU3OSwzMS4wNDktMzQuMTU0LDMxLjA0OVpNODUuMzY0LDMyNC4wMDNoLTIxLjczM3YyNC4yOTloMjIuMDAzYzguNzc2LDAsMTMuNS00LjA1MSwxMy41LTEyLjI4NXMtNS4zOTgtMTIuMDE0LTEzLjc3LTEyLjAxNFoiLz4KICAgIDxwYXRoIGQ9Ik0xMjkuNzgsNDAwLjEzOXYtOTQuNDk2aDE4Ljg5OXY3Ni4wMDJoNDcuMzg0djE4LjQ5NGgtNjYuMjgzWiIvPgogICAgPHBhdGggZD0iTTI3NC40NjYsNDAwLjEzOWwtNy40MjYtMjEuMDU5aC0zNC41NTlsLTcuNDI0LDIxLjA1OWgtMjAuMjVsMzYuMTgtOTQuNDk2aDE4LjM1OGwzNS45MDksOTQuNDk2aC0yMC43ODlaTTI1NC40ODcsMzQzLjk4MWMtMS44OTEtNS41MzQtMy43ODEtMTEuMjA1LTQuNzI2LTE0LjcxNS0uOTQ0LDMuNTEtMi44MzQsOS4xODEtNC43MjQsMTQuNzE1bC02LjA3NSwxNy4xNDVoMjEuNmwtNi4wNzQtMTcuMTQ1WiIvPgogICAgPHBhdGggZD0iTTM1My4xMTYsMzMzLjE4Yy0zLjM3NS02LjQ3OC04Ljc3NS0xMC4yNTgtMTcuMjc5LTEwLjI1OC0xNC4xNzUsMC0yMi4yNzMsMTIuNDE5LTIyLjI3MywyOS45NjgsMCwxNy4wMSw4LjIzMywyOS45NywyMi40MDgsMjkuOTcsOC41MDYsMCwxMy40OTktMy42NDQsMTguNDk0LTEyLjAxNmwxNS45Myw5LjQ1Yy02LjQ4LDEzLjM2NC0xNy44MTksMjEuMzI5LTM0Ljk2NCwyMS4zMjktMjQuNzAzLDAtNDEuMzA5LTE4Ljg5OC00MS4zMDktNDguNzMzLDAtMjguNzUzLDE3LjI3OS00OC43MzIsNDEuOTgzLTQ4LjczMiwxNy44MiwwLDI4LjYxOSw4LjY0LDM0LjU1OSwyMC45MjRsLTE3LjU0OSw4LjA5OVoiLz4KICAgIDxwYXRoIGQ9Ik0zODEuNTY3LDQwMC4xMzl2LTk0LjQ5Nmg2NS42MDd2MTguNDk0aC00Ni43MDd2MTYuMzM0aDI3LjEzM3YxOC4zNTloLTI3LjEzM3YyMi44MTRoNDguNzMzdjE4LjQ5NGgtNjcuNjMzWiIvPgogIDwvZz4KICA8Zz4KICAgIDxwYXRoIGNsYXNzPSJjbHMtMSIgZD0iTTE2OS41ODIsNDM4Ljk0djcuNTY3aDYuNjI4di03LjU2N2g1LjQ3OHYyMC40aC01LjQ3OHYtOC4wNWgtNi42Mjh2OC4wNWgtNS40Nzh2LTIwLjRoNS40NzhaIi8+CiAgICA8cGF0aCBjbGFzcz0iY2xzLTEiIGQ9Ik0yMDUuNzI2LDQ1OS42NzRjLTYuMzI2LDAtOS44MDctNC43NTMtOS44MDctMTAuNDEzLDAtNS45MzIsMy44NzQtMTAuNjUzLDEwLjE0LTEwLjY1Myw2LjU2OCwwLDkuODk3LDQuODcyLDkuODk3LDEwLjMyMSwwLDYuNTY4LTMuOTM1LDEwLjc0NS0xMC4yLDEwLjc0NWgtLjAzWk0yMDUuOTk4LDQ1NS4zNDZjMi42MzQsMCw0LjE3Ny0yLjU0Miw0LjE3Ny02LjIzNSwwLTMuNTEtMS41NzQtNi4xNzQtNC4yMzctNi4xNzQtMi42MzMsMC00LjIzNywyLjY2My00LjIzNyw2LjIwNC0uMDMsMy42NjMsMS42MDQsNi4yMDUsNC4yMzcsNi4yMDVoLjA2WiIvPgogICAgPHBhdGggY2xhc3M9ImNscy0xIiBkPSJNMjM0LjU2LDQ0My41NDJoLTUuMjA2di00LjYwMmgxNS45ODF2NC42MDJoLTUuMjk2djE1Ljc5OWgtNS40Nzh2LTE1Ljc5OVoiLz4KICAgIDxwYXRoIGNsYXNzPSJjbHMtMSIgZD0iTTI3Mi4zNjgsNDUxLjEwOGgtNy4zMjR2My43NTNoOC4yMDJ2NC40OGgtMTMuNjh2LTIwLjRoMTMuMjU3djQuNDhoLTcuNzc5djMuMjY5aDcuMzI0djQuNDE5WiIvPgogICAgPHBhdGggY2xhc3M9ImNscy0xIiBkPSJNMjg3LjYsNDM4Ljk0aDUuNDc4djE1LjgzaDcuODM5djQuNTdoLTEzLjMxN3YtMjAuNFoiLz4KICAgIDxwYXRoIGNsYXNzPSJjbHMtMSIgZD0iTTMxNi4xNzcsNDUzLjg5M2MxLjI0MS42MzYsMy4yMzksMS4yNzEsNS4yOTYsMS4yNzEsMS44NzcsMCwyLjc4NS0uNjM2LDIuNzg1LTEuNjY1LDAtLjk5OS0uOTA4LTEuNTQzLTMuMjA4LTIuMzMxLTMuNDUxLTEuMjQxLTUuNzUxLTMuMTE2LTUuNzUxLTYuMTQzLDAtMy42MDIsMy4wNTctNi4zODYsOC4yMDMtNi4zODYsMi40MjEsMCw0LjE3Ny40NTQsNS41MDksMS4wM2wtMS4xNSw0LjM4OGMtLjg3OC0uMzkzLTIuMzkxLS45NjgtNC40MTktLjk2OC0xLjY2NSwwLTIuNTczLjYwNS0yLjU3MywxLjUxMywwLDEuMDMsMS4wOSwxLjQyMiwzLjY2MywyLjM5MSwzLjY2MiwxLjM2Miw1LjI5NiwzLjI5OSw1LjI5Niw2LjE0MywwLDMuNTEyLTIuNzI0LDYuNTA3LTguNjg3LDYuNTA3LTIuNDUxLDAtNC44NDMtLjYzNi01Ljk5Mi0xLjI0bDEuMDI5LTQuNTFaIi8+CiAgPC9nPgogIDxwYXRoIGQ9Ik0yNDYuOTY2LDQxMS44ODljLTY2Ljk1NSwwLTEzMy45MTMsNi43NDMtMjAyLjIzNCwyMC4xODZ2Ny42NWM2OC40MTgtOS43MzksMTM1LjMyNi0xNC42MTMsMjAyLjIzNC0xNC42MTNzMTMzLjgxNiw0Ljg3NSwyMDIuMjMzLDE0LjYxM3YtNy42NWMtNjguMzItMTMuNDQzLTEzNS4yNzktMjAuMTg2LTIwMi4yMzMtMjAuMTg2WiIvPgogIDxwYXRoIGQ9Ik00NjUuNzU5LDMxNC44MzRjMCwzLjk5OS0zLjEzOSw3LjEzOC03LjIyNCw3LjEzOC00LjA0MiwwLTcuMjY3LTMuMTM5LTcuMjY3LTcuMTM4LDAtMy45MTMsMy4yMjUtNy4wNTIsNy4yNjctNy4wNTIsNC4wODUsMCw3LjIyNCwzLjEzOSw3LjIyNCw3LjA1MlpNNDUzLjA3NCwzMTQuODM0YzAsMy4xMzksMi4zMjIsNS42MzMsNS41MDQsNS42MzMsMy4wOTYsMCw1LjM3NS0yLjQ5NCw1LjM3NS01LjU5LDAtMy4xMzktMi4yNzktNS42NzYtNS40MTgtNS42NzZzLTUuNDYxLDIuNTM3LTUuNDYxLDUuNjMzWk00NTcuNDE3LDMxOC41MzJoLTEuNjM0di03LjA1MmMuNjQ1LS4xMjksMS41NDgtLjIxNSwyLjcwOS0uMjE1LDEuMzMzLDAsMS45MzUuMjE1LDIuNDUxLjUxNi4zODcuMzAxLjY4OC44Ni42ODgsMS41NDgsMCwuNzc0LS42MDIsMS4zNzYtMS40NjIsMS42MzR2LjA4NmMuNjg4LjI1OCwxLjA3NS43NzQsMS4yOSwxLjcyLjIxNSwxLjA3NS4zNDQsMS41MDUuNTE2LDEuNzYzaC0xLjc2M2MtLjIxNS0uMjU4LS4zNDQtLjkwMy0uNTU5LTEuNzItLjEyOS0uNzc0LS41NTktMS4xMTgtMS40NjItMS4xMThoLS43NzR2Mi44MzhaTTQ1Ny40NjEsMzE0LjUzM2guNzc0Yy45MDMsMCwxLjYzNC0uMzAxLDEuNjM0LTEuMDMyLDAtLjY0NS0uNDczLTEuMDc1LTEuNTA1LTEuMDc1LS40MywwLS43MzEuMDQzLS45MDMuMDg2djIuMDIxWiIvPgo8L3N2Zz4=" alt="My Place Hotels">
+  <div>
+    <h1>New Member Conversion Behavior</h1>
+    <div class="sub">Prior Booking Analysis — Stay Rewarded Members Through March 31, 2026</div>
+  </div>
+  </div>
+  <a href="index.html" class="portal-btn">&larr; Portal</a>
+</div>
+
+<div class="container">
+
+<!-- KPI Row -->
+<div class="kpi-row">
+  <div class="kpi">
+    <div class="label">Total New Members</div>
+    <div class="value">3,280</div>
+    <div class="detail">Since pilot launch</div>
+  </div>
+  <div class="kpi">
+    <div class="label">Members with Prior Stays</div>
+    <div class="value">226</div>
+    <div class="detail">6.9% of all new members</div>
+  </div>
+  <div class="kpi">
+    <div class="label">New-to-Brand Members</div>
+    <div class="value">3,054</div>
+    <div class="detail">93.1% — first-time guests</div>
+  </div>
+  <div class="kpi highlight">
+    <div class="label">ADR Lift After Joining</div>
+    <div class="value">+$14.92</div>
+    <div class="detail">$95.05 → $109.97 (+15.7%)</div>
+  </div>
+</div>
+
+<!-- Three Narrative Cards -->
+<div class="narrative-row">
+  <div class="narrative">
+    <div class="n-num">Narrative 1</div>
+    <div class="n-title">Net-New Guest Acquisition</div>
+    <div class="n-stat">93.1%</div>
+    <div class="n-desc">The vast majority of Stay Rewarded members are brand-new to My Place Hotels. Only 226 of 3,280 members had any prior booking history — meaning the program is driving genuine new business, not just rewarding existing guests.</div>
+  </div>
+  <div class="narrative">
+    <div class="n-num">Narrative 2</div>
+    <div class="n-title">OTA → Direct Channel Shift</div>
+    <div class="n-stat">48% → 0%</div>
+    <div class="n-desc">Before joining, 48.2% of returning-guest bookings came through OTA/GDS channels (Expedia, Booking.com, etc.). After converting to Stay Rewarded, 100% of their bookings are direct — eliminating OTA commissions entirely.</div>
+  </div>
+  <div class="narrative">
+    <div class="n-num">Narrative 3</div>
+    <div class="n-title">Members Are Not Trading Down</div>
+    <div class="n-stat">+15.7%</div>
+    <div class="n-desc">Prior stays averaged $95.05 ADR. After becoming members, the same pool averages $109.97 ADR — a $14.92 increase. The member rate program is not cannibalizing revenue; it's growing it while building loyalty.</div>
+  </div>
+</div>
+
+<!-- Member Acquisition Breakdown -->
+<div class="section">
+  <h2>Member Acquisition Breakdown</h2>
+  <div class="chart-row">
+    <div class="chart-box">
+      <canvas id="acquisitionDonut" width="280" height="280"></canvas>
+    </div>
+    <div style="display:flex;flex-direction:column;justify-content:center;padding:20px;">
+      <div style="margin-bottom:20px;">
+        <div style="font-size:13px;color:#64748B;">New-to-Brand Members</div>
+        <div style="font-size:32px;font-weight:700;color:var(--navy);">3,054</div>
+        <div style="font-size:13px;color:#64748B;">No prior booking history at My Place</div>
+      </div>
+      <div>
+        <div style="font-size:13px;color:#64748B;">Returning Guest Conversions</div>
+        <div style="font-size:32px;font-weight:700;color:var(--orange);">226</div>
+        <div style="font-size:13px;color:#64748B;">Had prior stays before becoming members</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Channel Shift Analysis -->
+<div class="section">
+  <h2>Channel Shift — Before vs. After Membership</h2>
+  <div class="ch-compare">
+    <div class="ch-card">
+      <div class="ch-title">Before Joining (226 Members, 862 Room Nights)</div>
+      <div class="ch-bar-row">
+        <div class="ch-bar-label">PMS</div>
+        <div class="ch-bar-track"><div class="ch-bar-fill" style="width:56.3%;background:var(--blue);">56.3%</div></div>
+        <div class="ch-bar-val">485 RN</div>
+      </div>
+      <div class="ch-bar-row">
+        <div class="ch-bar-label">OTA/GDS</div>
+        <div class="ch-bar-track"><div class="ch-bar-fill" style="width:37%;background:var(--red);">37.0%</div></div>
+        <div class="ch-bar-val">319 RN</div>
+      </div>
+      <div class="ch-bar-row">
+        <div class="ch-bar-label">WEB</div>
+        <div class="ch-bar-track"><div class="ch-bar-fill" style="width:6.7%;background:var(--green);">6.7%</div></div>
+        <div class="ch-bar-val">58 RN</div>
+      </div>
+    </div>
+    <div class="ch-card">
+      <div class="ch-title">After Joining (3,280 Members, 9,057 Room Nights)</div>
+      <div class="ch-bar-row">
+        <div class="ch-bar-label">PMS</div>
+        <div class="ch-bar-track"><div class="ch-bar-fill" style="width:64%;background:var(--blue);">64.0%</div></div>
+        <div class="ch-bar-val">5,796 RN</div>
+      </div>
+      <div class="ch-bar-row">
+        <div class="ch-bar-label">OTA/GDS</div>
+        <div class="ch-bar-track"><div class="ch-bar-fill" style="width:0%;background:var(--red);min-width:0;">0%</div></div>
+        <div class="ch-bar-val">0 RN</div>
+      </div>
+      <div class="ch-bar-row">
+        <div class="ch-bar-label">WEB</div>
+        <div class="ch-bar-track"><div class="ch-bar-fill" style="width:36%;background:var(--green);">36.0%</div></div>
+        <div class="ch-bar-val">3,261 RN</div>
+      </div>
+    </div>
+  </div>
+  <div style="text-align:center;margin-top:16px;">
+    <span style="background:var(--green);color:#fff;padding:6px 16px;border-radius:20px;font-size:13px;font-weight:600;">OTA/GDS bookings eliminated — 100% direct after membership</span>
+  </div>
+</div>
+
+<!-- ADR Comparison -->
+<div class="section">
+  <h2>ADR Comparison — Before vs. After Membership</h2>
+  <div class="adr-compare">
+    <div class="adr-box before">
+      <div class="adr-label">Before Joining</div>
+      <div class="adr-val">$95.05</div>
+      <div style="font-size:12px;color:#64748B;margin-top:4px;">862 room nights</div>
+    </div>
+    <div class="adr-arrow">→</div>
+    <div class="adr-box after">
+      <div class="adr-label">After Joining</div>
+      <div class="adr-val">$109.97</div>
+      <div style="font-size:12px;color:#64748B;margin-top:4px;">9,057 room nights</div>
+    </div>
+  </div>
+  <div class="adr-lift"><span>+$14.92 per night (+15.7%)</span></div>
+  
+  <h3>ADR by Channel — Before Membership</h3>
+  <div class="adr-compare" style="margin-top:12px;">
+    <div class="adr-box before" style="padding:14px 24px;">
+      <div class="adr-label">PMS</div>
+      <div class="adr-val" style="font-size:24px;">$97.02</div>
+      <div style="font-size:11px;color:#64748B;">485 RN · $47,053</div>
+    </div>
+    <div class="adr-box before" style="padding:14px 24px;">
+      <div class="adr-label">OTA/GDS</div>
+      <div class="adr-val" style="font-size:24px;">$91.13</div>
+      <div style="font-size:11px;color:#64748B;">319 RN · $29,069</div>
+    </div>
+    <div class="adr-box before" style="padding:14px 24px;">
+      <div class="adr-label">WEB</div>
+      <div class="adr-val" style="font-size:24px;">$100.11</div>
+      <div style="font-size:11px;color:#64748B;">58 RN · $5,806</div>
+    </div>
+  </div>
+</div>
+
+<!-- Prior Booking Rate Plan Detail -->
+<div class="section">
+  <h2>Prior Booking Rate Plans — Before Membership (226 Members)</h2>
+  
+  <h3>PMS Channel — 106 Members · 485 Room Nights · $47,053 Revenue</h3>
+  <table>
+    <thead><tr>
+      <th style="width:30%">Rate Plan</th>
+      <th class="num" style="width:14%">Members</th>
+      <th class="num" style="width:14%">Room Nights</th>
+      <th class="num" style="width:14%">ADR</th>
+      <th class="num" style="width:14%">Revenue</th>
+      <th class="num" style="width:14%">% of PMS</th>
+    </tr></thead>
+    <tbody>
+      <tr><td>NIGHTLY</td><td class="num">57</td><td class="num">119</td><td class="num">$114.77</td><td class="num">$13,658</td><td class="num">29.0%<span class="pct-bar" style="width:29px;"></span></td></tr>
+      <tr><td>WEEKMONTH</td><td class="num">1</td><td class="num">116</td><td class="num">$70.09</td><td class="num">$8,130</td><td class="num">17.3%<span class="pct-bar" style="width:17px;"></span></td></tr>
+      <tr><td>TXRDHS</td><td class="num">1</td><td class="num">69</td><td class="num">$97.49</td><td class="num">$6,727</td><td class="num">14.3%<span class="pct-bar" style="width:14px;"></span></td></tr>
+      <tr><td>EXTENDED</td><td class="num">3</td><td class="num">37</td><td class="num">$95.41</td><td class="num">$3,530</td><td class="num">7.5%<span class="pct-bar" style="width:8px;"></span></td></tr>
+      <tr><td>AAA/CAA</td><td class="num">12</td><td class="num">20</td><td class="num">$123.37</td><td class="num">$2,467</td><td class="num">5.2%<span class="pct-bar" style="width:5px;"></span></td></tr>
+      <tr style="font-style:italic;color:#64748B;"><td>Other (31 plans)</td><td class="num">32</td><td class="num">124</td><td class="num">$101.93</td><td class="num">$12,541</td><td class="num">26.7%<span class="pct-bar" style="width:27px;"></span></td></tr>
+    </tbody>
+  </table>
+
+  <h3 style="margin-top:24px;">OTA/GDS Channel (SYDC) — 109 Members · 319 Room Nights · $29,069 Revenue</h3>
+  <table>
+    <thead><tr>
+      <th style="width:30%">Rate Plan</th>
+      <th class="num" style="width:14%">Members</th>
+      <th class="num" style="width:14%">Room Nights</th>
+      <th class="num" style="width:14%">ADR</th>
+      <th class="num" style="width:14%">Revenue</th>
+      <th class="num" style="width:14%">% of OTA</th>
+    </tr></thead>
+    <tbody>
+      <tr><td>BKG1 <span style="font-size:11px;color:#94A3B8;">(Booking.com)</span></td><td class="num">12</td><td class="num">96</td><td class="num">$81.20</td><td class="num">$7,796</td><td class="num">26.8%<span class="pct-bar" style="width:27px;"></span></td></tr>
+      <tr><td>EQB <span style="font-size:11px;color:#94A3B8;">(Expedia)</span></td><td class="num">34</td><td class="num">72</td><td class="num">$83.30</td><td class="num">$5,998</td><td class="num">20.6%<span class="pct-bar" style="width:21px;"></span></td></tr>
+      <tr><td>EQBHC <span style="font-size:11px;color:#94A3B8;">(Expedia HC)</span></td><td class="num">12</td><td class="num">33</td><td class="num">$103.99</td><td class="num">$3,432</td><td class="num">11.8%<span class="pct-bar" style="width:12px;"></span></td></tr>
+      <tr><td>BKGVCC <span style="font-size:11px;color:#94A3B8;">(Booking VCC)</span></td><td class="num">18</td><td class="num">32</td><td class="num">$101.54</td><td class="num">$3,249</td><td class="num">11.2%<span class="pct-bar" style="width:11px;"></span></td></tr>
+      <tr><td>BKEXT1</td><td class="num">1</td><td class="num">19</td><td class="num">$159.00</td><td class="num">$3,021</td><td class="num">10.4%<span class="pct-bar" style="width:10px;"></span></td></tr>
+      <tr style="font-style:italic;color:#64748B;"><td>Other (11 plans)</td><td class="num">32</td><td class="num">67</td><td class="num">$82.17</td><td class="num">$5,573</td><td class="num">19.2%<span class="pct-bar" style="width:19px;"></span></td></tr>
+    </tbody>
+  </table>
+
+  <h3 style="margin-top:24px;">WEB Channel — 22 Members · 58 Room Nights · $5,806 Revenue</h3>
+  <table>
+    <thead><tr>
+      <th style="width:30%">Rate Plan</th>
+      <th class="num" style="width:14%">Members</th>
+      <th class="num" style="width:14%">Room Nights</th>
+      <th class="num" style="width:14%">ADR</th>
+      <th class="num" style="width:14%">Revenue</th>
+      <th class="num" style="width:14%">% of WEB</th>
+    </tr></thead>
+    <tbody>
+      <tr><td>NIGHTLY</td><td class="num">16</td><td class="num">26</td><td class="num">$113.61</td><td class="num">$2,954</td><td class="num">50.9%<span class="pct-bar" style="width:51px;"></span></td></tr>
+      <tr><td>EXTENDED</td><td class="num">2</td><td class="num">26</td><td class="num">$88.15</td><td class="num">$2,292</td><td class="num">39.5%<span class="pct-bar" style="width:40px;"></span></td></tr>
+      <tr><td>AP21</td><td class="num">2</td><td class="num">3</td><td class="num">$82.13</td><td class="num">$246</td><td class="num">4.2%<span class="pct-bar" style="width:4px;"></span></td></tr>
+      <tr><td>AP7</td><td class="num">1</td><td class="num">2</td><td class="num">$94.60</td><td class="num">$189</td><td class="num">3.3%<span class="pct-bar" style="width:3px;"></span></td></tr>
+      <tr><td>AAA/CAA</td><td class="num">1</td><td class="num">1</td><td class="num">$125.10</td><td class="num">$125</td><td class="num">2.2%<span class="pct-bar" style="width:2px;"></span></td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- Revenue Impact -->
+<div class="section">
+  <h2>Revenue Impact Summary</h2>
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;">
+    <div style="background:var(--light-bg);border-radius:8px;padding:20px;text-align:center;">
+      <div style="font-size:12px;text-transform:uppercase;color:#64748B;letter-spacing:0.5px;">Prior Revenue (226 Members)</div>
+      <div style="font-size:28px;font-weight:700;color:var(--navy);margin-top:6px;">$81,929</div>
+      <div style="font-size:12px;color:#64748B;margin-top:4px;">862 room nights · $95.05 ADR</div>
+    </div>
+    <div style="background:var(--light-bg);border-radius:8px;padding:20px;text-align:center;">
+      <div style="font-size:12px;text-transform:uppercase;color:#64748B;letter-spacing:0.5px;">Member Revenue (3,280 Members)</div>
+      <div style="font-size:28px;font-weight:700;color:var(--green);margin-top:6px;">$995,963</div>
+      <div style="font-size:12px;color:#64748B;margin-top:4px;">9,057 room nights · $109.97 ADR</div>
+    </div>
+    <div style="background:var(--light-bg);border-radius:8px;padding:20px;text-align:center;">
+      <div style="font-size:12px;text-transform:uppercase;color:#64748B;letter-spacing:0.5px;">Est. OTA Commission Savings</div>
+      <div style="font-size:28px;font-weight:700;color:var(--green);margin-top:6px;">$4,360</div>
+      <div style="font-size:12px;color:#64748B;margin-top:4px;">319 OTA room nights × $91.13 ADR × 15%</div>
+    </div>
+  </div>
+</div>
+
+</div>
+
+<!-- Donut Chart Script -->
+<script>
+(function() {
+  const c = document.getElementById('acquisitionDonut');
+  const ctx = c.getContext('2d');
+  const cx = 140, cy = 140, R = 110, r = 65;
+  const data = [
+    { val: 3054, color: '#1C355E', label: 'New-to-Brand' },
+    { val: 226, color: '#FF5F00', label: 'Prior Guests' }
+  ];
+  const total = data.reduce((s, d) => s + d.val, 0);
+  let angle = -Math.PI / 2;
+  data.forEach(d => {
+    const sweep = (d.val / total) * Math.PI * 2;
+    ctx.beginPath();
+    ctx.arc(cx, cy, R, angle, angle + sweep);
+    ctx.arc(cx, cy, r, angle + sweep, angle, true);
+    ctx.closePath();
+    ctx.fillStyle = d.color;
+    ctx.fill();
+    // Label
+    const mid = angle + sweep / 2;
+    const lx = cx + Math.cos(mid) * (R + r) / 2;
+    const ly = cy + Math.sin(mid) * (R + r) / 2;
+    ctx.fillStyle = '#fff';
+    ctx.font = 'bold 13px Segoe UI, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    const pct = ((d.val / total) * 100).toFixed(1) + '%';
+    ctx.fillText(pct, lx, ly);
+    angle += sweep;
+  });
+  // Center text
+  ctx.fillStyle = '#1C355E';
+  ctx.font = 'bold 24px Segoe UI, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('3,280', cx, cy - 8);
+  ctx.font = '12px Segoe UI, sans-serif';
+  ctx.fillStyle = '#64748B';
+  ctx.fillText('Total Members', cx, cy + 12);
+})();
+</script>
+
+<div class="footer">
+  My Place Hotels of America · New Member Conversion Behavior Dashboard · Data through March 31, 2026
+  <br><em>Note: Total reflects 3,280 unique member enrollments (by email). Members who stayed at multiple properties are counted once. See the Enrollments by Hotel dashboard for property-level totals (3,341), where multi-property members are counted at each hotel.</em>
+</div>
+
+</body>
+</html>

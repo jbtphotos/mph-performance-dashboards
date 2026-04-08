@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Member Rate Pilot — Trade-Down Analysis</title>
+<style>
+  :root {
+    --bg:       #EEF1F6; --card:     #FFFFFF; --card-hover: #F4F7FB;
+    --border:   #D0D8E8; --text:     #1C355E; --muted:    #5A6B84;
+    --positive: #2E8B57; --negative: #E11B22; --accent:   #FF5F00;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif;
+         background:var(--bg); color:var(--text); }
+
+  .brand-bar { background:#FF5F00; height:5px; }
+  .header { padding:24px 32px 18px; background:#1C355E;
+            border-bottom:3px solid #FF5F00; display:flex; align-items:center; gap:20px; }
+  .header-logo { height:48px; }
+  .header-text h1 { font-size:22px; font-weight:700; color:#fff; }
+  .header-text .subtitle { color:rgba(255,255,255,.72); font-size:13px; margin-top:4px; }
+  .pilot-badge { display:inline-block; background:linear-gradient(135deg,#FF5F00,#cc4800);
+                 color:#fff; font-size:11px; font-weight:700; padding:3px 10px;
+                 border-radius:12px; margin-left:12px; vertical-align:middle; }
+
+  .dashboard { padding:24px 32px; max-width:1520px; margin:0 auto; }
+
+  /* KPI row */
+  .kpi-row { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:24px; }
+  .kpi-card { background:var(--card); border:1px solid var(--border);
+              border-top:3px solid #1C355E; border-radius:8px; padding:18px 16px;
+              box-shadow:0 1px 4px rgba(28,53,94,.07); }
+  .kpi-card.accent { border-top-color:#FF5F00; }
+  .kpi-label { font-size:10px; text-transform:uppercase; letter-spacing:1px;
+               color:var(--muted); font-weight:700; margin-bottom:8px; }
+  .kpi-value { font-size:26px; font-weight:700; color:#1C355E; }
+  .kpi-sub { font-size:11px; color:var(--muted); margin-top:6px; }
+  .kpi-sub .pos { color:var(--positive); font-weight:600; }
+  .kpi-sub .neg { color:var(--negative); font-weight:600; }
+  .kpi-sub .pms { color:#1C355E; font-weight:600; }
+  .kpi-sub .web { color:#2E8B57; font-weight:600; }
+
+  /* Section */
+  .section-title { font-size:16px; font-weight:700; margin:30px 0 6px;
+                   color:#1C355E; display:flex; align-items:center; gap:8px; }
+  .section-title .dot { width:10px; height:10px; border-radius:50%; }
+  .section-desc { font-size:12px; color:var(--muted); margin-bottom:16px; line-height:1.6; }
+
+  /* Chart cards */
+  .grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:24px; }
+  .chart-card { background:var(--card); border:1px solid var(--border);
+                border-radius:8px; padding:20px;
+                box-shadow:0 1px 4px rgba(28,53,94,.06); }
+  .chart-card h3 { font-size:12px; font-weight:700; color:var(--muted);
+                   text-transform:uppercase; letter-spacing:.6px;
+                   border-bottom:2px solid #FF5F00; padding-bottom:8px; margin-bottom:10px; }
+  .chart-desc { font-size:11px; color:#8ba0bf; font-style:italic;
+                margin-bottom:14px; line-height:1.5; }
+
+  /* Tables */
+  .tbl-wrap { overflow-x:auto; margin-bottom:24px; }
+  table { width:100%; border-collapse:collapse; font-size:12px; table-layout:fixed; }
+  th { background:#1C355E; color:#fff; padding:9px 7px; text-align:left;
+       font-size:10px; text-transform:uppercase; letter-spacing:.4px;
+       white-space:nowrap; position:sticky; top:0; cursor:pointer; user-select:none; }
+  th:hover { background:#2a4a7a; }
+  td { padding:7px 7px; border-bottom:1px solid var(--border); white-space:nowrap; }
+  tr:hover td { background:#f0f4fa; }
+  tr:nth-child(even) td { background:#f8f9fc; }
+  tr:nth-child(even):hover td { background:#edf1f8; }
+  .num { text-align:right; font-variant-numeric:tabular-nums; }
+  .pos { color:var(--positive); font-weight:600; }
+  .neg { color:var(--negative); font-weight:600; }
+  .cat-swatch { display:inline-block; width:12px; height:12px; border-radius:3px;
+                vertical-align:middle; margin-right:6px; }
+  tr.total-row td { font-weight:700; border-top:2px solid #1C355E;
+                    background:#EEF1F6 !important; }
+
+  /* Stacked bar */
+  .stack-row { display:flex; align-items:center; margin-bottom:6px; }
+  .stack-label { width:60px; font-size:11px; font-weight:700; color:var(--muted); text-align:right; padding-right:8px; }
+  .stack-track { flex:1; height:28px; display:flex; border-radius:5px; overflow:hidden; }
+  .stack-seg { height:100%; transition:width .8s ease; position:relative; }
+  .stack-seg:hover { opacity:.85; }
+  .stack-val { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+               font-size:9px; font-weight:700; color:#fff; pointer-events:none; }
+  .legend { display:flex; flex-wrap:wrap; gap:14px; margin-top:10px; font-size:11px; color:var(--muted); }
+  .legend-item { display:flex; align-items:center; gap:5px; }
+  .legend-swatch { width:12px; height:12px; border-radius:3px; }
+
+  /* Insight */
+  .insight-box { border-radius:6px; padding:16px 20px; margin-bottom:20px; }
+  .insight-box h4 { font-size:13px; margin-bottom:6px; font-weight:700; }
+  .insight-box p { font-size:12px; color:#5A6B84; line-height:1.6; }
+  .insight-pms { background:#F0F4FA; border:1px solid #B8C9E2; border-left:4px solid #1C355E; }
+  .insight-pms h4 { color:#1C355E; }
+  .insight-web { background:#F0FAF4; border:1px solid #A8D8B8; border-left:4px solid #2E8B57; }
+  .insight-web h4 { color:#2E8B57; }
+  .insight-trade { background:#FFF8F0; border:1px solid #FFD6A8; border-left:4px solid #FF5F00; }
+  .insight-trade h4 { color:#FF5F00; }
+
+  /* Tabs */
+  .tab-bar { display:flex; gap:0; margin-bottom:0; }
+  .tab { padding:10px 24px; font-size:13px; font-weight:700; cursor:pointer;
+          border:1px solid var(--border); border-bottom:none; border-radius:8px 8px 0 0;
+          background:#E4EAF3; color:var(--muted); }
+  .tab.active { background:var(--card); color:#1C355E; border-bottom:1px solid var(--card); }
+  .tab-content { display:none; background:var(--card); border:1px solid var(--border);
+                 border-radius:0 8px 8px 8px; padding:20px;
+                 box-shadow:0 1px 4px rgba(28,53,94,.06); }
+  .tab-content.active { display:block; }
+
+  /* Filter */
+  .filter-bar { display:flex; gap:12px; align-items:center; margin-bottom:14px; flex-wrap:wrap; }
+  .filter-bar label { font-size:12px; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:.5px; }
+  .filter-bar input { padding:6px 10px; border:1px solid var(--border); border-radius:6px;
+                      font-size:13px; color:var(--text); background:#fff; }
+
+  @media print {
+    .brand-bar,.header,th { print-color-adjust:exact; -webkit-print-color-adjust:exact; }
+  }
+  @media (max-width:1100px) {
+    .kpi-row { grid-template-columns:repeat(2,1fr); }
+    .grid-2 { grid-template-columns:1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="brand-bar"></div>
+<div class="header">
+  <img class='header-logo' src='data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyBpZD0iTXlfUGxhY2VfSG90ZWxzX0xvZ28iIGRhdGEtbmFtZT0iTXkgUGxhY2UgSG90ZWxzIExvZ28iIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgdmlld0JveD0iMCAwIDQ5My45MzEgNDg4LjQ2OCI+CiAgPGRlZnM+CiAgICA8c3R5bGU+CiAgICAgIC5jbHMtMSB7CiAgICAgICAgZmlsbDogI2UxMWIyMjsKICAgICAgfQoKICAgICAgLmNscy0yIHsKICAgICAgICBmaWxsOiAjZmZmOwogICAgICB9CgogICAgICAuY2xzLTMgewogICAgICAgIGZpbGw6ICNmZDA7CiAgICAgIH0KICAgIDwvc3R5bGU+CiAgPC9kZWZzPgogIDxnPgogICAgPHBhdGggY2xhc3M9ImNscy0zIiBkPSJNMjQ2Ljk2Niw0ODAuOTY2Yy03Mi4xNiwwLTE0My41MjUtNS41MTgtMjE4LjE4NS0xNi44NzJsLTUuNDkxLS44MzUtLjgwMy01LjQ5OEMyLjUwMiwzMjEuMDA1LDIuNTAyLDE4Mi4zMTcsMjIuNDg3LDQ1LjU2bC44MDMtNS40OTcsNS40OTEtLjgzNWM3NC42NTktMTEuMzU2LDE0Ni4wMjQtMTYuODc2LDIxOC4xODUtMTYuODc2czE0My41MjQsNS41MTksMjE4LjE4MiwxNi44NzZsNS40OTIuODM1LjgwMyw1LjQ5N2MxOS45ODYsMTM2Ljc1NywxOS45ODYsMjc1LjQ0NCwwLDQxMi4ybC0uODAzLDUuNDk4LTUuNDkyLjgzNWMtNzQuNjU3LDExLjM1NS0xNDYuMDI0LDE2Ljg3Mi0yMTguMTgyLDE2Ljg3MmgwWiIvPgogICAgPHBhdGggZD0iTTI0Ni45NjQsMjkuODUzYzcxLjczMiwwLDE0My40NjMsNS41OTcsMjE3LjA1NywxNi43OSwxOS44NjgsMTM1Ljk1NSwxOS44NjgsMjc0LjA3OCwwLDQxMC4wMzMtNzMuNTk0LDExLjE5My0xNDUuMzI0LDE2Ljc5MS0yMTcuMDU2LDE2Ljc5MXMtMTQzLjQ2My01LjU5OC0yMTcuMDU2LTE2Ljc5MWMtMTkuODY3LTEzNS45NTUtMTkuODY3LTI3NC4wNzgsMC00MTAuMDMzLDczLjU5My0xMS4xOTMsMTQ1LjMyNC0xNi43OSwyMTcuMDU1LTE2Ljc5TTI0Ni45NjQsMTQuODUzYy03Mi41MzksMC0xNDQuMjc1LDUuNTQ4LTIxOS4zMSwxNi45NmwtMTAuOTgsMS42Ny0xLjYwNiwxMC45OTFjLTIwLjA4OSwxMzcuNDc4LTIwLjA4OSwyNzYuODkzLDAsNDE0LjM3MmwxLjYwNiwxMC45ODksMTAuOTgsMS42NzFjNzUuMDM2LDExLjQxMywxNDYuNzczLDE2Ljk2MSwyMTkuMzExLDE2Ljk2MXMxNDQuMjc1LTUuNTQ4LDIxOS4zMTEtMTYuOTYxbDEwLjk4LTEuNjcxLDEuNjA1LTEwLjk4OWMyMC4wOTEtMTM3LjQ3OSwyMC4wOTEtMjc2Ljg5NCwwLTQxNC4zNzJsLTEuNjA1LTEwLjk5MS0xMC45OC0xLjY3Yy03NS4wMzUtMTEuNDEyLTE0Ni43NzItMTYuOTYtMjE5LjMxMi0xNi45NmgwWiIvPgogIDwvZz4KICA8Zz4KICAgIDxwYXRoIGNsYXNzPSJjbHMtMSIgZD0iTTM4Ni4yODksMTQ3LjE2MmMwLDc2LjgwMi02Mi4yNTQsMTM5LjA1Ny0xMzkuMDYyLDEzOS4wNTdzLTEzOS4wNTItNjIuMjU1LTEzOS4wNTItMTM5LjA1N1MxNzAuNDI4LDguMTAxLDI0Ny4yMjcsOC4xMDFzMTM5LjA2Miw2Mi4yNTQsMTM5LjA2MiwxMzkuMDYxWiIvPgogICAgPHBhdGggZD0iTTk5LjMyNywxNDYuOTQxQzk5LjMyNyw2NS43NzgsMTY1LjExMywwLDI0Ni4yNzIsMGgwYzgxLjE2MSwwLDE0Ni45MzksNjUuNzc4LDE0Ni45NDMsMTQ2Ljk0MWgwYy0uMDA0LDgxLjE2NC02NS43ODIsMTQ2LjkzNy0xNDYuOTQzLDE0Ni45NTFoMGMtODEuMTU4LS4wMTUtMTQ2Ljk0NC02NS43ODctMTQ2Ljk0NC0xNDYuOTUxaDBaTTExNS4xMDcsMTQ2Ljk0MWMuMTI4LDcyLjQ0Myw1OC43MjIsMTMxLjAzMywxMzEuMTY1LDEzMS4xNjZoMGM3Mi40NDEtLjEzMywxMzEuMDMzLTU4LjcyMywxMzEuMTc0LTEzMS4xNjZoMGMtLjE0MS03Mi40NDctNTguNzMyLTEzMS4wMzUtMTMxLjE3NC0xMzEuMTY2aDBjLTcyLjQ0My4xMzEtMTMxLjAzNyw1OC43MTktMTMxLjE2NSwxMzEuMTY2aDBaIi8+CiAgICA8Zz4KICAgICAgPHBhdGggZD0iTTg2LjQ4OSwyNTMuMzcyYy0xMC4zNjIsMC0xOS4wNzgtNC42NjctMjMuMzEzLTEyLjQ5NS0yLjUyMi00LjYzOS01LjQ5LTE0LjM0MiwyLjg4Mi0yNy4yMjEsNS42NDctOC42NzEsMTEuMzE5LTE3LjMyMiwxNi45NzItMjUuOTgybDQuOTA3LTcuNDg4YzguMDkyLTEyLjM4NywxNi4xNTctMjQuOCwyNC4yMzMtMzcuMjA0bDYuNzE3LTEwLjMzNiwxMS4wODgtMTcuMDE2LDExLjA3Ni0xNy4wMjgsMS4xODctMS44NWM2LjA2My05LjQzOSwxNS4yMDUtMjMuNywzMy42MDctMjMuNyw2LjA1OSwwLDI1LjgyNSwyLjE2MSwyNS44MjUsMzAuMDE2djQuNzI0YzMuNzM2LTUuMzksNy40NjctMTAuNzc0LDExLjIwNi0xNi4xNjcsNy44MTktMTAuOTM0LDE5LjY0Ny0xNy42NDMsMzAuOTc5LTE3LjY0Myw3LjE2NSwwLDEzLjc3NCwyLjY5MywxOC42Miw3LjU2NSwzLjk1MiwzLjk4Miw4LjY0NSwxMS4zOTcsOC41NjcsMjQuMDc2LS4xMjUsMTguOTYxLS4xMTIsMzguMjY4LS4wODYsNTYuOTNsLjAyMSwyMi40NzNjMCwxLjI3LjA3NSwyLjYxNS4xMzQsMy45OTIuMzgsOC4xMTMsMS4wMjMsMjEuNjkxLTEwLjE5NCwzMC4zMjgtNC45OSwzLjg0Ny0xMS4zMTQsNS45NjItMTcuODI0LDUuOTYyLTUuMzM2LDAtMTAuNDUzLTEuNDI0LTE0Ljc5MS00LjExOS0xMy4zMTItOC4yNTYtMTIuNTc2LTIzLjIyNC0xMi4xNDMtMzIuMTcxLjA3OS0xLjQyMi4xNDgtMi44MDkuMTQ4LTQuMDk4di0xLjI4MWwtMTYuNjY5LDI0LjU5MmMtMy4wNSw0LjQ5OC0xMS4xNjIsMTYuNDkxLTI1LjUxNSwxNy40MTQtLjU1OS4wMzktMS4xMTUuMDYxLTEuNjc2LjA2MS0xMi45MTQsMC0yMy43ODMtOS44NDQtMjUuMjk1LTIyLjkxMy0uNDU5LTMuOTc2LS43MzItNy45ODYtLjg2NS0xMS45OTRsLTMwLjk5LDQ3LjI4OWMtNi4zMTUsOS40NjUtMTcuMzQsMTUuMjg2LTI4LjgxLDE1LjI4NmgwWiIvPgogICAgICA8cGF0aCBjbGFzcz0iY2xzLTIiIGQ9Ik0xNzUuODQyLDg1Ljc4M2MxMC44NjcsMCwxMy4wOTMsOC4wOSwxMy4wOTMsMTcuMjgzdjQ1LjQ3OWMxMS40NjItMTYuNTU3LDIyLjkzNC0zMy4xMTcsMzQuNDA1LTQ5LjY3NiwxMS45MjUtMTYuNjYxLDM1LjEzNS0xNy43NjksMzQuOTcsNi42NzItLjE3OSwyNi40OS0uMDY3LDUyLjk5NC0uMDY3LDc5LjQ4MiwwLDcuOTg1LDIuMTkxLDE4LjYyMy01LjEwMSwyNC4yMzYtNS4wMjEsMy44Ny0xMi42ODUsNC40ODItMTguMTI2LDEuMTA5LTguNDQzLTUuMjQtNS45NzctMTcuMTM5LTUuOTc3LTI1LjQ0NnYtNDIuNzUzYy0xMy4zMDksMTkuNjMxLTI2LjYyMSwzOS4yNjktMzkuOTM1LDU4LjkwMi0zLjc1OSw1LjU1MS04LjU2NywxMS40LTE1LjgwNCwxMS44Ny02Ljk4MS40NTEtMTIuNzA4LTQuNzc0LTEzLjQ5LTExLjYwNC0yLjAyNy0xNy42MjctLjA3OS0zNi41NTMtLjA3OS01NC4zMDMtMTguMzY0LDI4LjAyOS0zNi43MjYsNTYuMDQzLTU1LjA5Myw4NC4wNzEtMTEuMDc3LDE2LjYxLTQxLjU3MiwxMC41MDYtMjcuOTA1LTEwLjUwMSw3LjI2LTExLjE2NiwxNC41NzUtMjIuMzA4LDIxLjg2MS0zMy40NTYsMTAuMzQ1LTE1LjgzOCwyMC42NTEtMzEuNzA1LDMwLjk2Ny00Ny41NTgsNy4zODgtMTEuMzUsMTQuNzcyLTIyLjY5NSwyMi4xNi0zNC4wNDcsNS44OTQtOS4wNzYsMTEuODI0LTE5Ljc2MiwyNC4xMi0xOS43NjIiLz4KICAgIDwvZz4KICAgIDxnPgogICAgICA8cGF0aCBkPSJNMjgxLjcsMjY4LjIxMWMtOC4xMjcsMC0xNS43OTQtNC4zMDMtMjAuNTE3LTExLjUxMi00Ljk0My03LjU2My01Ljc0Mi0xNi45OTgtMi4xNDItMjUuMjUsMy40MjYtNy44MTMsNy43MzUtMTUuMTQ0LDExLjUyOS0yMS42MDEsNS45NDctMTAuMTE2LDE5LjgxMy0zNC42ODcsMjMuODQ1LTQzLjQzM2wtNS4zMi0xOS4yMTEtMTQuNjI2LTUyLjg1OWMtMS44NDgtNi42ODgsMi4wMDItMTMuNjI3LDguNjY0LTE1LjYwM2wyNC4xNy03LjE1NGMxLjE4MS0uMzUsMi40MDItLjUyMiwzLjYwNS0uNTIyLDIuMjE1LDAsNC40MS41NzgsNi4zNjUsMS42OTYsMy4wMjUsMS43MzUsNS4xOTMsNC42NDEsNi4wMTksOC4wM2w0LjUwMiwxOC41NmM1Ljk5NC0xMy40MTMsMTIuMTExLTI3LjA3NiwxOC4yNTktNDAuNTMyLjk0NC0yLjA1OSwxLjg1Mi00LjE2NCwyLjc3NC02LjI5NywyLjg0Ni02LjU3OCw1Ljc5NS0xMy4zODksOS44NjUtMTkuODE2LDQuNTMxLTcuMTg0LDExLjc0Mi0xMS4yOTksMTkuNzczLTExLjI5OXMxNS44NzksNC4xMzEsMjAuOTEzLDExLjA0OGM0Ljk0Miw2Ljc5LDYuMzI5LDE1LjE1MiwzLjgxLDIyLjk0NC0uMTQ3LjQ0Ni0uMzA2Ljg4Ni0uNDk5LDEuMzExbC0zMi42MDMsNzIuMzU5Yy02Ljc3OCwxNC41OC0xMy45NDcsMjkuMTk3LTIxLjk2OSw0NC44MjUtLjk4NCwxLjkwNy0yLjM5OCw0LjcyNi00LjEyNyw4LjE2MS0yMC40NTksNDAuNjQ0LTM1LjkyNCw2OS41NjEtNDQuODgxLDc4LjU2Ni00Ljg2MSw0Ljg5My0xMS4wNDcsNy41ODgtMTcuNDExLDcuNTg4aDBaIi8+CiAgICAgIDxwYXRoIGNsYXNzPSJjbHMtMiIgZD0iTTM1OC40NzcsMTIzLjgzOWMtNi45MzMsMTQuODk1LTE0LjE4NSwyOS42MzQtMjEuNjg3LDQ0LjIzOS02Ljk4NiwxMy41OTktMzUuODAzLDcyLjYwMy00Ni43MDEsODMuNTY0LTEwLjUzOCwxMC41OTQtMjQuNzQ3LTIuODExLTE5LjM4MS0xNS4wOTYsMy4wNi02Ljk2OSw2Ljk5NC0xMy42OTcsMTAuODQ4LTIwLjI1MiwxLjQ0Ni0yLjQ2NywyNi45OTItNDYuNTYzLDI2LjE1Ni00OS41NzEtNi45OTQtMjUuMjU3LTEzLjk4NC01MC41MTMtMjAuOTcyLTc1Ljc3MmwyNC4xNzYtNy4xNTIsMTMuMzA2LDU0LjgyOGMxMS4xMjktMjQuODM4LDIyLjEwMi00OS43NSwzMy40MTYtNzQuNTA0LDMuNzIxLTguMTM3LDcuMDEyLTE3LjAxOSwxMS44MTQtMjQuNjA1LDcuOTU3LTEyLjU5NiwyNS43NDItLjc3MSwyMS42MTksMTEuOTYzbC0zMi41OTQsNzIuMzU4Ii8+CiAgICA8L2c+CiAgPC9nPgogIDxnPgogICAgPHBhdGggZD0iTTg0LjQxOSwzNjYuNjZoLTIwLjc4OXYzMy40NzloLTE4Ljg5OXYtOTQuNDk2aDQxLjMwOWMxNy44MTgsMCwzMi41MzQsOS44NTQsMzIuNTM0LDI5Ljk2OCwwLDIxLjg3LTE0LjU3OSwzMS4wNDktMzQuMTU0LDMxLjA0OVpNODUuMzY0LDMyNC4wMDNoLTIxLjczM3YyNC4yOTloMjIuMDAzYzguNzc2LDAsMTMuNS00LjA1MSwxMy41LTEyLjI4NXMtNS4zOTgtMTIuMDE0LTEzLjc3LTEyLjAxNFoiLz4KICAgIDxwYXRoIGQ9Ik0xMjkuNzgsNDAwLjEzOXYtOTQuNDk2aDE4Ljg5OXY3Ni4wMDJoNDcuMzg0djE4LjQ5NGgtNjYuMjgzWiIvPgogICAgPHBhdGggZD0iTTI3NC40NjYsNDAwLjEzOWwtNy40MjYtMjEuMDU5aC0zNC41NTlsLTcuNDI0LDIxLjA1OWgtMjAuMjVsMzYuMTgtOTQuNDk2aDE4LjM1OGwzNS45MDksOTQuNDk2aC0yMC43ODlaTTI1NC40ODcsMzQzLjk4MWMtMS44OTEtNS41MzQtMy43ODEtMTEuMjA1LTQuNzI2LTE0LjcxNS0uOTQ0LDMuNTEtMi44MzQsOS4xODEtNC43MjQsMTQuNzE1bC02LjA3NSwxNy4xNDVoMjEuNmwtNi4wNzQtMTcuMTQ1WiIvPgogICAgPHBhdGggZD0iTTM1My4xMTYsMzMzLjE4Yy0zLjM3NS02LjQ3OC04Ljc3NS0xMC4yNTgtMTcuMjc5LTEwLjI1OC0xNC4xNzUsMC0yMi4yNzMsMTIuNDE5LTIyLjI3MywyOS45NjgsMCwxNy4wMSw4LjIzMywyOS45NywyMi40MDgsMjkuOTcsOC41MDYsMCwxMy40OTktMy42NDQsMTguNDk0LTEyLjAxNmwxNS45Myw5LjQ1Yy02LjQ4LDEzLjM2NC0xNy44MTksMjEuMzI5LTM0Ljk2NCwyMS4zMjktMjQuNzAzLDAtNDEuMzA5LTE4Ljg5OC00MS4zMDktNDguNzMzLDAtMjguNzUzLDE3LjI3OS00OC43MzIsNDEuOTgzLTQ4LjczMiwxNy44MiwwLDI4LjYxOSw4LjY0LDM0LjU1OSwyMC45MjRsLTE3LjU0OSw4LjA5OVoiLz4KICAgIDxwYXRoIGQ9Ik0zODEuNTY3LDQwMC4xMzl2LTk0LjQ5Nmg2NS42MDd2MTguNDk0aC00Ni43MDd2MTYuMzM0aDI3LjEzM3YxOC4zNTloLTI3LjEzM3YyMi44MTRoNDguNzMzdjE4LjQ5NGgtNjcuNjMzWiIvPgogIDwvZz4KICA8Zz4KICAgIDxwYXRoIGNsYXNzPSJjbHMtMSIgZD0iTTE2OS41ODIsNDM4Ljk0djcuNTY3aDYuNjI4di03LjU2N2g1LjQ3OHYyMC40aC01LjQ3OHYtOC4wNWgtNi42Mjh2OC4wNWgtNS40Nzh2LTIwLjRoNS40NzhaIi8+CiAgICA8cGF0aCBjbGFzcz0iY2xzLTEiIGQ9Ik0yMDUuNzI2LDQ1OS42NzRjLTYuMzI2LDAtOS44MDctNC43NTMtOS44MDctMTAuNDEzLDAtNS45MzIsMy44NzQtMTAuNjUzLDEwLjE0LTEwLjY1Myw2LjU2OCwwLDkuODk3LDQuODcyLDkuODk3LDEwLjMyMSwwLDYuNTY4LTMuOTM1LDEwLjc0NS0xMC4yLDEwLjc0NWgtLjAzWk0yMDUuOTk4LDQ1NS4zNDZjMi42MzQsMCw0LjE3Ny0yLjU0Miw0LjE3Ny02LjIzNSwwLTMuNTEtMS41NzQtNi4xNzQtNC4yMzctNi4xNzQtMi42MzMsMC00LjIzNywyLjY2My00LjIzNyw2LjIwNC0uMDMsMy42NjMsMS42MDQsNi4yMDUsNC4yMzcsNi4yMDVoLjA2WiIvPgogICAgPHBhdGggY2xhc3M9ImNscy0xIiBkPSJNMjM0LjU2LDQ0My41NDJoLTUuMjA2di00LjYwMmgxNS45ODF2NC42MDJoLTUuMjk2djE1Ljc5OWgtNS40Nzh2LTE1Ljc5OVoiLz4KICAgIDxwYXRoIGNsYXNzPSJjbHMtMSIgZD0iTTI3Mi4zNjgsNDUxLjEwOGgtNy4zMjR2My43NTNoOC4yMDJ2NC40OGgtMTMuNjh2LTIwLjRoMTMuMjU3djQuNDhoLTcuNzc5djMuMjY5aDcuMzI0djQuNDE5WiIvPgogICAgPHBhdGggY2xhc3M9ImNscy0xIiBkPSJNMjg3LjYsNDM4Ljk0aDUuNDc4djE1LjgzaDcuODM5djQuNTdoLTEzLjMxN3YtMjAuNFoiLz4KICAgIDxwYXRoIGNsYXNzPSJjbHMtMSIgZD0iTTMxNi4xNzcsNDUzLjg5M2MxLjI0MS42MzYsMy4yMzksMS4yNzEsNS4yOTYsMS4yNzEsMS44NzcsMCwyLjc4NS0uNjM2LDIuNzg1LTEuNjY1LDAtLjk5OS0uOTA4LTEuNTQzLTMuMjA4LTIuMzMxLTMuNDUxLTEuMjQxLTUuNzUxLTMuMTE2LTUuNzUxLTYuMTQzLDAtMy42MDIsMy4wNTctNi4zODYsOC4yMDMtNi4zODYsMi40MjEsMCw0LjE3Ny40NTQsNS41MDksMS4wM2wtMS4xNSw0LjM4OGMtLjg3OC0uMzkzLTIuMzkxLS45NjgtNC40MTktLjk2OC0xLjY2NSwwLTIuNTczLjYwNS0yLjU3MywxLjUxMywwLDEuMDMsMS4wOSwxLjQyMiwzLjY2MywyLjM5MSwzLjY2MiwxLjM2Miw1LjI5NiwzLjI5OSw1LjI5Niw2LjE0MywwLDMuNTEyLTIuNzI0LDYuNTA3LTguNjg3LDYuNTA3LTIuNDUxLDAtNC44NDMtLjYzNi01Ljk5Mi0xLjI0bDEuMDI5LTQuNTFaIi8+CiAgPC9nPgogIDxwYXRoIGQ9Ik0yNDYuOTY2LDQxMS44ODljLTY2Ljk1NSwwLTEzMy45MTMsNi43NDMtMjAyLjIzNCwyMC4xODZ2Ny42NWM2OC40MTgtOS43MzksMTM1LjMyNi0xNC42MTMsMjAyLjIzNC0xNC42MTNzMTMzLjgxNiw0Ljg3NSwyMDIuMjMzLDE0LjYxM3YtNy42NWMtNjguMzItMTMuNDQzLTEzNS4yNzktMjAuMTg2LTIwMi4yMzMtMjAuMTg2WiIvPgogIDxwYXRoIGQ9Ik00NjUuNzU5LDMxNC44MzRjMCwzLjk5OS0zLjEzOSw3LjEzOC03LjIyNCw3LjEzOC00LjA0MiwwLTcuMjY3LTMuMTM5LTcuMjY3LTcuMTM4LDAtMy45MTMsMy4yMjUtNy4wNTIsNy4yNjctNy4wNTIsNC4wODUsMCw3LjIyNCwzLjEzOSw3LjIyNCw3LjA1MlpNNDUzLjA3NCwzMTQuODM0YzAsMy4xMzksMi4zMjIsNS42MzMsNS41MDQsNS42MzMsMy4wOTYsMCw1LjM3NS0yLjQ5NCw1LjM3NS01LjU5LDAtMy4xMzktMi4yNzktNS42NzYtNS40MTgtNS42NzZzLTUuNDYxLDIuNTM3LTUuNDYxLDUuNjMzWk00NTcuNDE3LDMxOC41MzJoLTEuNjM0di03LjA1MmMuNjQ1LS4xMjksMS41NDgtLjIxNSwyLjcwOS0uMjE1LDEuMzMzLDAsMS45MzUuMjE1LDIuNDUxLjUxNi4zODcuMzAxLjY4OC44Ni42ODgsMS41NDgsMCwuNzc0LS42MDIsMS4zNzYtMS40NjIsMS42MzR2LjA4NmMuNjg4LjI1OCwxLjA3NS43NzQsMS4yOSwxLjcyLjIxNSwxLjA3NS4zNDQsMS41MDUuNTE2LDEuNzYzaC0xLjc2M2MtLjIxNS0uMjU4LS4zNDQtLjkwMy0uNTU5LTEuNzItLjEyOS0uNzc0LS41NTktMS4xMTgtMS40NjItMS4xMThoLS43NzR2Mi44MzhaTTQ1Ny40NjEsMzE0LjUzM2guNzc0Yy45MDMsMCwxLjYzNC0uMzAxLDEuNjM0LTEuMDMyLDAtLjY0NS0uNDczLTEuMDc1LTEuNTA1LTEuMDc1LS40MywwLS43MzEuMDQzLS45MDMuMDg2djIuMDIxWiIvPgo8L3N2Zz4=' alt='My Place Hotels'>
+  <div class="header-text">
+    <h1>Member Rate Pilot — Trade-Down Analysis<span class="pilot-badge">PILOT</span></h1>
+    <div class="subtitle">27 Legacy Properties &nbsp;·&nbsp; Prior Year vs Pilot Period (Launched Nov 13, 2025) &nbsp;·&nbsp; PMS &amp; Website Compared Separately</div>
+  </div>
+</div>
+<div class="dashboard">
+
+<!-- ═══ KPI ROW ═══ -->
+<div class="kpi-row">
+  <div class="kpi-card accent">
+    <div class="kpi-label">Member Rate RNs Gained</div>
+    <div class="kpi-value">+11,185</div>
+    <div class="kpi-sub"><span class="pms">PMS +6,904</span> &nbsp;·&nbsp; <span class="web">Web +4,281</span></div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-label">Nightly RNs Lost YoY</div>
+    <div class="kpi-value neg">-4,165</div>
+    <div class="kpi-sub"><span class="pms">PMS -2,591</span> &nbsp;·&nbsp; <span class="web">Web -1,574</span></div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-label">Member Rate ADR vs Nightly</div>
+    <div class="kpi-value">$111.17</div>
+    <div class="kpi-sub"><span class="pms">PMS: $106.58</span> &nbsp;·&nbsp; <span class="web">Web: $118.56</span></div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-label">ADR Discount vs Nightly</div>
+    <div class="kpi-value neg">-14.9%</div>
+    <div class="kpi-sub"><span class="pms">PMS: -14.9%</span> &nbsp;·&nbsp; <span class="web">Web: -14.8%</span></div>
+  </div>
+</div>
+
+<!-- ═══ OVERVIEW INSIGHT ═══ -->
+<div class="insight-box insight-trade">
+  <h4>What This Dashboard Shows</h4>
+  <p>This analysis compares <strong>rate plan booking behavior</strong> in the <strong>prior year</strong> (before the member rate existed for legacy properties) vs the <strong>pilot period</strong> (Nov 13, 2025 – present). All rate plans are grouped into 7 categories. The PMS and Website channels are analyzed independently to show where Member Rate bookings are coming from and whether guests are trading down from Nightly or other higher-priced rate plans.</p>
+</div>
+
+<!-- ═══ PMS SECTION ═══ -->
+<div class="section-title"><span class="dot" style="background:#1C355E"></span> PMS Bookings — Rate Category Shift</div>
+<div class="section-desc">Front desk, phone, and direct PMS bookings. Compares the same calendar window in the prior year (pre-pilot) vs the pilot period.</div>
+
+<div class="grid-2">
+  <div class="chart-card">
+    <h3>Rate Category Mix — Prior Year vs Pilot</h3>
+    <div class="chart-desc">Stacked bars show each category's share of total room nights. Watch for Nightly shrinkage and Member Rate emergence.</div>
+    <div id="pms-stack"></div>
+  </div>
+  <div class="chart-card">
+    <h3>Room Night Change by Category</h3>
+    <div class="chart-desc">Horizontal bars showing the absolute change in room nights per category. Green = gained, Red = lost.</div>
+    <div id="pms-delta"></div>
+  </div>
+</div>
+
+<div class="insight-box insight-pms">
+  <h4>PMS Channel Summary</h4>
+  <p>Total PMS room nights went from <strong>65,892</strong> (prior) to <strong>85,362</strong> (pilot), a change of <strong>+29.5%</strong>.
+  Nightly rate bookings dropped by <strong>2,591 RNs</strong> while Member Rate added <strong>6,904 RNs</strong>.
+  The Member Rate ADR of <strong>$106.58</strong> runs at a <strong>14.9% discount</strong> vs the Nightly pilot ADR of <strong>$125.24</strong>.</p>
+</div>
+
+<div class="tbl-wrap">
+
+    <table class="cat-table" id="pms-table">
+    <thead><tr>
+      <th style="width:170px">Rate Category</th>
+      <th class="num" style="width:85px">Prior RNs</th>
+      <th class="num" style="width:85px">Pilot RNs</th>
+      <th class="num" style="width:75px">Δ RNs</th>
+      <th class="num" style="width:60px">% Chg</th>
+      <th class="num" style="width:70px">Prior Mix</th>
+      <th class="num" style="width:70px">Pilot Mix</th>
+      <th class="num" style="width:70px">Mix Shift</th>
+      <th class="num" style="width:80px">Prior ADR</th>
+      <th class="num" style="width:80px">Pilot ADR</th>
+      <th class="num" style="width:65px">ADR Chg</th>
+      <th class="num" style="width:95px">Prior Rev</th>
+      <th class="num" style="width:95px">Pilot Rev</th>
+      <th class="num" style="width:75px">Rev Chg</th>
+    </tr></thead>
+    <tbody id="pms-tbody"></tbody>
+    </table>
+</div>
+
+<!-- ═══ WEB SECTION ═══ -->
+<div class="section-title"><span class="dot" style="background:#2E8B57"></span> Website Bookings — Rate Category Shift</div>
+<div class="section-desc">Bookings made through the My Place Hotels website. This channel shows stronger Member Rate adoption since the rate is prominently displayed online.</div>
+
+<div class="grid-2">
+  <div class="chart-card">
+    <h3>Rate Category Mix — Prior Year vs Pilot</h3>
+    <div class="chart-desc">Stacked bars showing the rate plan mix shift on the website booking engine.</div>
+    <div id="web-stack"></div>
+  </div>
+  <div class="chart-card">
+    <h3>Room Night Change by Category</h3>
+    <div class="chart-desc">Absolute room night gains and losses by category on the website channel.</div>
+    <div id="web-delta"></div>
+  </div>
+</div>
+
+<div class="insight-box insight-web">
+  <h4>Website Channel Summary</h4>
+  <p>Total Website room nights went from <strong>9,371</strong> (prior) to <strong>11,700</strong> (pilot), a change of <strong>+24.9%</strong>.
+  Nightly rate bookings dropped by <strong>1,574 RNs</strong> while Member Rate added <strong>4,281 RNs</strong>.
+  The Member Rate ADR of <strong>$118.56</strong> runs at a <strong>14.8% discount</strong> vs the Nightly pilot ADR of <strong>$139.08</strong>.</p>
+</div>
+
+<div class="tbl-wrap">
+
+    <table class="cat-table" id="web-table">
+    <thead><tr>
+      <th style="width:170px">Rate Category</th>
+      <th class="num" style="width:85px">Prior RNs</th>
+      <th class="num" style="width:85px">Pilot RNs</th>
+      <th class="num" style="width:75px">Δ RNs</th>
+      <th class="num" style="width:60px">% Chg</th>
+      <th class="num" style="width:70px">Prior Mix</th>
+      <th class="num" style="width:70px">Pilot Mix</th>
+      <th class="num" style="width:70px">Mix Shift</th>
+      <th class="num" style="width:80px">Prior ADR</th>
+      <th class="num" style="width:80px">Pilot ADR</th>
+      <th class="num" style="width:65px">ADR Chg</th>
+      <th class="num" style="width:95px">Prior Rev</th>
+      <th class="num" style="width:95px">Pilot Rev</th>
+      <th class="num" style="width:75px">Rev Chg</th>
+    </tr></thead>
+    <tbody id="web-tbody"></tbody>
+    </table>
+</div>
+
+<!-- ═══ PROPERTY DETAIL ═══ -->
+<div class="section-title"><span class="dot" style="background:#FF5F00"></span> Property-Level Detail</div>
+<div class="section-desc">For each property: Prior vs Pilot room nights for Member Rate, Nightly, and total — with ADR comparison. Use the tabs to switch between PMS and Website views.</div>
+
+<div class="tab-bar">
+  <div class="tab active" data-tab="pms-prop">PMS by Property</div>
+  <div class="tab" data-tab="web-prop">Website by Property</div>
+</div>
+
+<div class="tab-content active" id="pms-prop">
+  <div class="filter-bar">
+    <label>Search:</label>
+    <input type="text" class="prop-search" data-target="pms-prop-tbody" placeholder="Filter by property…" style="width:240px">
+  </div>
+  <div class="tbl-wrap" style="max-height:650px;overflow-y:auto;">
+  <table>
+  <thead><tr>
+    <th style="width:190px">Property</th>
+    <th class="num" style="width:65px">MR Prior</th>
+    <th class="num" style="width:65px">MR Pilot</th>
+    <th class="num" style="width:65px">MR Gain</th>
+    <th class="num" style="width:65px">MR ADR</th>
+    <th class="num" style="width:60px">MR Mix</th>
+    <th class="num" style="width:65px">Ni Prior</th>
+    <th class="num" style="width:65px">Ni Pilot</th>
+    <th class="num" style="width:65px">Ni Loss</th>
+    <th class="num" style="width:70px">Ni ADR Pr</th>
+    <th class="num" style="width:70px">Ni ADR Pi</th>
+    <th class="num" style="width:60px">Ni Mix Δ</th>
+    <th class="num" style="width:70px">Tot Prior</th>
+    <th class="num" style="width:70px">Tot Pilot</th>
+    <th class="num" style="width:60px">Tot Chg</th>
+  </tr></thead>
+  <tbody id="pms-prop-tbody"></tbody>
+  </table>
+  </div>
+</div>
+
+<div class="tab-content" id="web-prop">
+  <div class="filter-bar">
+    <label>Search:</label>
+    <input type="text" class="prop-search" data-target="web-prop-tbody" placeholder="Filter by property…" style="width:240px">
+  </div>
+  <div class="tbl-wrap" style="max-height:650px;overflow-y:auto;">
+  <table>
+  <thead><tr>
+    <th style="width:190px">Property</th>
+    <th class="num" style="width:65px">MR Prior</th>
+    <th class="num" style="width:65px">MR Pilot</th>
+    <th class="num" style="width:65px">MR Gain</th>
+    <th class="num" style="width:65px">MR ADR</th>
+    <th class="num" style="width:60px">MR Mix</th>
+    <th class="num" style="width:65px">Ni Prior</th>
+    <th class="num" style="width:65px">Ni Pilot</th>
+    <th class="num" style="width:65px">Ni Loss</th>
+    <th class="num" style="width:70px">Ni ADR Pr</th>
+    <th class="num" style="width:70px">Ni ADR Pi</th>
+    <th class="num" style="width:60px">Ni Mix Δ</th>
+    <th class="num" style="width:70px">Tot Prior</th>
+    <th class="num" style="width:70px">Tot Pilot</th>
+    <th class="num" style="width:60px">Tot Chg</th>
+  </tr></thead>
+  <tbody id="web-prop-tbody"></tbody>
+  </table>
+  </div>
+</div>
+
+<div style="text-align:center;padding:24px 0 12px;font-size:11px;color:var(--muted);">
+  Member Rate Pilot — Trade-Down Analysis &nbsp;·&nbsp; Data: Nov 13 2025 – Present vs Prior Year Same Period &nbsp;·&nbsp; My Place Hotels of America
+</div>
+</div>
+
+<script>
+const PMS_CATS = [{"category": "Member Rate", "color": "#FF5F00", "pilot_rns": 6904, "prior_rns": 0, "rns_delta": 6904, "rns_chg": null, "pilot_share": 8.1, "prior_share": 0.0, "share_shift": 8.1, "pilot_adr": 106.58, "prior_adr": 0, "adr_chg": null, "pilot_rev": 735833, "prior_rev": 0, "rev_delta": 735833, "rev_chg": null}, {"category": "Nightly", "color": "#4A7FC1", "pilot_rns": 7915, "prior_rns": 10506, "rns_delta": -2591, "rns_chg": -24.7, "pilot_share": 9.3, "prior_share": 15.9, "share_shift": -6.7, "pilot_adr": 125.24, "prior_adr": 114.15, "adr_chg": 9.7, "pilot_rev": 991316, "prior_rev": 1199259, "rev_delta": -207943, "rev_chg": -17.3}, {"category": "Extended Stay", "color": "#7B2D8B", "pilot_rns": 7131, "prior_rns": 7518, "rns_delta": -387, "rns_chg": -5.1, "pilot_share": 8.4, "prior_share": 11.4, "share_shift": -3.1, "pilot_adr": 90.19, "prior_adr": 86.32, "adr_chg": 4.5, "pilot_rev": 643182, "prior_rev": 648976, "rev_delta": -5794, "rev_chg": -0.9}, {"category": "Corporate/Negotiated", "color": "#1C355E", "pilot_rns": 58197, "prior_rns": 41379, "rns_delta": 16818, "rns_chg": 40.6, "pilot_share": 68.2, "prior_share": 62.8, "share_shift": 5.4, "pilot_adr": 91.12, "prior_adr": 79.17, "adr_chg": 15.1, "pilot_rev": 5295493, "prior_rev": 3263582, "rev_delta": 2031911, "rev_chg": 62.3}, {"category": "Loyalty & Promo", "color": "#2E8B57", "pilot_rns": 2321, "prior_rns": 3628, "rns_delta": -1307, "rns_chg": -36.0, "pilot_share": 2.7, "prior_share": 5.5, "share_shift": -2.8, "pilot_adr": 107.86, "prior_adr": 105.82, "adr_chg": 1.9, "pilot_rev": 248519, "prior_rev": 381492, "rev_delta": -132973, "rev_chg": -34.9}, {"category": "Government", "color": "#8B6914", "pilot_rns": 2891, "prior_rns": 2814, "rns_delta": 77, "rns_chg": 2.7, "pilot_share": 3.4, "prior_share": 4.3, "share_shift": -0.9, "pilot_adr": 94.73, "prior_adr": 98.25, "adr_chg": -3.6, "pilot_rev": 273867, "prior_rev": 276464, "rev_delta": -2597, "rev_chg": -0.9}, {"category": "Advance Purchase & Promo", "color": "#B0BEC5", "pilot_rns": 3, "prior_rns": 47, "rns_delta": -44, "rns_chg": -93.6, "pilot_share": 0.0, "prior_share": 0.1, "share_shift": -0.1, "pilot_adr": 76.5, "prior_adr": 131.48, "adr_chg": -41.8, "pilot_rev": 230, "prior_rev": 6180, "rev_delta": -5950, "rev_chg": -96.3}];
+const WEB_CATS = [{"category": "Member Rate", "color": "#FF5F00", "pilot_rns": 4281, "prior_rns": 0, "rns_delta": 4281, "rns_chg": null, "pilot_share": 36.6, "prior_share": 0.0, "share_shift": 36.6, "pilot_adr": 118.56, "prior_adr": 0, "adr_chg": null, "pilot_rev": 507538, "prior_rev": 0, "rev_delta": 507538, "rev_chg": null}, {"category": "Nightly", "color": "#4A7FC1", "pilot_rns": 1841, "prior_rns": 3415, "rns_delta": -1574, "rns_chg": -46.1, "pilot_share": 15.7, "prior_share": 36.4, "share_shift": -20.7, "pilot_adr": 139.08, "prior_adr": 133.55, "adr_chg": 4.1, "pilot_rev": 256054, "prior_rev": 456071, "rev_delta": -200017, "rev_chg": -43.9}, {"category": "Extended Stay", "color": "#7B2D8B", "pilot_rns": 2027, "prior_rns": 2830, "rns_delta": -803, "rns_chg": -28.4, "pilot_share": 17.3, "prior_share": 30.2, "share_shift": -12.9, "pilot_adr": 93.04, "prior_adr": 100.09, "adr_chg": -7.0, "pilot_rev": 188590, "prior_rev": 283260, "rev_delta": -94670, "rev_chg": -33.4}, {"category": "Corporate/Negotiated", "color": "#1C355E", "pilot_rns": 2972, "prior_rns": 2107, "rns_delta": 865, "rns_chg": 41.1, "pilot_share": 25.4, "prior_share": 22.5, "share_shift": 2.9, "pilot_adr": 102.3, "prior_adr": 106.06, "adr_chg": -3.5, "pilot_rev": 304040, "prior_rev": 223050, "rev_delta": 80990, "rev_chg": 36.3}, {"category": "Loyalty & Promo", "color": "#2E8B57", "pilot_rns": 137, "prior_rns": 315, "rns_delta": -178, "rns_chg": -56.5, "pilot_share": 1.2, "prior_share": 3.4, "share_shift": -2.2, "pilot_adr": 120.4, "prior_adr": 127.71, "adr_chg": -5.7, "pilot_rev": 15892, "prior_rev": 39335, "rev_delta": -23442, "rev_chg": -59.6}, {"category": "Government", "color": "#8B6914", "pilot_rns": 138, "prior_rns": 56, "rns_delta": 82, "rns_chg": 146.4, "pilot_share": 1.2, "prior_share": 0.6, "share_shift": 0.6, "pilot_adr": 96.22, "prior_adr": 123.24, "adr_chg": -21.9, "pilot_rev": 13279, "prior_rev": 6902, "rev_delta": 6377, "rev_chg": 92.4}, {"category": "Advance Purchase & Promo", "color": "#B0BEC5", "pilot_rns": 304, "prior_rns": 648, "rns_delta": -344, "rns_chg": -53.1, "pilot_share": 2.6, "prior_share": 6.9, "share_shift": -4.3, "pilot_adr": 121.86, "prior_adr": 118.73, "adr_chg": 2.6, "pilot_rev": 37045, "prior_rev": 76940, "rev_delta": -39895, "rev_chg": -51.9}];
+const PMS_TOTALS = {"pilot_rns": 85362, "prior_rns": 65892, "rns_delta": 19470, "rns_chg": 29.5, "pilot_rev": 8188440, "prior_rev": 5775953, "rev_delta": 2412486, "rev_chg": 41.8};
+const WEB_TOTALS = {"pilot_rns": 11700, "prior_rns": 9371, "rns_delta": 2329, "rns_chg": 24.9, "pilot_rev": 1322439, "prior_rev": 1085558, "rev_delta": 236881, "rev_chg": 21.8};
+const PMS_PROPS = [{"property": "ABERDEEN, SD", "mr_pilot_rns": 169, "mr_prior_rns": 0, "mr_pilot_adr": 135.48, "mr_pilot_share": 3.6, "ni_pilot_rns": 714, "ni_prior_rns": 564, "ni_pilot_adr": 217.43, "ni_prior_adr": 108.2, "ni_pilot_share": 15.2, "ni_prior_share": 16.2, "ni_share_shift": -1.0, "ex_pilot_rns": 0, "ex_prior_rns": 185, "tot_pilot_rns": 4696, "tot_prior_rns": 3483, "tot_rns_chg": 34.8, "tot_pilot_rev": 670691, "tot_prior_rev": 325735, "tot_rev_chg": 105.9, "ni_loss": -150, "mr_gain": 169}, {"property": "ANCHORAGE, AK", "mr_pilot_rns": 46, "mr_prior_rns": 0, "mr_pilot_adr": 149.82, "mr_pilot_share": 0.9, "ni_pilot_rns": 407, "ni_prior_rns": 865, "ni_pilot_adr": 155.5, "ni_prior_adr": 153.61, "ni_pilot_share": 8.1, "ni_prior_share": 67.1, "ni_share_shift": -59.0, "ex_pilot_rns": 69, "ex_prior_rns": 253, "tot_pilot_rns": 5041, "tot_prior_rns": 1289, "tot_rns_chg": 291.1, "tot_pilot_rev": 584025, "tot_prior_rev": 181588, "tot_rev_chg": 221.6, "ni_loss": 458, "mr_gain": 46}, {"property": "ATLANTA WEST/LITHIA SPRINGS, GA", "mr_pilot_rns": 78, "mr_prior_rns": 0, "mr_pilot_adr": 110.7, "mr_pilot_share": 0.7, "ni_pilot_rns": 166, "ni_prior_rns": 85, "ni_pilot_adr": 89.48, "ni_prior_adr": 128.56, "ni_pilot_share": 1.5, "ni_prior_share": 0.6, "ni_share_shift": 0.8, "ex_pilot_rns": 969, "ex_prior_rns": 3, "tot_pilot_rns": 11414, "tot_prior_rns": 13100, "tot_rns_chg": -12.9, "tot_pilot_rev": 432312, "tot_prior_rev": 495100, "tot_rev_chg": -12.7, "ni_loss": -81, "mr_gain": 78}, {"property": "BILLINGS, MT", "mr_pilot_rns": 360, "mr_prior_rns": 0, "mr_pilot_adr": 83.65, "mr_pilot_share": 19.1, "ni_pilot_rns": 321, "ni_prior_rns": 199, "ni_pilot_adr": 107.57, "ni_prior_adr": 118.26, "ni_pilot_share": 17.0, "ni_prior_share": 11.8, "ni_share_shift": 5.2, "ex_pilot_rns": 59, "ex_prior_rns": 74, "tot_pilot_rns": 1885, "tot_prior_rns": 1684, "tot_rns_chg": 11.9, "tot_pilot_rev": 169183, "tot_prior_rev": 165504, "tot_rev_chg": 2.2, "ni_loss": -122, "mr_gain": 360}, {"property": "BISMARCK, ND", "mr_pilot_rns": 441, "mr_prior_rns": 0, "mr_pilot_adr": 86.98, "mr_pilot_share": 17.5, "ni_pilot_rns": 364, "ni_prior_rns": 595, "ni_pilot_adr": 92.91, "ni_prior_adr": 97.26, "ni_pilot_share": 14.4, "ni_prior_share": 32.2, "ni_share_shift": -17.8, "ex_pilot_rns": 238, "ex_prior_rns": 144, "tot_pilot_rns": 2525, "tot_prior_rns": 1845, "tot_rns_chg": 36.9, "tot_pilot_rev": 224997, "tot_prior_rev": 171091, "tot_rev_chg": 31.5, "ni_loss": 231, "mr_gain": 441}, {"property": "COLORADO SPRINGS, CO", "mr_pilot_rns": 746, "mr_prior_rns": 0, "mr_pilot_adr": 82.79, "mr_pilot_share": 53.3, "ni_pilot_rns": 145, "ni_prior_rns": 413, "ni_pilot_adr": 90.85, "ni_prior_adr": 97.38, "ni_pilot_share": 10.4, "ni_prior_share": 47.7, "ni_share_shift": -37.4, "ex_pilot_rns": 38, "ex_prior_rns": 211, "tot_pilot_rns": 1399, "tot_prior_rns": 865, "tot_rns_chg": 61.7, "tot_pilot_rev": 118297, "tot_prior_rev": 75654, "tot_rev_chg": 56.4, "ni_loss": 268, "mr_gain": 746}, {"property": "DICKINSON, ND", "mr_pilot_rns": 144, "mr_prior_rns": 0, "mr_pilot_adr": 73.93, "mr_pilot_share": 7.1, "ni_pilot_rns": 172, "ni_prior_rns": 262, "ni_pilot_adr": 83.71, "ni_prior_adr": 80.67, "ni_pilot_share": 8.5, "ni_prior_share": 23.3, "ni_share_shift": -14.8, "ex_pilot_rns": 797, "ex_prior_rns": 555, "tot_pilot_rns": 2030, "tot_prior_rns": 1126, "tot_rns_chg": 80.3, "tot_pilot_rev": 150441, "tot_prior_rev": 84979, "tot_rev_chg": 77.0, "ni_loss": 90, "mr_gain": 144}, {"property": "FARGO, ND", "mr_pilot_rns": 99, "mr_prior_rns": 0, "mr_pilot_adr": 96.57, "mr_pilot_share": 5.9, "ni_pilot_rns": 282, "ni_prior_rns": 635, "ni_pilot_adr": 114.56, "ni_prior_adr": 111.38, "ni_pilot_share": 16.9, "ni_prior_share": 28.8, "ni_share_shift": -11.9, "ex_pilot_rns": 9, "ex_prior_rns": 0, "tot_pilot_rns": 1666, "tot_prior_rns": 2202, "tot_rns_chg": -24.3, "tot_pilot_rev": 166738, "tot_prior_rev": 224808, "tot_rev_chg": -25.8, "ni_loss": 353, "mr_gain": 99}, {"property": "FORT PIERRE, SD", "mr_pilot_rns": 154, "mr_prior_rns": 0, "mr_pilot_adr": 159.94, "mr_pilot_share": 5.9, "ni_pilot_rns": 204, "ni_prior_rns": 378, "ni_pilot_adr": 179.27, "ni_prior_adr": 157.12, "ni_pilot_share": 7.9, "ni_prior_share": 12.8, "ni_share_shift": -4.9, "ex_pilot_rns": 91, "ex_prior_rns": 0, "tot_pilot_rns": 2593, "tot_prior_rns": 2963, "tot_rns_chg": -12.5, "tot_pilot_rev": 311222, "tot_prior_rev": 336898, "tot_rev_chg": -7.6, "ni_loss": 174, "mr_gain": 154}, {"property": "GRAND FORKS, ND", "mr_pilot_rns": 245, "mr_prior_rns": 0, "mr_pilot_adr": 106.37, "mr_pilot_share": 6.7, "ni_pilot_rns": 134, "ni_prior_rns": 179, "ni_pilot_adr": 119.31, "ni_prior_adr": 122.9, "ni_pilot_share": 3.6, "ni_prior_share": 6.9, "ni_share_shift": -3.3, "ex_pilot_rns": 67, "ex_prior_rns": 17, "tot_pilot_rns": 3682, "tot_prior_rns": 2588, "tot_rns_chg": 42.3, "tot_pilot_rev": 334298, "tot_prior_rev": 229208, "tot_rev_chg": 45.8, "ni_loss": 45, "mr_gain": 245}, {"property": "GRAND RAPIDS, MN", "mr_pilot_rns": 47, "mr_prior_rns": 0, "mr_pilot_adr": 146.22, "mr_pilot_share": 1.1, "ni_pilot_rns": 182, "ni_prior_rns": 264, "ni_pilot_adr": 131.75, "ni_prior_adr": 149.06, "ni_pilot_share": 4.2, "ni_prior_share": 9.0, "ni_share_shift": -4.8, "ex_pilot_rns": 122, "ex_prior_rns": 6, "tot_pilot_rns": 4345, "tot_prior_rns": 2941, "tot_rns_chg": 47.7, "tot_pilot_rev": 458045, "tot_prior_rev": 354107, "tot_rev_chg": 29.4, "ni_loss": 82, "mr_gain": 47}, {"property": "INDIANAPOLIS AIRPORT/PLAINFIELD, IN", "mr_pilot_rns": 281, "mr_prior_rns": 0, "mr_pilot_adr": 84.77, "mr_pilot_share": 14.9, "ni_pilot_rns": 213, "ni_prior_rns": 290, "ni_pilot_adr": 91.2, "ni_prior_adr": 86.28, "ni_pilot_share": 11.3, "ni_prior_share": 16.3, "ni_share_shift": -5.0, "ex_pilot_rns": 84, "ex_prior_rns": 182, "tot_pilot_rns": 1883, "tot_prior_rns": 1781, "tot_rns_chg": 5.7, "tot_pilot_rev": 161818, "tot_prior_rev": 153395, "tot_rev_chg": 5.5, "ni_loss": 77, "mr_gain": 281}, {"property": "JAMESTOWN, ND", "mr_pilot_rns": 106, "mr_prior_rns": 0, "mr_pilot_adr": 130.81, "mr_pilot_share": 3.3, "ni_pilot_rns": 272, "ni_prior_rns": 497, "ni_pilot_adr": 124.74, "ni_prior_adr": 108.94, "ni_pilot_share": 8.4, "ni_prior_share": 28.3, "ni_share_shift": -19.9, "ex_pilot_rns": 576, "ex_prior_rns": 12, "tot_pilot_rns": 3234, "tot_prior_rns": 1754, "tot_rns_chg": 84.4, "tot_pilot_rev": 329998, "tot_prior_rev": 167464, "tot_rev_chg": 97.1, "ni_loss": 225, "mr_gain": 106}, {"property": "KANSAS CITY EAST/INDEPENDENCE, MO", "mr_pilot_rns": 589, "mr_prior_rns": 0, "mr_pilot_adr": 91.88, "mr_pilot_share": 26.1, "ni_pilot_rns": 117, "ni_prior_rns": 277, "ni_pilot_adr": 103.38, "ni_prior_adr": 102.16, "ni_pilot_share": 5.2, "ni_prior_share": 9.8, "ni_share_shift": -4.6, "ex_pilot_rns": 1151, "ex_prior_rns": 1203, "tot_pilot_rns": 2254, "tot_prior_rns": 2821, "tot_rns_chg": -20.1, "tot_pilot_rev": 190280, "tot_prior_rev": 217383, "tot_rev_chg": -12.5, "ni_loss": 160, "mr_gain": 589}, {"property": "KETCHIKAN, AK", "mr_pilot_rns": 269, "mr_prior_rns": 0, "mr_pilot_adr": 177.11, "mr_pilot_share": 5.3, "ni_pilot_rns": 131, "ni_prior_rns": 237, "ni_pilot_adr": 190.99, "ni_prior_adr": 149.35, "ni_pilot_share": 2.6, "ni_prior_share": 14.6, "ni_share_shift": -12.1, "ex_pilot_rns": 101, "ex_prior_rns": 143, "tot_pilot_rns": 5123, "tot_prior_rns": 1618, "tot_rns_chg": 216.6, "tot_pilot_rev": 602483, "tot_prior_rev": 238559, "tot_rev_chg": 152.6, "ni_loss": 106, "mr_gain": 269}, {"property": "LOVELAND, CO", "mr_pilot_rns": 325, "mr_prior_rns": 0, "mr_pilot_adr": 91.19, "mr_pilot_share": 27.7, "ni_pilot_rns": 131, "ni_prior_rns": 225, "ni_pilot_adr": 97.14, "ni_prior_adr": 80.78, "ni_pilot_share": 11.2, "ni_prior_share": 5.0, "ni_share_shift": 6.2, "ex_pilot_rns": 509, "ex_prior_rns": 1970, "tot_pilot_rns": 1173, "tot_prior_rns": 4512, "tot_rns_chg": -74.0, "tot_pilot_rev": 101237, "tot_prior_rev": 319521, "tot_rev_chg": -68.3, "ni_loss": 94, "mr_gain": 325}, {"property": "MARION, OH", "mr_pilot_rns": 62, "mr_prior_rns": 0, "mr_pilot_adr": 93.14, "mr_pilot_share": 1.9, "ni_pilot_rns": 177, "ni_prior_rns": 407, "ni_pilot_adr": 104.47, "ni_prior_adr": 104.58, "ni_pilot_share": 5.4, "ni_prior_share": 12.2, "ni_share_shift": -6.9, "ex_pilot_rns": 14, "ex_prior_rns": 69, "tot_pilot_rns": 3306, "tot_prior_rns": 3332, "tot_rns_chg": -0.8, "tot_pilot_rev": 300217, "tot_prior_rev": 310058, "tot_rev_chg": -3.2, "ni_loss": 230, "mr_gain": 62}, {"property": "PHOENIX EAST/MESA, AZ", "mr_pilot_rns": 83, "mr_prior_rns": 0, "mr_pilot_adr": 164.25, "mr_pilot_share": 21.7, "ni_pilot_rns": 175, "ni_prior_rns": 0, "ni_pilot_adr": 174.01, "ni_prior_adr": 0, "ni_pilot_share": 45.7, "ni_prior_share": 0, "ni_share_shift": 45.7, "ex_pilot_rns": 0, "ex_prior_rns": 0, "tot_pilot_rns": 383, "tot_prior_rns": 0, "tot_rns_chg": null, "tot_pilot_rev": 59388, "tot_prior_rev": 0, "tot_rev_chg": null, "ni_loss": -175, "mr_gain": 83}, {"property": "PHOENIX WEST/BUCKEYE, AZ", "mr_pilot_rns": 200, "mr_prior_rns": 0, "mr_pilot_adr": 196.62, "mr_pilot_share": 3.8, "ni_pilot_rns": 182, "ni_prior_rns": 253, "ni_pilot_adr": 189.61, "ni_prior_adr": 181.22, "ni_pilot_share": 3.4, "ni_prior_share": 10.6, "ni_share_shift": -7.1, "ex_pilot_rns": 77, "ex_prior_rns": 269, "tot_pilot_rns": 5314, "tot_prior_rns": 2397, "tot_rns_chg": 121.7, "tot_pilot_rev": 849167, "tot_prior_rev": 408056, "tot_rev_chg": 108.1, "ni_loss": 71, "mr_gain": 200}, {"property": "PITTSBURGH NORTH/MONACA, PA", "mr_pilot_rns": 100, "mr_prior_rns": 0, "mr_pilot_adr": 83.14, "mr_pilot_share": 2.9, "ni_pilot_rns": 99, "ni_prior_rns": 317, "ni_pilot_adr": 89.05, "ni_prior_adr": 80.81, "ni_pilot_share": 2.9, "ni_prior_share": 20.8, "ni_share_shift": -17.9, "ex_pilot_rns": 9, "ex_prior_rns": 147, "tot_pilot_rns": 3470, "tot_prior_rns": 1527, "tot_rns_chg": 127.2, "tot_pilot_rev": 258188, "tot_prior_rev": 118297, "tot_rev_chg": 118.3, "ni_loss": 218, "mr_gain": 100}, {"property": "PORTLAND EAST, OR", "mr_pilot_rns": 220, "mr_prior_rns": 0, "mr_pilot_adr": 98.62, "mr_pilot_share": 6.5, "ni_pilot_rns": 1130, "ni_prior_rns": 1141, "ni_pilot_adr": 89.87, "ni_prior_adr": 92.73, "ni_pilot_share": 33.3, "ni_prior_share": 40.5, "ni_share_shift": -7.1, "ex_pilot_rns": 607, "ex_prior_rns": 701, "tot_pilot_rns": 3389, "tot_prior_rns": 2820, "tot_rns_chg": 20.2, "tot_pilot_rev": 296085, "tot_prior_rev": 248638, "tot_rev_chg": 19.1, "ni_loss": 11, "mr_gain": 220}, {"property": "REDDING,CA", "mr_pilot_rns": 205, "mr_prior_rns": 0, "mr_pilot_adr": 127.7, "mr_pilot_share": 26.0, "ni_pilot_rns": 108, "ni_prior_rns": 0, "ni_pilot_adr": 139.33, "ni_prior_adr": 0, "ni_pilot_share": 13.7, "ni_prior_share": 0, "ni_share_shift": 13.7, "ex_pilot_rns": 87, "ex_prior_rns": 0, "tot_pilot_rns": 788, "tot_prior_rns": 0, "tot_rns_chg": null, "tot_pilot_rev": 95930, "tot_prior_rev": 0, "tot_rev_chg": null, "ni_loss": -108, "mr_gain": 205}, {"property": "SIOUX FALLS, SD", "mr_pilot_rns": 296, "mr_prior_rns": 0, "mr_pilot_adr": 92.34, "mr_pilot_share": 26.4, "ni_pilot_rns": 127, "ni_prior_rns": 239, "ni_pilot_adr": 103.17, "ni_prior_adr": 101.55, "ni_pilot_share": 11.3, "ni_prior_share": 12.2, "ni_share_shift": -0.8, "ex_pilot_rns": 85, "ex_prior_rns": 229, "tot_pilot_rns": 1122, "tot_prior_rns": 1965, "tot_rns_chg": -42.9, "tot_pilot_rev": 101608, "tot_prior_rev": 187144, "tot_rev_chg": -45.7, "ni_loss": 112, "mr_gain": 296}, {"property": "TUCSON NORTH-MARANA/CORTARO, AZ", "mr_pilot_rns": 436, "mr_prior_rns": 0, "mr_pilot_adr": 121.71, "mr_pilot_share": 15.6, "ni_pilot_rns": 443, "ni_prior_rns": 310, "ni_pilot_adr": 129.28, "ni_prior_adr": 149.07, "ni_pilot_share": 15.8, "ni_prior_share": 22.9, "ni_share_shift": -7.1, "ex_pilot_rns": 103, "ex_prior_rns": 246, "tot_pilot_rns": 2803, "tot_prior_rns": 1356, "tot_rns_chg": 106.7, "tot_pilot_rev": 322437, "tot_prior_rev": 163603, "tot_rev_chg": 97.1, "ni_loss": -133, "mr_gain": 436}, {"property": "TUCSON SOUTH, AZ", "mr_pilot_rns": 309, "mr_prior_rns": 0, "mr_pilot_adr": 128.81, "mr_pilot_share": 7.8, "ni_pilot_rns": 720, "ni_prior_rns": 720, "ni_pilot_adr": 121.27, "ni_prior_adr": 125.27, "ni_pilot_share": 18.1, "ni_prior_share": 28.7, "ni_share_shift": -10.6, "ex_pilot_rns": 82, "ex_prior_rns": 149, "tot_pilot_rns": 3968, "tot_prior_rns": 2507, "tot_rns_chg": 58.3, "tot_pilot_rev": 390965, "tot_prior_rev": 273823, "tot_rev_chg": 42.8, "ni_loss": 0, "mr_gain": 309}, {"property": "VANCOUVER, WA", "mr_pilot_rns": 692, "mr_prior_rns": 0, "mr_pilot_adr": 95.94, "mr_pilot_share": 23.1, "ni_pilot_rns": 405, "ni_prior_rns": 845, "ni_pilot_adr": 105.63, "ni_prior_adr": 103.11, "ni_pilot_share": 13.5, "ni_prior_share": 34.6, "ni_share_shift": -21.1, "ex_pilot_rns": 655, "ex_prior_rns": 625, "tot_pilot_rns": 3001, "tot_prior_rns": 2440, "tot_rns_chg": 23.0, "tot_pilot_rev": 277688, "tot_prior_rev": 237138, "tot_rev_chg": 17.1, "ni_loss": 440, "mr_gain": 692}, {"property": "WIXOM/NOVI/DETROIT, MI", "mr_pilot_rns": 202, "mr_prior_rns": 0, "mr_pilot_adr": 93.15, "mr_pilot_share": 7.0, "ni_pilot_rns": 394, "ni_prior_rns": 309, "ni_pilot_adr": 103.08, "ni_prior_adr": 102.08, "ni_pilot_share": 13.7, "ni_prior_share": 31.7, "ni_share_shift": -18.0, "ex_pilot_rns": 532, "ex_prior_rns": 125, "tot_pilot_rns": 2875, "tot_prior_rns": 976, "tot_rns_chg": 194.6, "tot_pilot_rev": 230701, "tot_prior_rev": 88204, "tot_rev_chg": 161.6, "ni_loss": -85, "mr_gain": 202}];
+const WEB_PROPS = [{"property": "ABERDEEN, SD", "mr_pilot_rns": 34, "mr_prior_rns": 0, "mr_pilot_adr": 182.86, "mr_pilot_share": 39.1, "ni_pilot_rns": 11, "ni_prior_rns": 82, "ni_pilot_adr": 209.64, "ni_prior_adr": 134.97, "ni_pilot_share": 12.6, "ni_prior_share": 18.3, "ni_share_shift": -5.6, "ex_pilot_rns": 0, "ex_prior_rns": 0, "tot_pilot_rns": 87, "tot_prior_rns": 449, "tot_rns_chg": -80.6, "tot_pilot_rev": 13830, "tot_prior_rev": 44619, "tot_rev_chg": -69.0, "ni_loss": 71, "mr_gain": 34}, {"property": "ANCHORAGE, AK", "mr_pilot_rns": 141, "mr_prior_rns": 0, "mr_pilot_adr": 165.51, "mr_pilot_share": 25.9, "ni_pilot_rns": 78, "ni_prior_rns": 263, "ni_pilot_adr": 178.26, "ni_prior_adr": 154.63, "ni_pilot_share": 14.3, "ni_prior_share": 52.2, "ni_share_shift": -37.8, "ex_pilot_rns": 36, "ex_prior_rns": 210, "tot_pilot_rns": 544, "tot_prior_rns": 504, "tot_rns_chg": 7.9, "tot_pilot_rev": 72558, "tot_prior_rev": 67071, "tot_rev_chg": 8.2, "ni_loss": 185, "mr_gain": 141}, {"property": "ATLANTA WEST/LITHIA SPRINGS, GA", "mr_pilot_rns": 57, "mr_prior_rns": 0, "mr_pilot_adr": 128.96, "mr_pilot_share": 51.4, "ni_pilot_rns": 11, "ni_prior_rns": 20, "ni_pilot_adr": 130.09, "ni_prior_adr": 131.57, "ni_pilot_share": 9.9, "ni_prior_share": 4.5, "ni_share_shift": 5.4, "ex_pilot_rns": 0, "ex_prior_rns": 371, "tot_pilot_rns": 111, "tot_prior_rns": 444, "tot_rns_chg": -75.0, "tot_pilot_rev": 14246, "tot_prior_rev": 40441, "tot_rev_chg": -64.8, "ni_loss": 9, "mr_gain": 57}, {"property": "BILLINGS, MT", "mr_pilot_rns": 184, "mr_prior_rns": 0, "mr_pilot_adr": 86.73, "mr_pilot_share": 37.2, "ni_pilot_rns": 69, "ni_prior_rns": 80, "ni_pilot_adr": 103.01, "ni_prior_adr": 123.93, "ni_pilot_share": 13.9, "ni_prior_share": 65.6, "ni_share_shift": -51.6, "ex_pilot_rns": 0, "ex_prior_rns": 0, "tot_pilot_rns": 495, "tot_prior_rns": 122, "tot_rns_chg": 305.7, "tot_pilot_rev": 44675, "tot_prior_rev": 14007, "tot_rev_chg": 219.0, "ni_loss": 11, "mr_gain": 184}, {"property": "BISMARCK, ND", "mr_pilot_rns": 219, "mr_prior_rns": 0, "mr_pilot_adr": 90.96, "mr_pilot_share": 67.4, "ni_pilot_rns": 68, "ni_prior_rns": 130, "ni_pilot_adr": 99.88, "ni_prior_adr": 105.24, "ni_pilot_share": 20.9, "ni_prior_share": 44.1, "ni_share_shift": -23.1, "ex_pilot_rns": 7, "ex_prior_rns": 107, "tot_pilot_rns": 325, "tot_prior_rns": 295, "tot_rns_chg": 10.2, "tot_pilot_rev": 30196, "tot_prior_rev": 28507, "tot_rev_chg": 5.9, "ni_loss": 62, "mr_gain": 219}, {"property": "COLORADO SPRINGS, CO", "mr_pilot_rns": 605, "mr_prior_rns": 0, "mr_pilot_adr": 83.78, "mr_pilot_share": 60.2, "ni_pilot_rns": 126, "ni_prior_rns": 214, "ni_pilot_adr": 101.43, "ni_prior_adr": 102.57, "ni_pilot_share": 12.5, "ni_prior_share": 42.9, "ni_share_shift": -30.3, "ex_pilot_rns": 168, "ex_prior_rns": 132, "tot_pilot_rns": 1005, "tot_prior_rns": 499, "tot_rns_chg": 101.4, "tot_pilot_rev": 88206, "tot_prior_rev": 48439, "tot_rev_chg": 82.1, "ni_loss": 88, "mr_gain": 605}, {"property": "DICKINSON, ND", "mr_pilot_rns": 68, "mr_prior_rns": 0, "mr_pilot_adr": 75.36, "mr_pilot_share": 36.0, "ni_pilot_rns": 17, "ni_prior_rns": 56, "ni_pilot_adr": 81.71, "ni_prior_adr": 81.42, "ni_pilot_share": 9.0, "ni_prior_share": 82.4, "ni_share_shift": -73.4, "ex_pilot_rns": 72, "ex_prior_rns": 11, "tot_pilot_rns": 189, "tot_prior_rns": 68, "tot_rns_chg": 177.9, "tot_pilot_rev": 14484, "tot_prior_rev": 5482, "tot_rev_chg": 164.2, "ni_loss": 39, "mr_gain": 68}, {"property": "FARGO, ND", "mr_pilot_rns": 130, "mr_prior_rns": 0, "mr_pilot_adr": 113.66, "mr_pilot_share": 52.6, "ni_pilot_rns": 71, "ni_prior_rns": 71, "ni_pilot_adr": 120.67, "ni_prior_adr": 130.08, "ni_pilot_share": 28.7, "ni_prior_share": 76.3, "ni_share_shift": -47.6, "ex_pilot_rns": 14, "ex_prior_rns": 14, "tot_pilot_rns": 247, "tot_prior_rns": 93, "tot_rns_chg": 165.6, "tot_pilot_rev": 28466, "tot_prior_rev": 11818, "tot_rev_chg": 140.9, "ni_loss": 0, "mr_gain": 130}, {"property": "FORT PIERRE, SD", "mr_pilot_rns": 92, "mr_prior_rns": 0, "mr_pilot_adr": 168.52, "mr_pilot_share": 44.9, "ni_pilot_rns": 86, "ni_prior_rns": 116, "ni_pilot_adr": 190.17, "ni_prior_adr": 166.0, "ni_pilot_share": 42.0, "ni_prior_share": 52.3, "ni_share_shift": -10.3, "ex_pilot_rns": 7, "ex_prior_rns": 69, "tot_pilot_rns": 205, "tot_prior_rns": 222, "tot_rns_chg": -7.7, "tot_pilot_rev": 36002, "tot_prior_rev": 33358, "tot_rev_chg": 7.9, "ni_loss": 30, "mr_gain": 92}, {"property": "GRAND FORKS, ND", "mr_pilot_rns": 77, "mr_prior_rns": 0, "mr_pilot_adr": 124.99, "mr_pilot_share": 41.6, "ni_pilot_rns": 31, "ni_prior_rns": 66, "ni_pilot_adr": 143.35, "ni_prior_adr": 154.74, "ni_pilot_share": 16.8, "ni_prior_share": 30.4, "ni_share_shift": -13.7, "ex_pilot_rns": 58, "ex_prior_rns": 80, "tot_pilot_rns": 185, "tot_prior_rns": 217, "tot_rns_chg": -14.7, "tot_pilot_rev": 22751, "tot_prior_rev": 26534, "tot_rev_chg": -14.3, "ni_loss": 35, "mr_gain": 77}, {"property": "GRAND RAPIDS, MN", "mr_pilot_rns": 50, "mr_prior_rns": 0, "mr_pilot_adr": 156.41, "mr_pilot_share": 7.5, "ni_pilot_rns": 72, "ni_prior_rns": 134, "ni_pilot_adr": 168.85, "ni_prior_adr": 157.64, "ni_pilot_share": 10.7, "ni_prior_share": 53.2, "ni_share_shift": -42.4, "ex_pilot_rns": 15, "ex_prior_rns": 12, "tot_pilot_rns": 670, "tot_prior_rns": 252, "tot_rns_chg": 165.9, "tot_pilot_rev": 100153, "tot_prior_rev": 37172, "tot_rev_chg": 169.4, "ni_loss": 62, "mr_gain": 50}, {"property": "INDIANAPOLIS AIRPORT/PLAINFIELD, IN", "mr_pilot_rns": 177, "mr_prior_rns": 0, "mr_pilot_adr": 87.39, "mr_pilot_share": 57.3, "ni_pilot_rns": 47, "ni_prior_rns": 97, "ni_pilot_adr": 99.52, "ni_prior_adr": 98.51, "ni_pilot_share": 15.2, "ni_prior_share": 56.1, "ni_share_shift": -40.9, "ex_pilot_rns": 57, "ex_prior_rns": 31, "tot_pilot_rns": 309, "tot_prior_rns": 173, "tot_rns_chg": 78.6, "tot_pilot_rev": 27940, "tot_prior_rev": 16181, "tot_rev_chg": 72.7, "ni_loss": 50, "mr_gain": 177}, {"property": "JAMESTOWN, ND", "mr_pilot_rns": 119, "mr_prior_rns": 0, "mr_pilot_adr": 132.23, "mr_pilot_share": 40.6, "ni_pilot_rns": 34, "ni_prior_rns": 87, "ni_pilot_adr": 133.91, "ni_prior_adr": 122.82, "ni_pilot_share": 11.6, "ni_prior_share": 63.5, "ni_share_shift": -51.9, "ex_pilot_rns": 32, "ex_prior_rns": 0, "tot_pilot_rns": 293, "tot_prior_rns": 137, "tot_rns_chg": 113.9, "tot_pilot_rev": 35597, "tot_prior_rev": 15501, "tot_rev_chg": 129.6, "ni_loss": 53, "mr_gain": 119}, {"property": "KANSAS CITY EAST/INDEPENDENCE, MO", "mr_pilot_rns": 158, "mr_prior_rns": 0, "mr_pilot_adr": 94.54, "mr_pilot_share": 27.4, "ni_pilot_rns": 76, "ni_prior_rns": 105, "ni_pilot_adr": 119.05, "ni_prior_adr": 119.74, "ni_pilot_share": 13.2, "ni_prior_share": 51.5, "ni_share_shift": -38.3, "ex_pilot_rns": 156, "ex_prior_rns": 76, "tot_pilot_rns": 576, "tot_prior_rns": 204, "tot_rns_chg": 182.4, "tot_pilot_rev": 52209, "tot_prior_rev": 21057, "tot_rev_chg": 147.9, "ni_loss": 29, "mr_gain": 158}, {"property": "KETCHIKAN, AK", "mr_pilot_rns": 129, "mr_prior_rns": 0, "mr_pilot_adr": 179.4, "mr_pilot_share": 48.3, "ni_pilot_rns": 75, "ni_prior_rns": 235, "ni_pilot_adr": 193.36, "ni_prior_adr": 165.85, "ni_pilot_share": 28.1, "ni_prior_share": 70.6, "ni_share_shift": -42.5, "ex_pilot_rns": 29, "ex_prior_rns": 49, "tot_pilot_rns": 267, "tot_prior_rns": 333, "tot_rns_chg": -19.8, "tot_pilot_rev": 47205, "tot_prior_rev": 53808, "tot_rev_chg": -12.3, "ni_loss": 160, "mr_gain": 129}, {"property": "LOVELAND, CO", "mr_pilot_rns": 83, "mr_prior_rns": 0, "mr_pilot_adr": 104.91, "mr_pilot_share": 4.4, "ni_pilot_rns": 21, "ni_prior_rns": 23, "ni_pilot_adr": 129.76, "ni_prior_adr": 127.33, "ni_pilot_share": 1.1, "ni_prior_share": 5.9, "ni_share_shift": -4.8, "ex_pilot_rns": 1109, "ex_prior_rns": 309, "tot_pilot_rns": 1908, "tot_prior_rns": 388, "tot_rns_chg": 391.8, "tot_pilot_rev": 163190, "tot_prior_rev": 31362, "tot_rev_chg": 420.3, "ni_loss": 2, "mr_gain": 83}, {"property": "MARION, OH", "mr_pilot_rns": 125, "mr_prior_rns": 0, "mr_pilot_adr": 96.99, "mr_pilot_share": 32.5, "ni_pilot_rns": 97, "ni_prior_rns": 251, "ni_pilot_adr": 106.66, "ni_prior_adr": 116.38, "ni_pilot_share": 25.2, "ni_prior_share": 63.9, "ni_share_shift": -38.7, "ex_pilot_rns": 126, "ex_prior_rns": 74, "tot_pilot_rns": 385, "tot_prior_rns": 393, "tot_rns_chg": -2.0, "tot_pilot_rev": 38910, "tot_prior_rev": 43975, "tot_rev_chg": -11.5, "ni_loss": 154, "mr_gain": 125}, {"property": "PHOENIX EAST/MESA, AZ", "mr_pilot_rns": 382, "mr_prior_rns": 0, "mr_pilot_adr": 169.19, "mr_pilot_share": 62.3, "ni_pilot_rns": 105, "ni_prior_rns": 0, "ni_pilot_adr": 187.05, "ni_prior_adr": 0, "ni_pilot_share": 17.1, "ni_prior_share": 0, "ni_share_shift": 17.1, "ex_pilot_rns": 0, "ex_prior_rns": 0, "tot_pilot_rns": 613, "tot_prior_rns": 0, "tot_rns_chg": null, "tot_pilot_rev": 103829, "tot_prior_rev": 0, "tot_rev_chg": null, "ni_loss": -105, "mr_gain": 382}, {"property": "PHOENIX WEST/BUCKEYE, AZ", "mr_pilot_rns": 155, "mr_prior_rns": 0, "mr_pilot_adr": 212.8, "mr_pilot_share": 69.8, "ni_pilot_rns": 41, "ni_prior_rns": 258, "ni_pilot_adr": 212.08, "ni_prior_adr": 202.11, "ni_pilot_share": 18.5, "ni_prior_share": 33.3, "ni_share_shift": -14.9, "ex_pilot_rns": 8, "ex_prior_rns": 232, "tot_pilot_rns": 222, "tot_prior_rns": 774, "tot_rns_chg": -71.3, "tot_pilot_rev": 46367, "tot_prior_rev": 153206, "tot_rev_chg": -69.7, "ni_loss": 217, "mr_gain": 155}, {"property": "PITTSBURGH NORTH/MONACA, PA", "mr_pilot_rns": 50, "mr_prior_rns": 0, "mr_pilot_adr": 81.35, "mr_pilot_share": 71.4, "ni_pilot_rns": 12, "ni_prior_rns": 73, "ni_pilot_adr": 90.12, "ni_prior_adr": 92.18, "ni_pilot_share": 17.1, "ni_prior_share": 67.6, "ni_share_shift": -50.4, "ex_pilot_rns": 4, "ex_prior_rns": 27, "tot_pilot_rns": 70, "tot_prior_rns": 108, "tot_rns_chg": -35.2, "tot_pilot_rev": 5907, "tot_prior_rev": 9563, "tot_rev_chg": -38.2, "ni_loss": 61, "mr_gain": 50}, {"property": "PORTLAND EAST, OR", "mr_pilot_rns": 147, "mr_prior_rns": 0, "mr_pilot_adr": 97.24, "mr_pilot_share": 42.1, "ni_pilot_rns": 52, "ni_prior_rns": 121, "ni_pilot_adr": 109.21, "ni_prior_adr": 104.53, "ni_pilot_share": 14.9, "ni_prior_share": 28.7, "ni_share_shift": -13.8, "ex_pilot_rns": 29, "ex_prior_rns": 85, "tot_pilot_rns": 349, "tot_prior_rns": 421, "tot_rns_chg": -17.1, "tot_pilot_rev": 35896, "tot_prior_rev": 40204, "tot_rev_chg": -10.7, "ni_loss": 69, "mr_gain": 147}, {"property": "REDDING,CA", "mr_pilot_rns": 112, "mr_prior_rns": 0, "mr_pilot_adr": 122.37, "mr_pilot_share": 39.4, "ni_pilot_rns": 146, "ni_prior_rns": 0, "ni_pilot_adr": 139.11, "ni_prior_adr": 0, "ni_pilot_share": 51.4, "ni_prior_share": 0, "ni_share_shift": 51.4, "ex_pilot_rns": 8, "ex_prior_rns": 0, "tot_pilot_rns": 284, "tot_prior_rns": 0, "tot_rns_chg": null, "tot_pilot_rev": 37445, "tot_prior_rev": 0, "tot_rev_chg": null, "ni_loss": -146, "mr_gain": 112}, {"property": "SIOUX FALLS, SD", "mr_pilot_rns": 96, "mr_prior_rns": 0, "mr_pilot_adr": 96.03, "mr_pilot_share": 46.4, "ni_pilot_rns": 50, "ni_prior_rns": 98, "ni_pilot_adr": 107.84, "ni_prior_adr": 105.83, "ni_pilot_share": 24.2, "ni_prior_share": 56.3, "ni_share_shift": -32.2, "ex_pilot_rns": 14, "ex_prior_rns": 52, "tot_pilot_rns": 207, "tot_prior_rns": 174, "tot_rns_chg": 19.0, "tot_pilot_rev": 20605, "tot_prior_rev": 16912, "tot_rev_chg": 21.8, "ni_loss": 48, "mr_gain": 96}, {"property": "TUCSON NORTH-MARANA/CORTARO, AZ", "mr_pilot_rns": 291, "mr_prior_rns": 0, "mr_pilot_adr": 125.41, "mr_pilot_share": 52.1, "ni_pilot_rns": 206, "ni_prior_rns": 141, "ni_pilot_adr": 154.53, "ni_prior_adr": 150.41, "ni_pilot_share": 36.9, "ni_prior_share": 28.3, "ni_share_shift": 8.5, "ex_pilot_rns": 7, "ex_prior_rns": 123, "tot_pilot_rns": 559, "tot_prior_rns": 498, "tot_rns_chg": 12.2, "tot_pilot_rev": 75489, "tot_prior_rev": 67590, "tot_rev_chg": 11.7, "ni_loss": -65, "mr_gain": 291}, {"property": "TUCSON SOUTH, AZ", "mr_pilot_rns": 276, "mr_prior_rns": 0, "mr_pilot_adr": 117.01, "mr_pilot_share": 50.8, "ni_pilot_rns": 125, "ni_prior_rns": 346, "ni_pilot_adr": 135.58, "ni_prior_adr": 133.43, "ni_pilot_share": 23.0, "ni_prior_share": 25.1, "ni_share_shift": -2.1, "ex_pilot_rns": 7, "ex_prior_rns": 164, "tot_pilot_rns": 543, "tot_prior_rns": 1377, "tot_rns_chg": -60.6, "tot_pilot_rev": 67387, "tot_prior_rev": 144437, "tot_rev_chg": -53.3, "ni_loss": 221, "mr_gain": 276}, {"property": "VANCOUVER, WA", "mr_pilot_rns": 229, "mr_prior_rns": 0, "mr_pilot_adr": 104.16, "mr_pilot_share": 41.5, "ni_pilot_rns": 69, "ni_prior_rns": 164, "ni_pilot_adr": 116.02, "ni_prior_adr": 124.15, "ni_pilot_share": 12.5, "ni_prior_share": 24.6, "ni_share_shift": -12.1, "ex_pilot_rns": 22, "ex_prior_rns": 261, "tot_pilot_rns": 552, "tot_prior_rns": 667, "tot_rns_chg": -17.2, "tot_pilot_rev": 56210, "tot_prior_rev": 68736, "tot_rev_chg": -18.2, "ni_loss": 95, "mr_gain": 229}, {"property": "WIXOM/NOVI/DETROIT, MI", "mr_pilot_rns": 95, "mr_prior_rns": 0, "mr_pilot_adr": 100.65, "mr_pilot_share": 19.0, "ni_pilot_rns": 45, "ni_prior_rns": 184, "ni_pilot_adr": 119.66, "ni_prior_adr": 99.0, "ni_pilot_share": 9.0, "ni_prior_share": 32.9, "ni_share_shift": -23.9, "ex_pilot_rns": 42, "ex_prior_rns": 341, "tot_pilot_rns": 500, "tot_prior_rns": 559, "tot_rns_chg": -10.6, "tot_pilot_rev": 42686, "tot_prior_rev": 45579, "tot_rev_chg": -6.3, "ni_loss": 139, "mr_gain": 95}];
+const CAT_ORDER = ["Member Rate", "Nightly", "Extended Stay", "Corporate/Negotiated", "Loyalty & Promo", "Government", "Advance Purchase & Promo"];
+const CAT_COLORS = {"Member Rate": "#FF5F00", "Nightly": "#4A7FC1", "Extended Stay": "#7B2D8B", "Corporate/Negotiated": "#1C355E", "Loyalty & Promo": "#2E8B57", "Government": "#8B6914", "Advance Purchase & Promo": "#B0BEC5"};
+
+function fmt$(v) { return v >= 1000 ? '$'+v.toLocaleString('en-US',{maximumFractionDigits:0}) : '$'+v.toFixed(2); }
+function fmtPct(v) { return v===null?'N/A':(v>0?'+':'')+v.toFixed(1)+'%'; }
+function fmtDelta(v) { return (v>=0?'+':'')+v.toLocaleString(); }
+function cls(v) { return v>0?'pos':v<0?'neg':''; }
+
+// ── Render Category Summary Tables ──
+function renderCatTable(prefix, rows, totals) {
+  const tbody = document.getElementById(prefix+'-tbody');
+  let html = '';
+  rows.forEach(r => {
+    html += `<tr>
+      <td><span class="cat-swatch" style="background:${r.color}"></span>${r.category}</td>
+      <td class="num">${r.prior_rns.toLocaleString()}</td>
+      <td class="num">${r.pilot_rns.toLocaleString()}</td>
+      <td class="num ${cls(r.rns_delta)}">${fmtDelta(r.rns_delta)}</td>
+      <td class="num ${cls(r.rns_chg)}">${fmtPct(r.rns_chg)}</td>
+      <td class="num">${r.prior_share.toFixed(1)}%</td>
+      <td class="num">${r.pilot_share.toFixed(1)}%</td>
+      <td class="num ${cls(r.share_shift)}">${r.share_shift>0?'+':''}${r.share_shift.toFixed(1)}pp</td>
+      <td class="num">${r.prior_adr>0?fmt$(r.prior_adr):'—'}</td>
+      <td class="num">${r.pilot_adr>0?fmt$(r.pilot_adr):'—'}</td>
+      <td class="num ${cls(r.adr_chg)}">${fmtPct(r.adr_chg)}</td>
+      <td class="num">${fmt$(r.prior_rev)}</td>
+      <td class="num">${fmt$(r.pilot_rev)}</td>
+      <td class="num ${cls(r.rev_chg)}">${fmtPct(r.rev_chg)}</td>
+    </tr>`;
+  });
+  // Total row
+  html += `<tr class="total-row">
+    <td>TOTAL</td>
+    <td class="num">${totals.prior_rns.toLocaleString()}</td>
+    <td class="num">${totals.pilot_rns.toLocaleString()}</td>
+    <td class="num ${cls(totals.rns_delta)}">${fmtDelta(totals.rns_delta)}</td>
+    <td class="num ${cls(totals.rns_chg)}">${fmtPct(totals.rns_chg)}</td>
+    <td class="num">100%</td><td class="num">100%</td><td class="num">—</td>
+    <td class="num">—</td><td class="num">—</td><td class="num">—</td>
+    <td class="num">${fmt$(totals.prior_rev)}</td>
+    <td class="num">${fmt$(totals.pilot_rev)}</td>
+    <td class="num ${cls(totals.rev_chg)}">${fmtPct(totals.rev_chg)}</td>
+  </tr>`;
+  tbody.innerHTML = html;
+}
+renderCatTable('pms', PMS_CATS, PMS_TOTALS);
+renderCatTable('web', WEB_CATS, WEB_TOTALS);
+
+// ── Stacked Mix Bars ──
+function renderStackBars(elId, rows, totals) {
+  const el = document.getElementById(elId);
+  function makeBar(label, field) {
+    let total = 0;
+    rows.forEach(r => total += r[field]);
+    if (total === 0) return '';
+    let segs = '';
+    rows.forEach(r => {
+      const pct = r[field] / total * 100;
+      if (pct < 0.3) return;
+      const lbl = pct > 5 ? `<span class="stack-val">${pct.toFixed(0)}%</span>` : '';
+      segs += `<div class="stack-seg" style="width:${pct}%;background:${r.color}" title="${r.category}: ${r[field].toLocaleString()} RNs (${pct.toFixed(1)}%)">${lbl}</div>`;
+    });
+    return `<div class="stack-row">
+      <div class="stack-label">${label}</div>
+      <div class="stack-track">${segs}</div>
+      <div style="width:70px;text-align:right;font-size:11px;font-weight:700;color:var(--muted);padding-left:8px">${total.toLocaleString()}</div>
+    </div>`;
+  }
+  let html = makeBar('Prior', 'prior_rns') + makeBar('Pilot', 'pilot_rns');
+  html += '<div class="legend">';
+  rows.forEach(r => {
+    html += `<div class="legend-item"><div class="legend-swatch" style="background:${r.color}"></div>${r.category}</div>`;
+  });
+  html += '</div>';
+  el.innerHTML = html;
+}
+renderStackBars('pms-stack', PMS_CATS, PMS_TOTALS);
+renderStackBars('web-stack', WEB_CATS, WEB_TOTALS);
+
+// ── Delta Bars (waterfall-style) ──
+function renderDeltaBars(elId, rows) {
+  const el = document.getElementById(elId);
+  const maxAbs = Math.max(...rows.map(r => Math.abs(r.rns_delta)), 1);
+  let html = '';
+  // Sort by delta descending
+  const sorted = [...rows].sort((a,b) => b.rns_delta - a.rns_delta);
+  sorted.forEach(r => {
+    const pct = Math.abs(r.rns_delta) / maxAbs * 85;
+    const color = r.rns_delta >= 0 ? 'var(--positive)' : 'var(--negative)';
+    const align = r.rns_delta >= 0 ? '' : 'justify-content:flex-end;';
+    html += `<div style="display:flex;align-items:center;margin-bottom:8px;gap:8px">
+      <div style="width:140px;font-size:11px;text-align:right;display:flex;align-items:center;justify-content:flex-end;gap:4px">
+        <span class="cat-swatch" style="background:${r.color};width:10px;height:10px"></span>${r.category}
+      </div>
+      <div style="flex:1;display:flex;${align}">
+        <div style="width:${pct}%;height:22px;background:${color};border-radius:4px;display:flex;align-items:center;padding:0 8px;min-width:40px;
+                    ${r.rns_delta >= 0 ? '' : 'justify-content:flex-end;'}">
+          <span style="font-size:10px;font-weight:700;color:#fff">${fmtDelta(r.rns_delta)}</span>
+        </div>
+      </div>
+      <div style="width:60px;font-size:11px;font-weight:600;${r.rns_delta>=0?'color:var(--positive)':'color:var(--negative)'}">${fmtPct(r.rns_chg)}</div>
+    </div>`;
+  });
+  el.innerHTML = html;
+}
+renderDeltaBars('pms-delta', PMS_CATS);
+renderDeltaBars('web-delta', WEB_CATS);
+
+// ── Property Tables ──
+function renderPropTable(tbodyId, data) {
+  const tbody = document.getElementById(tbodyId);
+  let html = '';
+  data.forEach(r => {
+    html += `<tr>
+      <td style="font-weight:600">${r.property}</td>
+      <td class="num">${r.mr_prior_rns.toLocaleString()}</td>
+      <td class="num" style="color:#FF5F00;font-weight:600">${r.mr_pilot_rns.toLocaleString()}</td>
+      <td class="num ${cls(r.mr_gain)}">${fmtDelta(r.mr_gain)}</td>
+      <td class="num">${r.mr_pilot_adr>0?fmt$(r.mr_pilot_adr):'—'}</td>
+      <td class="num" style="color:#FF5F00;font-weight:600">${r.mr_pilot_share.toFixed(1)}%</td>
+      <td class="num">${r.ni_prior_rns.toLocaleString()}</td>
+      <td class="num">${r.ni_pilot_rns.toLocaleString()}</td>
+      <td class="num ${cls(-r.ni_loss)}">${r.ni_loss>0?'-'+r.ni_loss.toLocaleString():'+'+Math.abs(r.ni_loss).toLocaleString()}</td>
+      <td class="num">${r.ni_prior_adr>0?fmt$(r.ni_prior_adr):'—'}</td>
+      <td class="num">${r.ni_pilot_adr>0?fmt$(r.ni_pilot_adr):'—'}</td>
+      <td class="num ${cls(r.ni_share_shift)}">${r.ni_share_shift>0?'+':''}${r.ni_share_shift.toFixed(1)}pp</td>
+      <td class="num">${r.tot_prior_rns.toLocaleString()}</td>
+      <td class="num">${r.tot_pilot_rns.toLocaleString()}</td>
+      <td class="num ${cls(r.tot_rns_chg)}">${fmtPct(r.tot_rns_chg)}</td>
+    </tr>`;
+  });
+  tbody.innerHTML = html;
+}
+renderPropTable('pms-prop-tbody', PMS_PROPS);
+renderPropTable('web-prop-tbody', WEB_PROPS);
+
+// ── Tabs ──
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', function() {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    this.classList.add('active');
+    document.getElementById(this.dataset.tab).classList.add('active');
+  });
+});
+
+// ── Property Search ──
+document.querySelectorAll('.prop-search').forEach(input => {
+  input.addEventListener('input', function() {
+    const q = this.value.toLowerCase();
+    const target = this.dataset.target;
+    const data = target.includes('pms') ? PMS_PROPS : WEB_PROPS;
+    const filtered = data.filter(r => r.property.toLowerCase().includes(q));
+    renderPropTable(target, filtered);
+  });
+});
+</script>
+</body>
+</html>

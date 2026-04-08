@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stay Rewarded — Property Enrollment Performance</title>
+<style>
+  :root {
+    --bg:       #EEF1F6; --card:     #FFFFFF; --card-hover: #F4F7FB;
+    --border:   #D0D8E8; --text:     #1C355E; --muted:    #5A6B84;
+    --positive: #2E8B57; --negative: #E11B22; --accent:   #FF5F00;
+    --direct:   #FF5F00; --mrprog:   #4A7FC1; --combined: #1C355E;
+    --non-legacy: #FF5F00; --legacy: #4A7FC1;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif;
+         background:var(--bg); color:var(--text); }
+
+  .brand-bar { background:#FF5F00; height:5px; }
+  .header { padding:24px 32px 18px; background:#1C355E;
+            border-bottom:3px solid #FF5F00; display:flex; align-items:center; gap:20px; }
+  .header-logo { height:48px; }
+  .header-text h1 { font-size:22px; font-weight:700; color:#fff; }
+  .header-text .subtitle { color:rgba(255,255,255,.72); font-size:13px; margin-top:4px; }
+  .pilot-badge { display:inline-block; background:linear-gradient(135deg,#FF5F00,#cc4800);
+                 color:#fff; font-size:11px; font-weight:700; padding:3px 10px;
+                 border-radius:12px; margin-left:12px; vertical-align:middle; }
+
+  .dashboard { padding:24px 32px; max-width:1520px; margin:0 auto; }
+
+  /* KPI row */
+  .kpi-row { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:24px; }
+  .kpi-card { background:var(--card); border:1px solid var(--border);
+              border-top:3px solid #1C355E; border-radius:8px; padding:18px 16px;
+              box-shadow:0 1px 4px rgba(28,53,94,.07); }
+  .kpi-card.accent { border-top-color:#FF5F00; }
+  .kpi-label { font-size:10px; text-transform:uppercase; letter-spacing:1px;
+               color:var(--muted); font-weight:700; margin-bottom:8px; }
+  .kpi-value { font-size:26px; font-weight:700; color:#1C355E; }
+  .kpi-sub { font-size:11px; color:var(--muted); margin-top:6px; }
+  .kpi-sub .direct { color:#FF5F00; font-weight:600; }
+  .kpi-sub .mrprog { color:#4A7FC1; font-weight:600; }
+  .kpi-sub .non-leg { color:#FF5F00; font-weight:600; }
+  .kpi-sub .leg { color:#4A7FC1; font-weight:600; }
+
+  /* Section */
+  .section-title { font-size:16px; font-weight:700; margin:30px 0 6px;
+                   color:#1C355E; display:flex; align-items:center; gap:8px; }
+  .section-title .dot { width:10px; height:10px; border-radius:50%; }
+  .section-desc { font-size:12px; color:var(--muted); margin-bottom:16px; line-height:1.6; }
+
+  /* Chart cards */
+  .grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:24px; }
+  .grid-3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px; margin-bottom:24px; }
+  .chart-card { background:var(--card); border:1px solid var(--border);
+                border-radius:8px; padding:20px;
+                box-shadow:0 1px 4px rgba(28,53,94,.06); }
+  .chart-card h3 { font-size:12px; font-weight:700; color:var(--muted);
+                   text-transform:uppercase; letter-spacing:.6px;
+                   border-bottom:2px solid #FF5F00; padding-bottom:8px; margin-bottom:10px; }
+  .chart-desc { font-size:11px; color:#8ba0bf; font-style:italic;
+                margin-bottom:14px; line-height:1.5; }
+
+  /* Tables */
+  .tbl-wrap { overflow-x:auto; margin-bottom:24px; }
+  table { width:100%; border-collapse:collapse; font-size:12px; table-layout:fixed; }
+  th { background:#1C355E; color:#fff; padding:9px 7px; text-align:left;
+       font-size:10px; text-transform:uppercase; letter-spacing:.4px;
+       white-space:nowrap; position:sticky; top:0; cursor:pointer; user-select:none; }
+  th:hover { background:#2a4a7a; }
+  td { padding:7px 7px; border-bottom:1px solid var(--border); white-space:nowrap; }
+  tr:hover td { background:#f0f4fa; }
+  tr:nth-child(even) td { background:#f8f9fc; }
+  tr:nth-child(even):hover td { background:#edf1f8; }
+  .num { text-align:right; font-variant-numeric:tabular-nums; }
+  .pos { color:var(--positive); font-weight:600; }
+  .neg { color:var(--negative); font-weight:600; }
+  tr.total-row td { font-weight:700; border-top:2px solid #1C355E;
+                    background:#EEF1F6 !important; }
+
+  /* Horizontal bars */
+  .hbar-row { display:flex; align-items:center; margin-bottom:7px; }
+  .hbar-label { width:220px; font-size:11px; font-weight:600; color:var(--text);
+                text-align:right; padding-right:10px; white-space:nowrap;
+                overflow:hidden; text-overflow:ellipsis; }
+  .hbar-track { flex:1; height:24px; background:#f0f2f7; border-radius:4px; position:relative; overflow:hidden; }
+  .hbar-fill { height:100%; border-radius:4px; transition:width .8s ease; position:relative; }
+  .hbar-val { position:absolute; right:6px; top:50%; transform:translateY(-50%);
+              font-size:10px; font-weight:700; color:#fff; }
+  .hbar-val-outside { position:absolute; left:calc(100% + 6px); top:50%; transform:translateY(-50%);
+                      font-size:10px; font-weight:700; color:var(--text); white-space:nowrap; }
+
+  /* Stacked bar for stream comparison */
+  .stack-row { display:flex; align-items:center; margin-bottom:7px; }
+  .stack-label { width:220px; font-size:11px; font-weight:600; color:var(--text);
+                 text-align:right; padding-right:10px; white-space:nowrap;
+                 overflow:hidden; text-overflow:ellipsis; }
+  .stack-track { flex:1; height:26px; display:flex; border-radius:4px; overflow:hidden; background:#f0f2f7; }
+  .stack-seg { height:100%; transition:width .8s ease; position:relative; display:flex; align-items:center; justify-content:center; }
+  .stack-seg span { font-size:9px; font-weight:700; color:#fff; white-space:nowrap; }
+
+  /* Legend */
+  .legend { display:flex; flex-wrap:wrap; gap:14px; margin-top:12px; margin-bottom:8px; font-size:11px; color:var(--muted); }
+  .legend-item { display:flex; align-items:center; gap:5px; }
+  .legend-swatch { width:12px; height:12px; border-radius:3px; }
+
+  /* Insight */
+  .insight-box { border-radius:6px; padding:16px 20px; margin-bottom:20px; }
+  .insight-box h4 { font-size:13px; margin-bottom:6px; font-weight:700; }
+  .insight-box p { font-size:12px; color:#5A6B84; line-height:1.6; }
+  .insight-program { background:#FFF8F0; border:1px solid #FFD6A8; border-left:4px solid #FF5F00; }
+  .insight-program h4 { color:#FF5F00; }
+  .insight-cohort { background:#F0F4FA; border:1px solid #B8C9E2; border-left:4px solid #4A7FC1; }
+  .insight-cohort h4 { color:#1C355E; }
+  .insight-combined { background:#F0FAF4; border:1px solid #A8D8B8; border-left:4px solid #2E8B57; }
+  .insight-combined h4 { color:#2E8B57; }
+
+  /* Tabs */
+  .tab-bar { display:flex; gap:0; margin-bottom:0; }
+  .tab { padding:10px 24px; font-size:13px; font-weight:700; cursor:pointer;
+          border:1px solid var(--border); border-bottom:none; border-radius:8px 8px 0 0;
+          background:#E4EAF3; color:var(--muted); }
+  .tab.active { background:var(--card); color:#1C355E; border-bottom:1px solid var(--card); }
+  .tab-content { display:none; background:var(--card); border:1px solid var(--border);
+                 border-radius:0 8px 8px 8px; padding:20px;
+                 box-shadow:0 1px 4px rgba(28,53,94,.06); }
+  .tab-content.active { display:block; }
+
+  /* Filter */
+  .filter-bar { display:flex; gap:12px; align-items:center; margin-bottom:14px; flex-wrap:wrap; }
+  .filter-bar label { font-size:12px; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:.5px; }
+  .filter-bar input { padding:6px 10px; border:1px solid var(--border); border-radius:6px;
+                      font-size:13px; color:var(--text); background:#fff; }
+
+  /* Rank badge */
+  .rank { display:inline-flex; align-items:center; justify-content:center;
+          width:24px; height:24px; border-radius:50%; font-size:10px; font-weight:700;
+          color:#fff; margin-right:4px; }
+  .rank-1 { background:#FFB800; }
+  .rank-2 { background:#A0A8B8; }
+  .rank-3 { background:#CD7F32; }
+  .rank-n { background:#D0D8E8; color:#5A6B84; }
+
+  .cohort-badge { display:inline-block; font-size:9px; font-weight:700; padding:2px 7px;
+                  border-radius:10px; vertical-align:middle; }
+  .badge-non-legacy { background:#FFF0E6; color:#FF5F00; border:1px solid #FFD6A8; }
+  .badge-legacy { background:#E8F0FA; color:#4A7FC1; border:1px solid #B8C9E2; }
+
+  /* Donut */
+  .donut-wrap { display:flex; align-items:center; justify-content:center; gap:24px; padding:10px 0; }
+  .donut-label { text-align:center; }
+  .donut-label .dl-val { font-size:22px; font-weight:700; color:#1C355E; }
+  .donut-label .dl-pct { font-size:13px; font-weight:700; margin-top:2px; }
+  .donut-label .dl-name { font-size:11px; color:var(--muted); margin-top:4px; }
+
+  @media print {
+    .brand-bar,.header,th { print-color-adjust:exact; -webkit-print-color-adjust:exact; }
+  }
+  @media (max-width:1100px) {
+    .kpi-row { grid-template-columns:repeat(2,1fr); }
+    .grid-2, .grid-3 { grid-template-columns:1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="brand-bar"></div>
+<div class="header">
+  <img class='header-logo' src='data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyBpZD0iTXlfUGxhY2VfSG90ZWxzX0xvZ28iIGRhdGEtbmFtZT0iTXkgUGxhY2UgSG90ZWxzIExvZ28iIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgdmlld0JveD0iMCAwIDQ5My45MzEgNDg4LjQ2OCI+CiAgPGRlZnM+CiAgICA8c3R5bGU+CiAgICAgIC5jbHMtMSB7CiAgICAgICAgZmlsbDogI2UxMWIyMjsKICAgICAgfQoKICAgICAgLmNscy0yIHsKICAgICAgICBmaWxsOiAjZmZmOwogICAgICB9CgogICAgICAuY2xzLTMgewogICAgICAgIGZpbGw6ICNmZDA7CiAgICAgIH0KICAgIDwvc3R5bGU+CiAgPC9kZWZzPgogIDxnPgogICAgPHBhdGggY2xhc3M9ImNscy0zIiBkPSJNMjQ2Ljk2Niw0ODAuOTY2Yy03Mi4xNiwwLTE0My41MjUtNS41MTgtMjE4LjE4NS0xNi44NzJsLTUuNDkxLS44MzUtLjgwMy01LjQ5OEMyLjUwMiwzMjEuMDA1LDIuNTAyLDE4Mi4zMTcsMjIuNDg3LDQ1LjU2bC44MDMtNS40OTcsNS40OTEtLjgzNWM3NC42NTktMTEuMzU2LDE0Ni4wMjQtMTYuODc2LDIxOC4xODUtMTYuODc2czE0My41MjQsNS41MTksMjE4LjE4MiwxNi44NzZsNS40OTIuODM1LjgwMyw1LjQ5N2MxOS45ODYsMTM2Ljc1NywxOS45ODYsMjc1LjQ0NCwwLDQxMi4ybC0uODAzLDUuNDk4LTUuNDkyLjgzNWMtNzQuNjU3LDExLjM1NS0xNDYuMDI0LDE2Ljg3Mi0yMTguMTgyLDE2Ljg3MmgwWiIvPgogICAgPHBhdGggZD0iTTI0Ni45NjQsMjkuODUzYzcxLjczMiwwLDE0My40NjMsNS41OTcsMjE3LjA1NywxNi43OSwxOS44NjgsMTM1Ljk1NSwxOS44NjgsMjc0LjA3OCwwLDQxMC4wMzMtNzMuNTk0LDExLjE5My0xNDUuMzI0LDE2Ljc5MS0yMTcuMDU2LDE2Ljc5MXMtMTQzLjQ2My01LjU5OC0yMTcuMDU2LTE2Ljc5MWMtMTkuODY3LTEzNS45NTUtMTkuODY3LTI3NC4wNzgsMC00MTAuMDMzLDczLjU5My0xMS4xOTMsMTQ1LjMyNC0xNi43OSwyMTcuMDU1LTE2Ljc5TTI0Ni45NjQsMTQuODUzYy03Mi41MzksMC0xNDQuMjc1LDUuNTQ4LTIxOS4zMSwxNi45NmwtMTAuOTgsMS42Ny0xLjYwNiwxMC45OTFjLTIwLjA4OSwxMzcuNDc4LTIwLjA4OSwyNzYuODkzLDAsNDE0LjM3MmwxLjYwNiwxMC45ODksMTAuOTgsMS42NzFjNzUuMDM2LDExLjQxMywxNDYuNzczLDE2Ljk2MSwyMTkuMzExLDE2Ljk2MXMxNDQuMjc1LTUuNTQ4LDIxOS4zMTEtMTYuOTYxbDEwLjk4LTEuNjcxLDEuNjA1LTEwLjk4OWMyMC4wOTEtMTM3LjQ3OSwyMC4wOTEtMjc2Ljg5NCwwLTQxNC4zNzJsLTEuNjA1LTEwLjk5MS0xMC45OC0xLjY3Yy03NS4wMzUtMTEuNDEyLTE0Ni43NzItMTYuOTYtMjE5LjMxMi0xNi45NmgwWiIvPgogIDwvZz4KICA8Zz4KICAgIDxwYXRoIGNsYXNzPSJjbHMtMSIgZD0iTTM4Ni4yODksMTQ3LjE2MmMwLDc2LjgwMi02Mi4yNTQsMTM5LjA1Ny0xMzkuMDYyLDEzOS4wNTdzLTEzOS4wNTItNjIuMjU1LTEzOS4wNTItMTM5LjA1N1MxNzAuNDI4LDguMTAxLDI0Ny4yMjcsOC4xMDFzMTM5LjA2Miw2Mi4yNTQsMTM5LjA2MiwxMzkuMDYxWiIvPgogICAgPHBhdGggZD0iTTk5LjMyNywxNDYuOTQxQzk5LjMyNyw2NS43NzgsMTY1LjExMywwLDI0Ni4yNzIsMGgwYzgxLjE2MSwwLDE0Ni45MzksNjUuNzc4LDE0Ni45NDMsMTQ2Ljk0MWgwYy0uMDA0LDgxLjE2NC02NS43ODIsMTQ2LjkzNy0xNDYuOTQzLDE0Ni45NTFoMGMtODEuMTU4LS4wMTUtMTQ2Ljk0NC02NS43ODctMTQ2Ljk0NC0xNDYuOTUxaDBaTTExNS4xMDcsMTQ2Ljk0MWMuMTI4LDcyLjQ0Myw1OC43MjIsMTMxLjAzMywxMzEuMTY1LDEzMS4xNjZoMGM3Mi40NDEtLjEzMywxMzEuMDMzLTU4LjcyMywxMzEuMTc0LTEzMS4xNjZoMGMtLjE0MS03Mi40NDctNTguNzMyLTEzMS4wMzUtMTMxLjE3NC0xMzEuMTY2aDBjLTcyLjQ0My4xMzEtMTMxLjAzNyw1OC43MTktMTMxLjE2NSwxMzEuMTY2aDBaIi8+CiAgICA8Zz4KICAgICAgPHBhdGggZD0iTTg2LjQ4OSwyNTMuMzcyYy0xMC4zNjIsMC0xOS4wNzgtNC42NjctMjMuMzEzLTEyLjQ5NS0yLjUyMi00LjYzOS01LjQ5LTE0LjM0MiwyLjg4Mi0yNy4yMjEsNS42NDctOC42NzEsMTEuMzE5LTE3LjMyMiwxNi45NzItMjUuOTgybDQuOTA3LTcuNDg4YzguMDkyLTEyLjM4NywxNi4xNTctMjQuOCwyNC4yMzMtMzcuMjA0bDYuNzE3LTEwLjMzNiwxMS4wODgtMTcuMDE2LDExLjA3Ni0xNy4wMjgsMS4xODctMS44NWM2LjA2My05LjQzOSwxNS4yMDUtMjMuNywzMy42MDctMjMuNyw2LjA1OSwwLDI1LjgyNSwyLjE2MSwyNS44MjUsMzAuMDE2djQuNzI0YzMuNzM2LTUuMzksNy40NjctMTAuNzc0LDExLjIwNi0xNi4xNjcsNy44MTktMTAuOTM0LDE5LjY0Ny0xNy42NDMsMzAuOTc5LTE3LjY0Myw3LjE2NSwwLDEzLjc3NCwyLjY5MywxOC42Miw3LjU2NSwzLjk1MiwzLjk4Miw4LjY0NSwxMS4zOTcsOC41NjcsMjQuMDc2LS4xMjUsMTguOTYxLS4xMTIsMzguMjY4LS4wODYsNTYuOTNsLjAyMSwyMi40NzNjMCwxLjI3LjA3NSwyLjYxNS4xMzQsMy45OTIuMzgsOC4xMTMsMS4wMjMsMjEuNjkxLTEwLjE5NCwzMC4zMjgtNC45OSwzLjg0Ny0xMS4zMTQsNS45NjItMTcuODI0LDUuOTYyLTUuMzM2LDAtMTAuNDUzLTEuNDI0LTE0Ljc5MS00LjExOS0xMy4zMTItOC4yNTYtMTIuNTc2LTIzLjIyNC0xMi4xNDMtMzIuMTcxLjA3OS0xLjQyMi4xNDgtMi44MDkuMTQ4LTQuMDk4di0xLjI4MWwtMTYuNjY5LDI0LjU5MmMtMy4wNSw0LjQ5OC0xMS4xNjIsMTYuNDkxLTI1LjUxNSwxNy40MTQtLjU1OS4wMzktMS4xMTUuMDYxLTEuNjc2LjA2MS0xMi45MTQsMC0yMy43ODMtOS44NDQtMjUuMjk1LTIyLjkxMy0uNDU5LTMuOTc2LS43MzItNy45ODYtLjg2NS0xMS45OTRsLTMwLjk5LDQ3LjI4OWMtNi4zMTUsOS40NjUtMTcuMzQsMTUuMjg2LTI4LjgxLDE1LjI4NmgwWiIvPgogICAgICA8cGF0aCBjbGFzcz0iY2xzLTIiIGQ9Ik0xNzUuODQyLDg1Ljc4M2MxMC44NjcsMCwxMy4wOTMsOC4wOSwxMy4wOTMsMTcuMjgzdjQ1LjQ3OWMxMS40NjItMTYuNTU3LDIyLjkzNC0zMy4xMTcsMzQuNDA1LTQ5LjY3NiwxMS45MjUtMTYuNjYxLDM1LjEzNS0xNy43NjksMzQuOTcsNi42NzItLjE3OSwyNi40OS0uMDY3LDUyLjk5NC0uMDY3LDc5LjQ4MiwwLDcuOTg1LDIuMTkxLDE4LjYyMy01LjEwMSwyNC4yMzYtNS4wMjEsMy44Ny0xMi42ODUsNC40ODItMTguMTI2LDEuMTA5LTguNDQzLTUuMjQtNS45NzctMTcuMTM5LTUuOTc3LTI1LjQ0NnYtNDIuNzUzYy0xMy4zMDksMTkuNjMxLTI2LjYyMSwzOS4yNjktMzkuOTM1LDU4LjkwMi0zLjc1OSw1LjU1MS04LjU2NywxMS40LTE1LjgwNCwxMS44Ny02Ljk4MS40NTEtMTIuNzA0LTQuNzc0LTEzLjQ5LTExLjYwNC0yLjAyNy0xNy42MjctLjA3OS0zNi41NTMtLjA3OS01NC4zMDMtMTguMzY0LDI4LjAyOS0zNi43MjYsNTYuMDQzLTU1LjA5Myw4NC4wNzEtMTEuMDc3LDE2LjYxLTQxLjU3MiwxMC41MDYtMjcuOTA1LTEwLjUwMSw3LjI2LTExLjE2NiwxNC41NzUtMjIuMzA4LDIxLjg2MS0zMy40NTYsMTAuMzQ1LTE1LjgzOCwyMC42NTEtMzEuNzA1LDMwLjk2Ny00Ny41NTgsNy4zODgtMTEuMzUsMTQuNzcyLTIyLjY5NSwyMi4xNi0zNC4wNDcsNS44OTQtOS4wNzYsMTEuODI0LTE5Ljc2MiwyNC4xMi0xOS43NjIiLz4KICAgIDwvZz4KICAgIDxnPgogICAgICA8cGF0aCBkPSJNMjgxLjcsMjY4LjIxMWMtOC4xMjcsMC0xNS43OTQtNC4zMDMtMjAuNTE3LTExLjUxMi00Ljk0My03LjU2My01Ljc0Mi0xNi45OTgtMi4xNDItMjUuMjUsMy40MjYtNy44MTMsNy43MzUtMTUuMTQ0LDExLjUyOS0yMS42MDEsNS45NDctMTAuMTE2LDE5LjgxMy0zNC42ODcsMjMuODQ1LTQzLjQzM2wtNS4zMi0xOS4yMTEtMTQuNjI2LTUyLjg1OWMtMS44NDgtNi42ODgsMi4wMDItMTMuNjI3LDguNjY0LTE1LjYwM2wyNC4xNy03LjE1NGMxLjE4MS0uMzUsMi40MDItLjUyMiwzLjYwNS0uNTIyLDIuMjE1LDAsNC40MS41NzgsNi4zNjUsMS42OTYsMy4wMjUsMS43MzUsNS4xOTMsNC42NDEsNi4wMTksOC4wM2w0LjUwMiwxOC41NmM1Ljk5NC0xMy40MTMsMTIuMTExLTI3LjA3NiwxOC4yNTktNDAuNTMyLjk0NC0yLjA1OSwxLjg1Mi00LjE2NCwyLjc3NC02LjI5NywyLjg0Ni02LjU3OCw1Ljc5NS0xMy4zODksOS44NjUtMTkuODE2LDQuNTMxLTcuMTg0LDExLjc0Mi0xMS4yOTksMTkuNzczLTExLjI5OXMxNS44NzksNC4xMzEsMjAuOTEzLDExLjA0OGM0Ljk0Miw2Ljc5LDYuMzI5LDE1LjE1MiwzLjgxLDIyLjk0NC0uMTQ3LjQ0Ni0uMzA2Ljg4Ni0uNDk5LDEuMzExbC0zMi42MDMsNzIuMzU5Yy02Ljc3OCwxNC41OC0xMy45NDcsMjkuMTk3LTIxLjk2OSw0NC44MjUtLjk4NCwxLjkwNy0yLjM5OCw0LjcyNi00LjEyNyw4LjE2MS0yMC40NTksNDAuNjQ0LTM1LjkyNCw2OS41NjEtNDQuODgxLDc4LjU2Ni00Ljg2MSw0Ljg5My0xMS4wNDcsNy41ODgtMTcuNDExLDcuNTg4aDBaIi8+CiAgICAgIDxwYXRoIGNsYXNzPSJjbHMtMiIgZD0iTTM1OC40NzcsMTIzLjgzOWMtNi45MzMsMTQuODk1LTE0LjE4NSwyOS42MzQtMjEuNjg3LDQ0LjIzOS02Ljk4NiwxMy41OTktMzUuODAzLDcyLjYwMy00Ni43MDEsODMuNTY0LTEwLjUzOCwxMC41OTQtMjQuNzQ3LTIuODExLTE5LjM4MS0xNS4wOTYsMy4wNi02Ljk2OSw2Ljk5NC0xMy42OTcsMTAuODQ0LTIwLjI1MiwxLjQ0Ni0yLjQ2NywyNi45OTItNDYuNTYzLDI2LjE1Ni00OS41NzEtNi45OTQtMjUuMjU3LTEzLjk4NC01MC41MTMtMjAuOTcyLTc1Ljc3MmwyNC4xNzYtNy4xNTIsMTMuMzA2LDU0LjgyOGMxMS4xMjktMjQuODM4LDIyLjEwMi00OS43NSwzMy40MTYtNzQuNTA0LDMuNzIxLTguMTM3LDcuMDEyLTE3LjAxOSwxMS44MTQtMjQuNjA1LDcuOTU3LTEyLjU5NiwyNS43NDItLjc3MSwyMS42MTksMTEuOTYzbC0zMi41OTQsNzIuMzU4Ii8+CiAgICA8L2c+CiAgPC9nPgogIDxnPgogICAgPHBhdGggZD0iTTg0LjQxOSwzNjYuNjZoLTIwLjc4OXYzMy40NzloLTE4Ljg5OXYtOTQuNDk2aDQxLjMwOWMxNy44MTgsMCwzMi41MzQsOS44NTQsMzIuNTM0LDI5Ljk2OCwwLDIxLjg3LTE0LjU3OSwzMS4wNDktMzQuMTU0LDMxLjA0OVpNODUuMzY0LDMyNC4wMDNoLTIxLjczM3YyNC4yOTloMjIuMDAzYzguNzc2LDAsMTMuNS00LjA1MSwxMy41LTEyLjI4NXMtNS4zOTgtMTIuMDE0LTEzLjc3LTEyLjAxNFoiLz4KICAgIDxwYXRoIGQ9Ik0xMjkuNzgsNDAwLjEzOXYtOTQuNDk2aDE4Ljg5OXY3Ni4wMDJoNDcuMzg0djE4LjQ5NGgtNjYuMjgzWiIvPgogICAgPHBhdGggZD0iTTI3NC40NjYsNDAwLjEzOWwtNy40MjYtMjEuMDU5aC0zNC41NTlsLTcuNDI0LDIxLjA1OWgtMjAuMjVsMzYuMTgtOTQuNDk2aDE4LjM1OGwzNS45MDksOTQuNDk2aC0yMC43ODlaTTI1NC40ODcsMzQzLjk4MWMtMS44OTEtNS41MzQtMy43ODEtMTEuMjA1LTQuNzI2LTE0LjcxNS0uOTQ0LDMuNTEtMi44MzQsOS4xODEtNC43MjQsMTQuNzE1bC02LjA3NSwxNy4xNDVoMjEuNmwtNi4wNzQtMTcuMTQ1WiIvPgogICAgPHBhdGggZD0iTTM1My4xMTYsMzMzLjE4Yy0zLjM3NS02LjQ3OC04Ljc3NS0xMC4yNTgtMTcuMjc5LTEwLjI1OC0xNC4xNzUsMC0yMi4yNzMsMTIuNDE5LTIyLjI3MywyOS45NjgsMCwxNy4wMSw4LjIzMywyOS45NywyMi40MDgsMjkuOTcsOC41MDYsMCwxMy40OTktMy42NDQsMTguNDk0LTEyLjAxNmwxNS45Myw5LjQ1Yy02LjQ4LDEzLjM2NC0xNy44MTksMjEuMzI5LTM0Ljk2NCwyMS4zMjktMjQuNzAzLDAtNDEuMzA5LTE4Ljg5OC00MS4zMDktNDguNzMzLDAtMjguNzUzLDE3LjI3OS00OC43MzIsNDEuOTgzLTQ4LjczMiwxNy44MiwwLDI4LjYxOSw4LjY0LDM0LjU1OSwyMC45MjRsLTE3LjU0OSw4LjA5OVoiLz4KICAgIDxwYXRoIGQ9Ik0zODEuNTY3LDQwMC4xMzl2LTk0LjQ5Nmg2NS42MDd2MTguNDk0aC00Ni43MDd2MTYuMzM0aDI3LjEzM3YxOC4zNTloLTI3LjEzM3YyMi44MTRoNDguNzMzdjE4LjQ5NGgtNjcuNjMzWiIvPgogIDwvZz4KICA8Zz4KICAgIDxwYXRoIGNsYXNzPSJjbHMtMSIgZD0iTTE2OS41ODIsNDM4Ljk0djcuNTY3aDYuNjI4di03LjU2N2g1LjQ3OHYyMC40aC01LjQ3OHYtOC4wNWgtNi42Mjh2OC4wNWgtNS40Nzh2LTIwLjRoNS40NzhaIi8+CiAgICA8cGF0aCBjbGFzcz0iY2xzLTEiIGQ9Ik0yMDUuNzI2LDQ1OS42NzRjLTYuMzI2LDAtOS44MDctNC43NTMtOS44MDctMTAuNDEzLDAtNS45MzIsMy44NzQtMTAuNjUzLDEwLjE0LTEwLjY1Myw2LjU2OCwwLDkuODk3LDQuODcyLDkuODk3LDEwLjMyMSwwLDYuNTY4LTMuOTM1LDEwLjc0NS0xMC4yLDEwLjc0NWgtLjAzWk0yMDUuOTk4LDQ1NS4zNDZjMi42MzQsMCw0LjE3Ny0yLjU0Miw0LjE3Ny02LjIzNSwwLTMuNTEtMS41NzQtNi4xNzQtNC4yMzctNi4xNzQtMi42MzMsMC00LjIzNywyLjY2My00LjIzNyw2LjIwNC0uMDMsMy42NjMsMS42MDQsNi4yMDUsNC4yMzcsNi4yMDVoLjA2WiIvPgogICAgPHBhdGggY2xhc3M9ImNscy0xIiBkPSJNMjM0LjU2LDQ0My41NDJoLTUuMjA2di00LjYwMmgxNS45ODF2NC42MDJoLTUuMjk2djE1Ljc5OWgtNS40Nzh2LTE1Ljc5OVoiLz4KICAgIDxwYXRoIGNsYXNzPSJjbHMtMSIgZD0iTTI3Mi4zNjgsNDUxLjEwOGgtNy4zMjR2My43NTNoOC4yMDJ2NC40OGgtMTMuNjh2LTIwLjRoMTMuMjU3djQuNDhoLTcuNzc5djMuMjY5aDcuMzI0djQuNDE5WiIvPgogICAgPHBhdGggY2xhc3M9ImNscy0xIiBkPSJNMjg3LjYsNDM4Ljk0aDUuNDc4djE1LjgzaDcuODM5djQuNTdoLTEzLjMxN3YtMjAuNFoiLz4KICAgIDxwYXRoIGNsYXNzPSJjbHMtMSIgZD0iTTMxNi4xNzcsNDUzLjg5M2MxLjI0MS42MzYsMy4yMzksMS4yNzEsNS4yOTYsMS4yNzEsMS44NzcsMCwyLjc4NS0uNjM2LDIuNzg1LTEuNjY1LDAtLjk5OS0uOTA0LTEuNTQzLTMuMjA4LTIuMzMxLTMuNDUxLTEuMjQxLTUuNzUxLTMuMTE2LTUuNzUxLTYuMTQzLDAtMy42MDIsMy4wNTctNi4zODYsOC4yMDMtNi4zODYsMi40MjEsMCw0LjE3Ny40NTQsNS41MDksMS4wM2wtMS4xNSw0LjM4OGMtLjg3OC0uMzkzLTIuMzkxLS45NjgtNC40MTktLjk2OC0xLjY2NSwwLTIuNTczLjYwNS0yLjU3MywxLjUxMywwLDEuMDMsMS4wOSwxLjQyMiwzLjY2MywyLjM5MSwzLjY2MiwxLjM2Miw1LjI5NiwzLjI5OSw1LjI5Niw2LjE0MywwLDMuNTEyLTIuNzI0LDYuNTA3LTguNjg3LDYuNTA3LTIuNDUxLDAtNC44NDMtLjYzNi01Ljk5Mi0xLjI0bDEuMDI5LTQuNTFaIi8+CiAgPC9nPgogIDxwYXRoIGQ9Ik0yNDYuOTY2LDQxMS44ODljLTY2Ljk1NSwwLTEzMy45MTMsNi43NDMtMjAyLjIzNCwyMC4xODZ2Ny42NWM2OC40MTgtOS43MzksMTM1LjMyNi0xNC42MTMsMjAyLjIzNC0xNC42MTNzMTMzLjgxNiw0Ljg3NSwyMDIuMjMzLDE0LjYxM3YtNy42NWMtNjguMzItMTMuNDQzLTEzNS4yNzktMjAuMTg2LTIwMi4yMzMtMjAuMTg2WiIvPgogIDxwYXRoIGQ9Ik00NjUuNzU5LDMxNC44MzRjMCwzLjk5OS0zLjEzOSw3LjEzOC03LjIyNCw3LjEzOC00LjA0MiwwLTcuMjY3LTMuMTM5LTcuMjY3LTcuMTM4LDAtMy45MTMsMy4yMjUtNy4wNTIsNy4yNjctNy4wNTIsNC4wODUsMCw3LjIyNCwzLjEzOSw3LjIyNCw3LjA1MlpNNDUzLjA3NCwzMTQuODM0YzAsMy4xMzksMi4zMjIsNS42MzMsNS41MDQsNS42MzMsMy4wOTYsMCw1LjM3NS0yLjQ5NCw1LjM3NS01LjU5LDAtMy4xMzktMi4yNzktNS42NzYtNS40MTgtNS42NzZzLTUuNDYxLDIuNTM3LTUuNDYxLDUuNjMzWk00NTcuNDE3LDMxOC41MzJoLTEuNjM0di03LjA1MmMuNjQ1LS4xMjksMS41NDgtLjIxNSwyLjcwOS0uMjE1LDEuMzMzLDAsMS45MzUuMjE1LDIuNDUxLjUxNi4zODcuMzAxLjY4OC44Ni42ODgsMS41NDgsMCwuNzc0LS42MDIsMS4zNzYtMS40NjIsMS42MzR2LjA4NmMuNjg4LjI1OCwxLjA3NS43NzQsMS4yOSwxLjcyLjIxNSwxLjA3NS4zNDQsMS41MDUuNTE2LDEuNzYzaC0xLjc2M2MtLjIxNS0uMjU4LS4zNDQtLjkwMy0uNTU5LTEuNzItLjEyOS0uNzc0LS41NTktMS4xMTgtMS40NjItMS4xMThoLS43NzR2Mi44MzhaTTQ1Ny40NjEsMzE0LjUzM2guNzc0Yy45MDMsMCwxLjYzNC0uMzAxLDEuNjM0LTEuMDMyLDAtLjY0NS0uNDczLTEuMDc1LTEuNTA1LTEuMDc1LS40MywwLS43MzEuMDQzLS45MDMuMDg2djIuMDIxWiIvPgo8L3N2Zz4=' alt='My Place Hotels'>
+  <div class="header-text">
+    <h1>Stay Rewarded — Property Enrollment Performance<span class="pilot-badge">PILOT</span></h1>
+    <div class="subtitle">32 Participating Properties &nbsp;·&nbsp; Property Sign-Ups + Member Rate Program Enrollments &nbsp;·&nbsp; Through March 31, 2026</div>
+  </div>
+</div>
+<div class="dashboard">
+
+<!-- ═══ KPI ROW ═══ -->
+<div class="kpi-row">
+  <div class="kpi-card accent">
+    <div class="kpi-label">Combined Enrollments</div>
+    <div class="kpi-value">21,508</div>
+    <div class="kpi-sub"><span class="direct">Property: 18,167</span> &nbsp;·&nbsp; <span class="mrprog">Member Rate: 3,341</span></div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-label">Participating Properties</div>
+    <div class="kpi-value">32</div>
+    <div class="kpi-sub"><span class="non-leg">7 Non-Legacy</span> &nbsp;·&nbsp; <span class="leg">25 Legacy</span></div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-label">Property Enrollment Share</div>
+    <div class="kpi-value">84.5%</div>
+    <div class="kpi-sub">18,167 of 21,508 total enrollments from in-property sign-ups</div>
+  </div>
+  <div class="kpi-card accent">
+    <div class="kpi-label">Top Property (Combined)</div>
+    <div class="kpi-value">2,233</div>
+    <div class="kpi-sub">Jacksonville/Camp Lejeune, NC <span class="non-leg">(Non-Legacy)</span></div>
+  </div>
+</div>
+
+<!-- ═══ OVERVIEW INSIGHT ═══ -->
+<div class="insight-box insight-program">
+  <h4>Two Enrollment Streams</h4>
+  <p>This dashboard tracks <strong>two distinct enrollment sources</strong> for the Stay Rewarded program across 32 participating properties. <strong style="color:#FF5F00;">Property Enrollments</strong> (18,167) are guests signed up at check-in or converted from OTA bookings at the front desk. <strong style="color:#4A7FC1;">Member Rate Program Enrollments</strong> (3,341) are guests who enrolled through the member rate booking flow — either via PMS at the property or on the website. Together they represent <strong>21,508 total enrollments</strong>. The <strong>Non-Legacy cohort</strong> (7 properties) has been live since June 9, 2025; the <strong>Legacy cohort</strong> (25 properties) launched November 13, 2025.</p>
+</div>
+
+<!-- ═══ ENROLLMENT STREAM COMPARISON ═══ -->
+<div class="section-title"><span class="dot" style="background:#1C355E"></span> Enrollment Stream Comparison</div>
+<div class="section-desc">How the two enrollment sources compare — property-level check-in/OTA sign-ups vs member rate program bookings (PMS + Web).</div>
+
+<div class="grid-2">
+  <div class="chart-card">
+    <h3>Total Volume by Stream</h3>
+    <div class="chart-desc">Aggregate enrollment count for each source. Property sign-ups are the dominant enrollment channel.</div>
+    <div id="stream-totals"></div>
+    <div class="legend">
+      <div class="legend-item"><div class="legend-swatch" style="background:#FF5F00"></div> Property Enrollments (Check-In / OTA Conversion)</div>
+      <div class="legend-item"><div class="legend-swatch" style="background:#4A7FC1"></div> Member Rate Program (PMS + Website)</div>
+    </div>
+  </div>
+  <div class="chart-card">
+    <h3>Stream Mix by Cohort</h3>
+    <div class="chart-desc">Stacked bars showing the property vs member rate enrollment mix for each cohort.</div>
+    <div id="stream-by-cohort"></div>
+    <div class="legend">
+      <div class="legend-item"><div class="legend-swatch" style="background:#FF5F00"></div> Property Enrollments</div>
+      <div class="legend-item"><div class="legend-swatch" style="background:#4A7FC1"></div> Member Rate Program</div>
+    </div>
+  </div>
+</div>
+
+<div class="insight-box insight-combined">
+  <h4>Key Takeaway</h4>
+  <p>Property-level enrollments account for <strong>84.5%</strong> of all Stay Rewarded sign-ups, demonstrating the critical role front desk staff and OTA conversion play in program growth. The Member Rate program adds an additional <strong>3,341 enrollments</strong> (15.5%) through the booking flow. Non-Legacy properties average <strong>1,071 combined enrollments</strong> per property vs <strong>560</strong> for Legacy, though Legacy has had less than half the time in-program.</p>
+</div>
+
+<!-- ═══ COHORT COMPARISON ═══ -->
+<div class="section-title"><span class="dot" style="background:#4A7FC1"></span> Cohort Comparison</div>
+<div class="section-desc">Performance across Non-Legacy (7 properties, since Jun 2025) vs Legacy (25 properties, since Nov 2025). Per-property averages normalize for different cohort sizes.</div>
+
+<div class="grid-2">
+  <div class="chart-card">
+    <h3>Combined Enrollments by Cohort</h3>
+    <div class="chart-desc">Total enrollment volume including both streams, broken out by cohort.</div>
+    <div id="cohort-totals"></div>
+    <div class="legend">
+      <div class="legend-item"><div class="legend-swatch" style="background:#FF5F00"></div> Non-Legacy (7 properties)</div>
+      <div class="legend-item"><div class="legend-swatch" style="background:#4A7FC1"></div> Legacy (25 properties)</div>
+    </div>
+  </div>
+  <div class="chart-card">
+    <h3>Average Combined Enrollments per Property</h3>
+    <div class="chart-desc">Per-property efficiency — normalizes for the different cohort sizes and time in program.</div>
+    <div id="cohort-avg"></div>
+    <div class="legend">
+      <div class="legend-item"><div class="legend-swatch" style="background:#FF5F00"></div> Non-Legacy Avg: 1,071</div>
+      <div class="legend-item"><div class="legend-swatch" style="background:#4A7FC1"></div> Legacy Avg: 560</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ PROPERTY LEADERBOARD ═══ -->
+<div class="section-title"><span class="dot" style="background:#FF5F00"></span> Property Enrollment Leaderboard</div>
+<div class="section-desc">All 32 participating properties ranked by combined enrollments, with both streams shown separately. Use the tabs to filter by cohort.</div>
+
+<div class="tab-bar">
+  <div class="tab active" onclick="switchTab('all')">All Properties (32)</div>
+  <div class="tab" onclick="switchTab('nonlegacy')">Non-Legacy (7)</div>
+  <div class="tab" onclick="switchTab('legacy')">Legacy (25)</div>
+</div>
+
+<div class="tab-content active" id="tab-all">
+  <div class="filter-bar">
+    <label>Search:</label>
+    <input type="text" id="search-all" placeholder="Filter by property name..." oninput="filterTable('all')">
+  </div>
+  <div class="tbl-wrap">
+    <table id="tbl-all">
+      <thead><tr>
+        <th style="width:35px">#</th>
+        <th style="width:260px" onclick="sortTbl('tbl-all',1)">Property</th>
+        <th style="width:85px" onclick="sortTbl('tbl-all',2)">Cohort</th>
+        <th class="num" style="width:95px" onclick="sortTbl('tbl-all',3)">Property</th>
+        <th class="num" style="width:95px" onclick="sortTbl('tbl-all',4)">Member Rate</th>
+        <th class="num" style="width:95px" onclick="sortTbl('tbl-all',5)">Combined</th>
+        <th style="width:250px">Stream Mix</th>
+      </tr></thead>
+      <tbody id="tbody-all"></tbody>
+    </table>
+  </div>
+</div>
+
+<div class="tab-content" id="tab-nonlegacy">
+  <div class="filter-bar">
+    <label>Search:</label>
+    <input type="text" id="search-nonlegacy" placeholder="Filter by property name..." oninput="filterTable('nonlegacy')">
+  </div>
+  <div class="tbl-wrap">
+    <table id="tbl-nonlegacy">
+      <thead><tr>
+        <th style="width:35px">#</th>
+        <th style="width:280px" onclick="sortTbl('tbl-nonlegacy',1)">Property</th>
+        <th class="num" style="width:100px" onclick="sortTbl('tbl-nonlegacy',2)">Property</th>
+        <th class="num" style="width:100px" onclick="sortTbl('tbl-nonlegacy',3)">Member Rate</th>
+        <th class="num" style="width:100px" onclick="sortTbl('tbl-nonlegacy',4)">Combined</th>
+        <th style="width:260px">Stream Mix</th>
+      </tr></thead>
+      <tbody id="tbody-nonlegacy"></tbody>
+    </table>
+  </div>
+</div>
+
+<div class="tab-content" id="tab-legacy">
+  <div class="filter-bar">
+    <label>Search:</label>
+    <input type="text" id="search-legacy" placeholder="Filter by property name..." oninput="filterTable('legacy')">
+  </div>
+  <div class="tbl-wrap">
+    <table id="tbl-legacy">
+      <thead><tr>
+        <th style="width:35px">#</th>
+        <th style="width:280px" onclick="sortTbl('tbl-legacy',1)">Property</th>
+        <th class="num" style="width:100px" onclick="sortTbl('tbl-legacy',2)">Property</th>
+        <th class="num" style="width:100px" onclick="sortTbl('tbl-legacy',3)">Member Rate</th>
+        <th class="num" style="width:100px" onclick="sortTbl('tbl-legacy',4)">Combined</th>
+        <th style="width:260px">Stream Mix</th>
+      </tr></thead>
+      <tbody id="tbody-legacy"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ═══ STACKED BAR CHART — ALL PROPERTIES ═══ -->
+<div class="section-title"><span class="dot" style="background:#2E8B57"></span> Enrollment Distribution — All Properties</div>
+<div class="section-desc">Visual ranking of all 32 properties. Each bar shows the split between property sign-ups (orange) and member rate program enrollments (blue).</div>
+
+<div class="chart-card" style="margin-bottom:24px;">
+  <h3>Combined Enrollments by Property — Stream Breakdown</h3>
+  <div id="all-stacked-bars"></div>
+  <div class="legend" style="margin-top:14px;">
+    <div class="legend-item"><div class="legend-swatch" style="background:#FF5F00"></div> Property Enrollments</div>
+    <div class="legend-item"><div class="legend-swatch" style="background:#4A7FC1"></div> Member Rate Program</div>
+  </div>
+</div>
+
+<!-- Footer -->
+<div style="text-align:center; padding:24px 0 8px; font-size:11px; color:#8ba0bf;">
+  Stay Rewarded Property Enrollment Dashboard &nbsp;·&nbsp; Data through March 31, 2026 &nbsp;·&nbsp; My Place Hotels of America
+</div>
+
+</div><!-- /dashboard -->
+
+<script>
+// ═══ DATA ═══
+// Property Enrollments = check-in / OTA conversion sign-ups at the property
+// MR = Member Rate Program enrollments (PMS + Website booking flow)
+const PROPS = [
+  { name:'My Place Hotel-Jacksonville/Camp Lejeune, NC', direct:1939, mr:294, cohort:'Non-Legacy' },
+  { name:'My Place Hotel-Kalispell, MT', direct:1539, mr:263, cohort:'Non-Legacy' },
+  { name:'My Place Hotel-Phoenix West/Buckeye, AZ', direct:827, mr:269, cohort:'Non-Legacy' },
+  { name:'My Place Hotel-Davenport/Quad Cities, IA', direct:656, mr:52, cohort:'Non-Legacy' },
+  { name:'My Place Hotel-Aberdeen, SD', direct:610, mr:50, cohort:'Non-Legacy' },
+  { name:'My Place Hotel-Boise/Nampa, ID - Idaho Center', direct:420, mr:113, cohort:'Non-Legacy' },
+  { name:'My Place Hotel-Watertown, SD', direct:379, mr:85, cohort:'Non-Legacy' },
+  { name:'My Place Hotel-Tucson South, AZ', direct:1507, mr:125, cohort:'Legacy' },
+  { name:'My Place Hotel-Indianapolis Airport/Plainfield, IN', direct:802, mr:86, cohort:'Legacy' },
+  { name:'My Place Hotel-Bismarck, ND', direct:608, mr:177, cohort:'Legacy' },
+  { name:'My Place Hotel-Fort Pierre, SD', direct:598, mr:87, cohort:'Legacy' },
+  { name:'My Place Hotel-Kansas City East/Independence, MO', direct:582, mr:140, cohort:'Legacy' },
+  { name:'My Place Hotel-Jamestown, ND', direct:581, mr:95, cohort:'Legacy' },
+  { name:'My Place Hotel-Vancouver, WA', direct:554, mr:118, cohort:'Legacy' },
+  { name:'My Place Hotel-Wixom/Novi/Detroit, MI', direct:554, mr:43, cohort:'Legacy' },
+  { name:'My Place Hotel-Colorado Springs, CO', direct:532, mr:251, cohort:'Legacy' },
+  { name:'My Place Hotel-Pittsburgh North/Monaca, PA', direct:485, mr:42, cohort:'Legacy' },
+  { name:'My Place Hotel-Portland East, OR', direct:484, mr:37, cohort:'Legacy' },
+  { name:'My Place Hotel-Grand Rapids, MN', direct:453, mr:42, cohort:'Legacy' },
+  { name:'My Place Hotel-Atlanta West/Lithia Springs, GA', direct:434, mr:42, cohort:'Legacy' },
+  { name:'My Place Hotel-Sioux Falls, SD', direct:410, mr:76, cohort:'Legacy' },
+  { name:'My Place Hotel-Grand Forks, ND', direct:402, mr:73, cohort:'Legacy' },
+  { name:'My Place Hotel-Redding, CA', direct:371, mr:95, cohort:'Legacy' },
+  { name:'My Place Hotel-Billings, MT', direct:351, mr:141, cohort:'Legacy' },
+  { name:'My Place Hotel-Ketchikan, AK', direct:341, mr:92, cohort:'Legacy' },
+  { name:'My Place Hotel-Tucson North-Marana/Cortaro, AZ', direct:334, mr:119, cohort:'Legacy' },
+  { name:'My Place Hotel-Marion, OH', direct:307, mr:40, cohort:'Legacy' },
+  { name:'My Place Hotel-Dickinson, ND', direct:291, mr:50, cohort:'Legacy' },
+  { name:'My Place Hotel-Loveland, CO', direct:242, mr:57, cohort:'Legacy' },
+  { name:'My Place Hotel-Fargo, ND', direct:230, mr:45, cohort:'Legacy' },
+  { name:'My Place Hotel-Phoenix East/Mesa, AZ', direct:211, mr:122, cohort:'Legacy' },
+  { name:'My Place Hotel-Anchorage, AK', direct:133, mr:20, cohort:'Legacy' }
+];
+
+// Add computed fields
+PROPS.forEach(p => { p.combined = p.direct + p.mr; });
+
+const TOTAL_DIRECT = PROPS.reduce((s,p)=>s+p.direct,0);
+const TOTAL_MR     = PROPS.reduce((s,p)=>s+p.mr,0);
+const TOTAL_ALL    = TOTAL_DIRECT + TOTAL_MR;
+
+const NL = PROPS.filter(p=>p.cohort==='Non-Legacy');
+const LEG = PROPS.filter(p=>p.cohort==='Legacy');
+
+const NL_DIRECT = NL.reduce((s,p)=>s+p.direct,0);
+const NL_MR     = NL.reduce((s,p)=>s+p.mr,0);
+const NL_COMB   = NL_DIRECT + NL_MR;
+const LEG_DIRECT= LEG.reduce((s,p)=>s+p.direct,0);
+const LEG_MR    = LEG.reduce((s,p)=>s+p.mr,0);
+const LEG_COMB  = LEG_DIRECT + LEG_MR;
+
+// ═══ STREAM COMPARISON CHARTS ═══
+function renderStreamTotals() {
+  const el = document.getElementById('stream-totals');
+  const max = Math.max(TOTAL_DIRECT, TOTAL_MR);
+  let html = '';
+  [{label:'Property Enrollments', val:TOTAL_DIRECT, color:'#FF5F00'},
+   {label:'Member Rate Program', val:TOTAL_MR, color:'#4A7FC1'}].forEach(c => {
+    const pct = (c.val/TOTAL_DIRECT*100).toFixed(1); // scale to larger
+    html += `<div class="hbar-row">
+      <div class="hbar-label">${c.label}</div>
+      <div class="hbar-track">
+        <div class="hbar-fill" style="width:${pct}%;background:${c.color};">
+          <span class="hbar-val">${c.val.toLocaleString()}</span>
+        </div>
+      </div>
+    </div>`;
+  });
+  el.innerHTML = html;
+}
+
+function renderStreamByCohort() {
+  const el = document.getElementById('stream-by-cohort');
+  const maxComb = Math.max(NL_COMB, LEG_COMB);
+  let html = '';
+  [{label:'Non-Legacy (7)', direct:NL_DIRECT, mr:NL_MR, total:NL_COMB},
+   {label:'Legacy (25)', direct:LEG_DIRECT, mr:LEG_MR, total:LEG_COMB}].forEach(c => {
+    const totalW = (c.total/maxComb*100).toFixed(1);
+    const directPct = (c.direct/c.total*100).toFixed(0);
+    const mrPct = (c.mr/c.total*100).toFixed(0);
+    const directW = (c.direct/c.total*parseFloat(totalW)).toFixed(1);
+    const mrW = (c.mr/c.total*parseFloat(totalW)).toFixed(1);
+    html += `<div class="stack-row">
+      <div class="stack-label">${c.label}</div>
+      <div class="stack-track">
+        <div class="stack-seg" style="width:${directW}%;background:#FF5F00;">
+          <span>${c.direct.toLocaleString()} (${directPct}%)</span>
+        </div>
+        <div class="stack-seg" style="width:${mrW}%;background:#4A7FC1;">
+          <span>${c.mr.toLocaleString()} (${mrPct}%)</span>
+        </div>
+      </div>
+    </div>`;
+  });
+  el.innerHTML = html;
+}
+
+// ═══ COHORT COMPARISON CHARTS ═══
+function renderCohortTotals() {
+  const el = document.getElementById('cohort-totals');
+  const max = Math.max(NL_COMB, LEG_COMB);
+  let html = '';
+  [{label:'Non-Legacy (7)', val:NL_COMB, color:'#FF5F00'},
+   {label:'Legacy (25)', val:LEG_COMB, color:'#4A7FC1'}].forEach(c => {
+    const pct = (c.val/max*100).toFixed(1);
+    html += `<div class="hbar-row">
+      <div class="hbar-label">${c.label}</div>
+      <div class="hbar-track">
+        <div class="hbar-fill" style="width:${pct}%;background:${c.color};">
+          <span class="hbar-val">${c.val.toLocaleString()}</span>
+        </div>
+      </div>
+    </div>`;
+  });
+  el.innerHTML = html;
+}
+
+function renderCohortAvg() {
+  const el = document.getElementById('cohort-avg');
+  const avgNL = Math.round(NL_COMB / NL.length);
+  const avgLeg = Math.round(LEG_COMB / LEG.length);
+  const max = Math.max(avgNL, avgLeg);
+  let html = '';
+  [{label:'Non-Legacy Avg', val:avgNL, color:'#FF5F00'},
+   {label:'Legacy Avg', val:avgLeg, color:'#4A7FC1'}].forEach(c => {
+    const pct = (c.val/max*100).toFixed(1);
+    html += `<div class="hbar-row">
+      <div class="hbar-label">${c.label}</div>
+      <div class="hbar-track">
+        <div class="hbar-fill" style="width:${pct}%;background:${c.color};">
+          <span class="hbar-val">${c.val.toLocaleString()}</span>
+        </div>
+      </div>
+    </div>`;
+  });
+  el.innerHTML = html;
+}
+
+// ═══ STACKED BAR CHART — ALL PROPERTIES ═══
+function renderAllStackedBars() {
+  const sorted = [...PROPS].sort((a,b)=>b.combined-a.combined);
+  const max = sorted[0].combined;
+  const el = document.getElementById('all-stacked-bars');
+  let html = '';
+  sorted.forEach(p => {
+    const totalW = (p.combined/max*100).toFixed(1);
+    const directW = (p.direct/max*100).toFixed(1);
+    const mrW = (p.mr/max*100).toFixed(1);
+    const shortName = p.name.replace('My Place Hotel-','');
+    html += `<div class="stack-row">
+      <div class="stack-label" title="${shortName}">${shortName}</div>
+      <div class="stack-track">
+        <div class="stack-seg" style="width:${directW}%;background:#FF5F00;">
+          ${p.direct > max*0.08 ? `<span>${p.direct.toLocaleString()}</span>` : ''}
+        </div>
+        <div class="stack-seg" style="width:${mrW}%;background:#4A7FC1;">
+          ${p.mr > max*0.06 ? `<span>${p.mr.toLocaleString()}</span>` : ''}
+        </div>
+      </div>
+    </div>`;
+  });
+  el.innerHTML = html;
+}
+
+// ═══ TABLES ═══
+function rankBadge(i) {
+  if (i===0) return '<span class="rank rank-1">1</span>';
+  if (i===1) return '<span class="rank rank-2">2</span>';
+  if (i===2) return '<span class="rank rank-3">3</span>';
+  return `<span class="rank rank-n">${i+1}</span>`;
+}
+
+function streamBar(direct, mr, maxCombined) {
+  const dW = (direct/maxCombined*100).toFixed(1);
+  const mW = (mr/maxCombined*100).toFixed(1);
+  return `<div style="display:flex;height:18px;background:#f0f2f7;border-radius:3px;overflow:hidden;">
+    <div style="width:${dW}%;background:#FF5F00;border-radius:3px 0 0 3px;"></div>
+    <div style="width:${mW}%;background:#4A7FC1;border-radius:0 3px 3px 0;"></div>
+  </div>`;
+}
+
+function buildAllTable() {
+  const sorted = [...PROPS].sort((a,b)=>b.combined-a.combined);
+  const max = sorted[0].combined;
+  const tbody = document.getElementById('tbody-all');
+  let html = '';
+  sorted.forEach((p,i) => {
+    const badgeClass = p.cohort==='Non-Legacy' ? 'badge-non-legacy' : 'badge-legacy';
+    html += `<tr data-name="${p.name.toLowerCase()}">
+      <td>${rankBadge(i)}</td>
+      <td>${p.name}</td>
+      <td><span class="cohort-badge ${badgeClass}">${p.cohort}</span></td>
+      <td class="num">${p.direct.toLocaleString()}</td>
+      <td class="num">${p.mr.toLocaleString()}</td>
+      <td class="num" style="font-weight:700">${p.combined.toLocaleString()}</td>
+      <td>${streamBar(p.direct, p.mr, max)}</td>
+    </tr>`;
+  });
+  html += `<tr class="total-row">
+    <td></td><td>Total — All Properties</td><td></td>
+    <td class="num">${TOTAL_DIRECT.toLocaleString()}</td>
+    <td class="num">${TOTAL_MR.toLocaleString()}</td>
+    <td class="num">${TOTAL_ALL.toLocaleString()}</td><td></td>
+  </tr>`;
+  tbody.innerHTML = html;
+}
+
+function buildCohortTable(data, tbodyId) {
+  const sorted = [...data].sort((a,b)=>b.combined-a.combined);
+  const max = sorted[0].combined;
+  const cohortDirect = data.reduce((s,p)=>s+p.direct,0);
+  const cohortMR = data.reduce((s,p)=>s+p.mr,0);
+  const cohortTotal = cohortDirect + cohortMR;
+  const tbody = document.getElementById(tbodyId);
+  let html = '';
+  sorted.forEach((p,i) => {
+    html += `<tr data-name="${p.name.toLowerCase()}">
+      <td>${rankBadge(i)}</td>
+      <td>${p.name}</td>
+      <td class="num">${p.direct.toLocaleString()}</td>
+      <td class="num">${p.mr.toLocaleString()}</td>
+      <td class="num" style="font-weight:700">${p.combined.toLocaleString()}</td>
+      <td>${streamBar(p.direct, p.mr, max)}</td>
+    </tr>`;
+  });
+  html += `<tr class="total-row">
+    <td></td><td>Cohort Total</td>
+    <td class="num">${cohortDirect.toLocaleString()}</td>
+    <td class="num">${cohortMR.toLocaleString()}</td>
+    <td class="num">${cohortTotal.toLocaleString()}</td><td></td>
+  </tr>`;
+  tbody.innerHTML = html;
+}
+
+// ═══ TABS ═══
+function switchTab(id) {
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
+  if (id==='all') {
+    document.querySelectorAll('.tab')[0].classList.add('active');
+    document.getElementById('tab-all').classList.add('active');
+  } else if (id==='nonlegacy') {
+    document.querySelectorAll('.tab')[1].classList.add('active');
+    document.getElementById('tab-nonlegacy').classList.add('active');
+  } else {
+    document.querySelectorAll('.tab')[2].classList.add('active');
+    document.getElementById('tab-legacy').classList.add('active');
+  }
+}
+
+// ═══ SEARCH FILTER ═══
+function filterTable(tabId) {
+  const q = document.getElementById('search-'+tabId).value.toLowerCase();
+  const rows = document.getElementById('tbl-'+tabId).querySelectorAll('tbody tr:not(.total-row)');
+  rows.forEach(r => {
+    r.style.display = r.dataset.name && r.dataset.name.includes(q) ? '' : 'none';
+  });
+}
+
+// ═══ SORT ═══
+const sortState = {};
+function sortTbl(tableId, colIdx) {
+  const key = tableId+'-'+colIdx;
+  sortState[key] = !sortState[key];
+  const asc = sortState[key];
+  const tbody = document.getElementById(tableId).querySelector('tbody');
+  const rows = Array.from(tbody.querySelectorAll('tr:not(.total-row)'));
+  const totalRow = tbody.querySelector('tr.total-row');
+  rows.sort((a,b) => {
+    let av = a.cells[colIdx].textContent.trim();
+    let bv = b.cells[colIdx].textContent.trim();
+    const an = parseFloat(av.replace(/[$+,KM%▲▼\s]/g,''));
+    const bn = parseFloat(bv.replace(/[$+,KM%▲▼\s]/g,''));
+    if (!isNaN(an) && !isNaN(bn)) return asc ? an-bn : bn-an;
+    return asc ? av.localeCompare(bv) : bv.localeCompare(av);
+  });
+  rows.forEach(r=>tbody.appendChild(r));
+  if (totalRow) tbody.appendChild(totalRow);
+}
+
+// ═══ INIT ═══
+renderStreamTotals();
+renderStreamByCohort();
+renderCohortTotals();
+renderCohortAvg();
+renderAllStackedBars();
+buildAllTable();
+buildCohortTable(NL, 'tbody-nonlegacy');
+buildCohortTable(LEG, 'tbody-legacy');
+</script>
+</body>
+</html>

@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>New Member Enrollments by Hotel — My Place Hotels</title>
+<style>
+  :root {
+    --bg:#EEF1F6;--card:#FFFFFF;--border:#D0D8E8;--text:#1C355E;--muted:#5A6B84;
+    --accent:#1C355E;--accent2:#2E8B57;--accent4:#FF5F00;
+  }
+  * { margin:0;padding:0;box-sizing:border-box; }
+  body { font-family:Arial,'Helvetica Neue',Helvetica,sans-serif;background:var(--bg);color:var(--text);min-height:100vh; }
+  .brand-bar { background:#FF5F00;height:5px; }
+  .header { padding:24px 32px 18px;background:#1C355E;border-bottom:3px solid #FF5F00;display:flex;align-items:center;justify-content:space-between; }
+  .header-left { display:flex;align-items:center;gap:0; }
+  .header h1 { font-size:22px;font-weight:700;color:#FFFFFF; }
+  .header .subtitle { color:rgba(255,255,255,0.72);font-size:13px;margin-top:4px; }
+  .portal-btn { background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.25);color:rgba(255,255,255,0.8);font-size:12px;padding:6px 14px;border-radius:8px;text-decoration:none;font-weight:600;white-space:nowrap;flex-shrink:0; }
+  .portal-btn:hover { background:rgba(255,255,255,0.2);color:#fff; }
+  .pilot-badge { display:inline-block;background:linear-gradient(135deg,#FF5F00,#cc4800);color:white;font-size:11px;font-weight:700;padding:3px 10px;border-radius:12px;margin-left:12px;vertical-align:middle; }
+  .dashboard { padding:24px 32px;max-width:1440px;margin:0 auto; }
+
+  /* KPI Row */
+  .kpi-row { display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-bottom:24px; }
+  .kpi-card { background:var(--card);border:1px solid var(--border);border-top:3px solid #1C355E;border-radius:8px;padding:18px 16px;text-align:center; }
+  .kpi-card.orange { border-top-color:#FF5F00; }
+  .kpi-label { font-size:11px;text-transform:uppercase;letter-spacing:0.8px;color:var(--muted);font-weight:600;margin-bottom:6px; }
+  .kpi-value { font-size:28px;font-weight:700;letter-spacing:-1px; }
+  .kpi-sub { font-size:11px;color:var(--muted);margin-top:4px; }
+  .pms { color:var(--accent); } .web { color:var(--accent2); }
+
+  /* Channel Widget */
+  .channel-widget { display:grid;grid-template-columns:1fr 2fr 1fr;gap:24px;align-items:center;margin-bottom:24px;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:24px; }
+  .ch-box { text-align:center;padding:16px;background:#E4EAF3;border-radius:10px;border:1px solid var(--border); }
+  .ch-big { font-size:36px;font-weight:700;letter-spacing:-1px; }
+  .ch-label { font-size:12px;color:var(--muted);margin-top:4px; }
+  .ch-center { text-align:center; }
+  .ch-hero { font-size:48px;font-weight:700;letter-spacing:-2px;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent; }
+
+  /* Table */
+  .chart-card { background:var(--card);border:1px solid var(--border);border-radius:10px;padding:20px;margin-bottom:24px; }
+  .chart-card h3 { font-size:16px;color:var(--accent);margin-bottom:4px; }
+  .chart-desc { font-size:12px;color:var(--muted);margin-bottom:16px; }
+  table { width:100%;border-collapse:collapse;table-layout:fixed;font-size:12px; }
+  thead { background:#F0F3F8;position:sticky;top:0; }
+  th { padding:8px 6px;font-size:10px;text-transform:uppercase;letter-spacing:0.5px;color:var(--muted);font-weight:700;border-bottom:2px solid var(--border);cursor:pointer;white-space:nowrap; }
+  th:hover { color:var(--accent); }
+  td { padding:6px;border-bottom:1px solid #E8ECF2; }
+  .num { text-align:right; }
+  .hotel-name { font-weight:600;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap; }
+  tr:hover { background:var(--bg); }
+  .super-header th { text-align:center;font-size:11px;letter-spacing:0.3px; }
+  .y26-header { background:#FFF3EB;color:#FF5F00;border-bottom:2px solid #FF5F00; }
+  .y25-header { background:#E4EAF3;color:#1C355E;border-bottom:2px solid #4A7FC1; }
+  .all-header { background:#E8F5EE;color:#2E8B57;border-bottom:2px solid #2E8B57; }
+  .col-divider { border-left:2px solid var(--border); }
+  .bar-cell { position:relative; }
+  .bar-fill { position:absolute;top:2px;bottom:2px;left:0;border-radius:3px;opacity:0.15; }
+  .pms-bar { background:var(--accent); }
+  .web-bar { background:var(--accent2); }
+
+  @media print { body { background:#fff; } .dashboard { padding:12px; } }
+</style>
+</head>
+<body>
+<div class="brand-bar"></div>
+<div class="header">
+  <div class="header-left">
+  <h1><img src='data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyBpZD0iTXlfUGxhY2VfSG90ZWxzX0xvZ28iIGRhdGEtbmFtZT0iTXkgUGxhY2UgSG90ZWxzIExvZ28iIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgdmlld0JveD0iMCAwIDQ5My45MzEgNDg4LjQ2OCI+CiAgPGRlZnM+CiAgICA8c3R5bGU+CiAgICAgIC5jbHMtMSB7CiAgICAgICAgZmlsbDogI2UxMWIyMjsKICAgICAgfQoKICAgICAgLmNscy0yIHsKICAgICAgICBmaWxsOiAjZmZmOwogICAgICB9CgogICAgICAuY2xzLTMgewogICAgICAgIGZpbGw6ICNmZDA7CiAgICAgIH0KICAgIDwvc3R5bGU+CiAgPC9kZWZzPgogIDxnPgogICAgPHBhdGggY2xhc3M9ImNscy0zIiBkPSJNMjQ2Ljk2Niw0ODAuOTY2Yy03Mi4xNiwwLTE0My41MjUtNS41MTgtMjE4LjE4NS0xNi44NzJsLTUuNDkxLS44MzUtLjgwMy01LjQ5OEMyLjUwMiwzMjEuMDA1LDIuNTAyLDE4Mi4zMTcsMjIuNDg3LDQ1LjU2bC44MDMtNS40OTcsNS40OTEtLjgzNWM3NC42NTktMTEuMzU2LDE0Ni4wMjQtMTYuODc2LDIxOC4xODUtMTYuODc2czE0My41MjQsNS41MTksMjE4LjE4MiwxNi44NzZsNS40OTIuODM1LjgwMyw1LjQ5N2MxOS45ODYsMTM2Ljc1NywxOS45ODYsMjc1LjQ0NCwwLDQxMi4ybC0uODAzLDUuNDk4LTUuNDkyLjgzNWMtNzQuNjU3LDExLjM1NS0xNDYuMDI0LDE2Ljg3Mi0yMTguMTgyLDE2Ljg3MmgwWiIvPgogICAgPHBhdGggZD0iTTI0Ni45NjQsMjkuODUzYzcxLjczMiwwLDE0My40NjMsNS41OTcsMjE3LjA1NywxNi43OSwxOS44NjgsMTM1Ljk1NSwxOS44NjgsMjc0LjA3OCwwLDQxMC4wMzMtNzMuNTk0LDExLjE5My0xNDUuMzI0LDE2Ljc5MS0yMTcuMDU2LDE2Ljc5MXMtMTQzLjQ2My01LjU5OC0yMTcuMDU2LTE2Ljc5MWMtMTkuODY3LTEzNS45NTUtMTkuODY3LTI3NC4wNzgsMC00MTAuMDMzLDczLjU5My0xMS4xOTMsMTQ1LjMyNC0xNi43OSwyMTcuMDU1LTE2Ljc5TTI0Ni45NjQsMTQuODUzYy03Mi41MzksMC0xNDQuMjc1LDUuNTQ4LTIxOS4zMSwxNi45NmwtMTAuOTgsMS42Ny0xLjYwNiwxMC45OTFjLTIwLjA4OSwxMzcuNDc4LTIwLjA4OSwyNzYuODkzLDAsNDE0LjM3MmwxLjYwNiwxMC45ODksMTAuOTgsMS42NzFjNzUuMDM2LDExLjQxMywxNDYuNzczLDE2Ljk2MSwyMTkuMzExLDE2Ljk2MXMxNDQuMjc1LTUuNTQ4LDIxOS4zMTEtMTYuOTYxbDEwLjk4LTEuNjcxLDEuNjA1LTEwLjk4OWMyMC4wOTEtMTM3LjQ3OSwyMC4wOTEtMjc2Ljg5NCwwLTQxNC4zNzJsLTEuNjA1LTEwLjk5MS0xMC45OC0xLjY3Yy03NS4wMzUtMTEuNDEyLTE0Ni43NzItMTYuOTYtMjE5LjMxMi0xNi45NmgwWiIvPgogIDwvZz4KICA8Zz4KICAgIDxwYXRoIGNsYXNzPSJjbHMtMSIgZD0iTTM4Ni4yODksMTQ3LjE2MmMwLDc2LjgwMi02Mi4yNTQsMTM5LjA1Ny0xMzkuMDYyLDEzOS4wNTdzLTEzOS4wNTItNjIuMjU1LTEzOS4wNTItMTM5LjA1N1MxNzAuNDI4LDguMTAxLDI0Ny4yMjcsOC4xMDFzMTM5LjA2Miw2Mi4yNTQsMTM5LjA2MiwxMzkuMDYxWiIvPgogICAgPHBhdGggZD0iTTk5LjMyNywxNDYuOTQxQzk5LjMyNyw2NS43NzgsMTY1LjExMywwLDI0Ni4yNzIsMGgwYzgxLjE2MSwwLDE0Ni45MzksNjUuNzc4LDE0Ni45NDMsMTQ2Ljk0MWgwYy0uMDA0LDgxLjE2NC02NS43ODIsMTQ2LjkzNy0xNDYuOTQzLDE0Ni45NTFoMGMtODEuMTU4LS4wMTUtMTQ2Ljk0NC02NS43ODctMTQ2Ljk0NC0xNDYuOTUxaDBaTTExNS4xMDcsMTQ2Ljk0MWMuMTI4LDcyLjQ0Myw1OC43MjIsMTMxLjAzMywxMzEuMTY1LDEzMS4xNjZoMGM3Mi40NDEtLjEzMywxMzEuMDMzLTU4LjcyMywxMzEuMTc0LTEzMS4xNjZoMGMtLjE0MS03Mi40NDctNTguNzMyLTEzMS4wMzUtMTMxLjE3NC0xMzEuMTY2aDBjLTcyLjQ0My4xMzEtMTMxLjAzNyw1OC43MTktMTMxLjE2NSwxMzEuMTY2aDBaIi8+CiAgICA8Zz4KICAgICAgPHBhdGggZD0iTTg2LjQ4OSwyNTMuMzcyYy0xMC4zNjIsMC0xOS4wNzgtNC42NjctMjMuMzEzLTEyLjQ5NS0yLjUyMi00LjYzOS01LjQ5LTE0LjM0MiwyLjg4Mi0yNy4yMjEsNS42NDctOC42NzEsMTEuMzE5LTE3LjMyMiwxNi45NzItMjUuOTgybDQuOTA3LTcuNDg4YzguMDkyLTEyLjM4NywxNi4xNTctMjQuOCwyNC4yMzMtMzcuMjA0bDYuNzE3LTEwLjMzNiwxMS4wODgtMTcuMDE2LDExLjA3Ni0xNy4wMjgsMS4xODctMS44NWM2LjA2My05LjQzOSwxNS4yMDUtMjMuNywzMy42MDctMjMuNyw2LjA1OSwwLDI1LjgyNSwyLjE2MSwyNS44MjUsMzAuMDE2djQuNzI0YzMuNzM2LTUuMzksNy40NjctMTAuNzc0LDExLjIwNi0xNi4xNjcsNy44MTktMTAuOTM0LDE5LjY0Ny0xNy42NDMsMzAuOTc5LTE3LjY0Myw3LjE2NSwwLDEzLjc3NCwyLjY5MywxOC42Miw3LjU2NSwzLjk1MiwzLjk4Miw4LjY0NSwxMS4zOTcsOC41NjcsMjQuMDc2LS4xMjUsMTguOTYxLS4xMTIsMzguMjY4LS4wODYsNTYuOTNsLjAyMSwyMi40NzNjMCwxLjI3LjA3NSwyLjYxNS4xMzQsMy45OTIuMzgsOC4xMTMsMS4wMjMsMjEuNjkxLTEwLjE5NCwzMC4zMjgtNC45OSwzLjg0Ny0xMS4zMTQsNS45NjItMTcuODI0LDUuOTYyLTUuMzM2LDAtMTAuNDUzLTEuNDI0LTE0Ljc5MS00LjExOS0xMy4zMTItOC4yNTYtMTIuNTc2LTIzLjIyNC0xMi4xNDMtMzIuMTcxLjA3OS0xLjQyMi4xNDgtMi44MDkuMTQ4LTQuMDk4di0xLjI4MWwtMTYuNjY5LDI0LjU5MmMtMy4wNSw0LjQ5OC0xMS4xNjIsMTYuNDkxLTI1LjUxNSwxNy40MTQtLjU1OS4wMzktMS4xMTUuMDYxLTEuNjc2LjA2MS0xMi45MTQsMC0yMy43ODMtOS44NDQtMjUuMjk1LTIyLjkxMy0uNDU5LTMuOTc2LS43MzItNy45ODYtLjg2NS0xMS45OTRsLTMwLjk5LDQ3LjI4OWMtNi4zMTUsOS40NjUtMTcuMzQsMTUuMjg2LTI4LjgxLDE1LjI4NmgwWiIvPgogICAgICA8cGF0aCBjbGFzcz0iY2xzLTIiIGQ9Ik0xNzUuODQyLDg1Ljc4M2MxMC44NjcsMCwxMy4wOTMsOC4wOSwxMy4wOTMsMTcuMjgzdjQ1LjQ3OWMxMS40NjItMTYuNTU3LDIyLjkzNC0zMy4xMTcsMzQuNDA1LTQ5LjY3NiwxMS45MjUtMTYuNjYxLDM1LjEzNS0xNy43NjksMzQuOTcsNi42NzItLjE3OSwyNi40OS0uMDY3LDUyLjk5NC0uMDY3LDc5LjQ4MiwwLDcuOTg1LDIuMTkxLDE4LjYyMy01LjEwMSwyNC4yMzYtNS4wMjEsMy44Ny0xMi42ODUsNC40ODItMTguMTI2LDEuMTA5LTguNDQzLTUuMjQtNS45NzctMTcuMTM5LTUuOTc3LTI1LjQ0NnYtNDIuNzUzYy0xMy4zMDksMTkuNjMxLTI2LjYyMSwzOS4yNjktMzkuOTM1LDU4LjkwMi0zLjc1OSw1LjU1MS04LjU2NywxMS40LTE1LjgwNCwxMS44Ny02Ljk4MS40NTEtMTIuNzA4LTQuNzc0LTEzLjQ5LTExLjYwNC0yLjAyNy0xNy42MjctLjA3OS0zNi41NTMtLjA3OS01NC4zMDMtMTguMzY0LDI4LjAyOS0zNi43MjYsNTYuMDQzLTU1LjA5Myw4NC4wNzEtMTEuMDc3LDE2LjYxLTQxLjU3MiwxMC41MDYtMjcuOTA1LTEwLjUwMSw3LjI2LTExLjE2NiwxNC41NzUtMjIuMzA4LDIxLjg2MS0zMy40NTYsMTAuMzQ1LTE1LjgzOCwyMC42NTEtMzEuNzA1LDMwLjk2Ny00Ny41NTgsNy4zODgtMTEuMzUsMTQuNzcyLTIyLjY5NSwyMi4xNi0zNC4wNDcsNS44OTQtOS4wNzYsMTEuODI0LTE5Ljc2MiwyNC4xMi0xOS43NjIiLz4KICAgIDwvZz4KICAgIDxnPgogICAgICA8cGF0aCBkPSJNMjgxLjcsMjY4LjIxMWMtOC4xMjcsMC0xNS43OTQtNC4zMDMtMjAuNTE3LTExLjUxMi00Ljk0My03LjU2My01Ljc0Mi0xNi45OTgtMi4xNDItMjUuMjUsMy40MjYtNy44MTMsNy43MzUtMTUuMTQ0LDExLjUyOS0yMS42MDEsNS45NDctMTAuMTE2LDE5LjgxMy0zNC42ODcsMjMuODQ1LTQzLjQzM2wtNS4zMi0xOS4yMTEtMTQuNjI2LTUyLjg1OWMtMS44NDgtNi42ODgsMi4wMDItMTMuNjI3LDguNjY0LTE1LjYwM2wyNC4xNy03LjE1NGMxLjE4MS0uMzUsMi40MDItLjUyMiwzLjYwNS0uNTIyLDIuMjE1LDAsNC40MS41NzgsNi4zNjUsMS42OTYsMy4wMjUsMS43MzUsNS4xOTMsNC42NDEsNi4wMTksOC4wM2w0LjUwMiwxOC41NmM1Ljk5NC0xMy40MTMsMTIuMTExLTI3LjA3NiwxOC4yNTktNDAuNTMyLjk0NC0yLjA1OSwxLjg1Mi00LjE2NCwyLjc3NC02LjI5NywyLjg0Ni02LjU3OCw1Ljc5NS0xMy4zODksOS44NjUtMTkuODE2LDQuNTMxLTcuMTg0LDExLjc0Mi0xMS4yOTksMTkuNzczLTExLjI5OXMxNS44NzksNC4xMzEsMjAuOTEzLDExLjA0OGM0Ljk0Miw2Ljc5LDYuMzI5LDE1LjE1MiwzLjgxLDIyLjk0NC0uMTQ3LjQ0Ni0uMzA2Ljg4Ni0uNDk5LDEuMzExbC0zMi42MDMsNzIuMzU5Yy02Ljc3OCwxNC41OC0xMy45NDcsMjkuMTk3LTIxLjk2OSw0NC44MjUtLjk4NCwxLjkwNy0yLjM5OCw0LjcyNi00LjEyNyw4LjE2MS0yMC40NTksNDAuNjQ0LTM1LjkyNCw2OS41NjEtNDQuODgxLDc4LjU2Ni00Ljg2MSw0Ljg5My0xMS4wNDcsNy41ODgtMTcuNDExLDcuNTg4aDBaIi8+CiAgICAgIDxwYXRoIGNsYXNzPSJjbHMtMiIgZD0iTTM1OC40NzcsMTIzLjgzOWMtNi45MzMsMTQuODk1LTE0LjE4NSwyOS42MzQtMjEuNjg3LDQ0LjIzOS02Ljk4NiwxMy41OTktMzUuODAzLDcyLjYwMy00Ni43MDEsODMuNTY0LTEwLjUzOCwxMC41OTQtMjQuNzQ3LTIuODExLTE5LjM4MS0xNS4wOTYsMy4wNi02Ljk2OSw2Ljk5NC0xMy42OTcsMTAuODQ4LTIwLjI1MiwxLjQ0Ni0yLjQ2NywyNi45OTItNDYuNTYzLDI2LjE1Ni00OS41NzEtNi45OTQtMjUuMjU3LTEzLjk4NC01MC41MTMtMjAuOTcyLTc1Ljc3MmwyNC4xNzYtNy4xNTIsMTMuMzA2LDU0LjgyOGMxMS4xMjktMjQuODM4LDIyLjEwMi00OS43NSwzMy40MTYtNzQuNTA0LDMuNzIxLTguMTM3LDcuMDEyLTE3LjAxOSwxMS44MTQtMjQuNjA1LDcuOTU3LTEyLjU5NiwyNS43NDItLjc3MSwyMS42MTksMTEuOTYzbC0zMi41OTQsNzIuMzU4Ii8+CiAgICA8L2c+CiAgPC9nPgogIDxnPgogICAgPHBhdGggZD0iTTg0LjQxOSwzNjYuNjZoLTIwLjc4OXYzMy40NzloLTE4Ljg5OXYtOTQuNDk2aDQxLjMwOWMxNy44MTgsMCwzMi41MzQsOS44NTQsMzIuNTM0LDI5Ljk2OCwwLDIxLjg3LTE0LjU3OSwzMS4wNDktMzQuMTU0LDMxLjA0OVpNODUuMzY0LDMyNC4wMDNoLTIxLjczM3YyNC4yOTloMjIuMDAzYzguNzc2LDAsMTMuNS00LjA1MSwxMy41LTEyLjI4NXMtNS4zOTgtMTIuMDE0LTEzLjc3LTEyLjAxNFoiLz4KICAgIDxwYXRoIGQ9Ik0xMjkuNzgsNDAwLjEzOXYtOTQuNDk2aDE4Ljg5OXY3Ni4wMDJoNDcuMzg0djE4LjQ5NGgtNjYuMjgzWiIvPgogICAgPHBhdGggZD0iTTI3NC40NjYsNDAwLjEzOWwtNy40MjYtMjEuMDU5aC0zNC41NTlsLTcuNDI0LDIxLjA1OWgtMjAuMjVsMzYuMTgtOTQuNDk2aDE4LjM1OGwzNS45MDksOTQuNDk2aC0yMC43ODlaTTI1NC40ODcsMzQzLjk4MWMtMS44OTEtNS41MzQtMy43ODEtMTEuMjA1LTQuNzI2LTE0LjcxNS0uOTQ0LDMuNTEtMi44MzQsOS4xODEtNC43MjQsMTQuNzE1bC02LjA3NSwxNy4xNDVoMjEuNmwtNi4wNzQtMTcuMTQ1WiIvPgogICAgPHBhdGggZD0iTTM1My4xMTYsMzMzLjE4Yy0zLjM3NS02LjQ3OC04Ljc3NS0xMC4yNTgtMTcuMjc5LTEwLjI1OC0xNC4xNzUsMC0yMi4yNzMsMTIuNDE5LTIyLjI3MywyOS45NjgsMCwxNy4wMSw4LjIzMywyOS45NywyMi40MDgsMjkuOTcsOC41MDYsMCwxMy40OTktMy42NDQsMTguNDk0LTEyLjAxNmwxNS45Myw5LjQ1Yy02LjQ4LDEzLjM2NC0xNy44MTksMjEuMzI5LTM0Ljk2NCwyMS4zMjktMjQuNzAzLDAtNDEuMzA5LTE4Ljg5OC00MS4zMDktNDguNzMzLDAtMjguNzUzLDE3LjI3OS00OC43MzIsNDEuOTgzLTQ4LjczMiwxNy44MiwwLDI4LjYxOSw4LjY0LDM0LjU1OSwyMC45MjRsLTE3LjU0OSw4LjA5OVoiLz4KICAgIDxwYXRoIGQ9Ik0zODEuNTY3LDQwMC4xMzl2LTk0LjQ5Nmg2NS42MDd2MTguNDk0aC00Ni43MDd2MTYuMzM0aDI3LjEzM3YxOC4zNTloLTI3LjEzM3YyMi44MTRoNDguNzMzdjE4LjQ5NGgtNjcuNjMzWiIvPgogIDwvZz4KICA8Zz4KICAgIDxwYXRoIGNsYXNzPSJjbHMtMSIgZD0iTTE2OS41ODIsNDM4Ljk0djcuNTY3aDYuNjI4di03LjU2N2g1LjQ3OHYyMC40aC01LjQ3OHYtOC4wNWgtNi42Mjh2OC4wNWgtNS40Nzh2LTIwLjRoNS40NzhaIi8+CiAgICA8cGF0aCBjbGFzcz0iY2xzLTEiIGQ9Ik0yMDUuNzI2LDQ1OS42NzRjLTYuMzI2LDAtOS44MDctNC43NTMtOS44MDctMTAuNDEzLDAtNS45MzIsMy44NzQtMTAuNjUzLDEwLjE0LTEwLjY1Myw2LjU2OCwwLDkuODk3LDQuODcyLDkuODk3LDEwLjMyMSwwLDYuNTY4LTMuOTM1LDEwLjc0NS0xMC4yLDEwLjc0NWgtLjAzWk0yMDUuOTk4LDQ1NS4zNDZjMi42MzQsMCw0LjE3Ny0yLjU0Miw0LjE3Ny02LjIzNSwwLTMuNTEtMS41NzQtNi4xNzQtNC4yMzctNi4xNzQtMi42MzMsMC00LjIzNywyLjY2My00LjIzNyw2LjIwNC0uMDMsMy42NjMsMS42MDQsNi4yMDUsNC4yMzcsNi4yMDVoLjA2WiIvPgogICAgPHBhdGggY2xhc3M9ImNscy0xIiBkPSJNMjM0LjU2LDQ0My41NDJoLTUuMjA2di00LjYwMmgxNS45ODF2NC42MDJoLTUuMjk2djE1Ljc5OWgtNS40Nzh2LTE1Ljc5OVoiLz4KICAgIDxwYXRoIGNsYXNzPSJjbHMtMSIgZD0iTTI3Mi4zNjgsNDUxLjEwOGgtNy4zMjR2My43NTNoOC4yMDJ2NC40OGgtMTMuNjh2LTIwLjRoMTMuMjU3djQuNDhoLTcuNzc5djMuMjY5aDcuMzI0djQuNDE5WiIvPgogICAgPHBhdGggY2xhc3M9ImNscy0xIiBkPSJNMjg3LjYsNDM4Ljk0aDUuNDc4djE1LjgzaDcuODM5djQuNTdoLTEzLjMxN3YtMjAuNFoiLz4KICAgIDxwYXRoIGNsYXNzPSJjbHMtMSIgZD0iTTMxNi4xNzcsNDUzLjg5M2MxLjI0MS42MzYsMy4yMzksMS4yNzEsNS4yOTYsMS4yNzEsMS44NzcsMCwyLjc4NS0uNjM2LDIuNzg1LTEuNjY1LDAtLjk5OS0uOTA4LTEuNTQzLTMuMjA4LTIuMzMxLTMuNDUxLTEuMjQxLTUuNzUxLTMuMTE2LTUuNzUxLTYuMTQzLDAtMy42MDIsMy4wNTctNi4zODYsOC4yMDMtNi4zODYsMi40MjEsMCw0LjE3Ny40NTQsNS41MDksMS4wM2wtMS4xNSw0LjM4OGMtLjg3OC0uMzkzLTIuMzkxLS45NjgtNC40MTktLjk2OC0xLjY2NSwwLTIuNTczLjYwNS0yLjU3MywxLjUxMywwLDEuMDMsMS4wOSwxLjQyMiwzLjY2MywyLjM5MSwzLjY2MiwxLjM2Miw1LjI5NiwzLjI5OSw1LjI5Niw2LjE0MywwLDMuNTEyLTIuNzI0LDYuNTA3LTguNjg3LDYuNTA3LTIuNDUxLDAtNC44NDMtLjYzNi01Ljk5Mi0xLjI0bDEuMDI5LTQuNTFaIi8+CiAgPC9nPgogIDxwYXRoIGQ9Ik0yNDYuOTY2LDQxMS44ODljLTY2Ljk1NSwwLTEzMy45MTMsNi43NDMtMjAyLjIzNCwyMC4xODZ2Ny42NWM2OC40MTgtOS43MzksMTM1LjMyNi0xNC42MTMsMjAyLjIzNC0xNC42MTNzMTMzLjgxNiw0Ljg3NSwyMDIuMjMzLDE0LjYxM3YtNy42NWMtNjguMzItMTMuNDQzLTEzNS4yNzktMjAuMTg2LTIwMi4yMzMtMjAuMTg2WiIvPgogIDxwYXRoIGQ9Ik00NjUuNzU5LDMxNC44MzRjMCwzLjk5OS0zLjEzOSw3LjEzOC03LjIyNCw3LjEzOC00LjA0MiwwLTcuMjY3LTMuMTM5LTcuMjY3LTcuMTM4LDAtMy45MTMsMy4yMjUtNy4wNTIsNy4yNjctNy4wNTIsNC4wODUsMCw3LjIyNCwzLjEzOSw3LjIyNCw3LjA1MlpNNDUzLjA3NCwzMTQuODM0YzAsMy4xMzksMi4zMjIsNS42MzMsNS41MDQsNS42MzMsMy4wOTYsMCw1LjM3NS0yLjQ5NCw1LjM3NS01LjU5LDAtMy4xMzktMi4yNzktNS42NzYtNS40MTgtNS42NzZzLTUuNDYxLDIuNTM3LTUuNDYxLDUuNjMzWk00NTcuNDE3LDMxOC41MzJoLTEuNjM0di03LjA1MmMuNjQ1LS4xMjksMS41NDgtLjIxNSwyLjcwOS0uMjE1LDEuMzMzLDAsMS45MzUuMjE1LDIuNDUxLjUxNi4zODcuMzAxLjY4OC44Ni42ODgsMS41NDgsMCwuNzc0LS42MDIsMS4zNzYtMS40NjIsMS42MzR2LjA4NmMuNjg4LjI1OCwxLjA3NS43NzQsMS4yOSwxLjcyLjIxNSwxLjA3NS4zNDQsMS41MDUuNTE2LDEuNzYzaC0xLjc2M2MtLjIxNS0uMjU4LS4zNDQtLjkwMy0uNTU5LTEuNzItLjEyOS0uNzc0LS41NTktMS4xMTgtMS40NjItMS4xMThoLS43NzR2Mi44MzhaTTQ1Ny40NjEsMzE0LjUzM2guNzc0Yy45MDMsMCwxLjYzNC0uMzAxLDEuNjM0LTEuMDMyLDAtLjY0NS0uNDczLTEuMDc1LTEuNTA1LTEuMDc1LS40MywwLS43MzEuMDQzLS45MDMuMDg2djIuMDIxWiIvPgo8L3N2Zz4=' style='height:36px;vertical-align:middle;margin-right:12px;'>New Member Enrollments by Hotel<span class="pilot-badge">Member Rate Program</span></h1>
+  <div class="subtitle">Property-level sign-up summary · PMS (Property) vs WEB (Website) · Pilot Launch Jun 9, 2025 through Mar 31, 2026</div>
+  </div>
+  <a href="index.html" class="portal-btn">&larr; Portal</a>
+</div>
+
+<div class="dashboard">
+
+<!-- KPI Row -->
+<div class="kpi-row">
+  <div class="kpi-card orange">
+    <div class="kpi-label">Total Enrollments</div>
+    <div class="kpi-value" style="color:#FF5F00;">3,341</div>
+    <div class="kpi-sub">All-time since pilot launch</div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-label">PMS Sign-Ups</div>
+    <div class="kpi-value pms">1,915</div>
+    <div class="kpi-sub">57.3% of enrollments</div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-label">WEB Sign-Ups</div>
+    <div class="kpi-value web">1,426</div>
+    <div class="kpi-sub">42.7% of enrollments</div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-label">2025 Enrollments</div>
+    <div class="kpi-value">1,188</div>
+    <div class="kpi-sub"><span class="pms">PMS 685</span> · <span class="web">WEB 503</span></div>
+  </div>
+  <div class="kpi-card orange">
+    <div class="kpi-label">2026 Q1 Enrollments</div>
+    <div class="kpi-value" style="color:#FF5F00;">2,153</div>
+    <div class="kpi-sub"><span class="pms">PMS 1,230</span> · <span class="web">WEB 923</span></div>
+  </div>
+</div>
+
+<!-- Channel Split Widget -->
+<div class="channel-widget">
+  <div class="ch-box">
+    <div style="font-size:11px;text-transform:uppercase;letter-spacing:0.8px;color:var(--accent);font-weight:600;margin-bottom:8px;">PMS (Property)</div>
+    <div class="ch-big" style="color:var(--accent);">1,915</div>
+    <div class="ch-label">Sign-Ups at Property</div>
+    <div style="margin-top:10px;font-size:13px;"><span style="color:var(--muted);">2025:</span> <b>685</b> · <span style="color:var(--muted);">2026:</span> <b>1,230</b></div>
+  </div>
+  <div class="ch-center">
+    <div style="font-size:11px;text-transform:uppercase;letter-spacing:0.8px;color:var(--muted);font-weight:600;margin-bottom:6px;">Total New Member Enrollments</div>
+    <div class="ch-hero">3,341</div>
+    <div style="font-size:13px;color:var(--muted);margin-top:2px;">32 participating hotels · Jun 2025 – Mar 2026</div>
+    <div style="margin-top:14px;">
+      <div style="height:12px;border-radius:6px;overflow:hidden;display:flex;background:#D0D8E8;">
+        <div style="width:57.3%;background:var(--accent);"></div>
+        <div style="width:42.7%;background:var(--accent2);"></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--muted);margin-top:4px;">
+        <span style="color:var(--accent);">▌ PMS 57.3%</span>
+        <span style="color:var(--accent2);">WEB 42.7% ▌</span>
+      </div>
+    </div>
+  </div>
+  <div class="ch-box">
+    <div style="font-size:11px;text-transform:uppercase;letter-spacing:0.8px;color:var(--accent2);font-weight:600;margin-bottom:8px;">WEB (Website)</div>
+    <div class="ch-big" style="color:var(--accent2);">1,426</div>
+    <div class="ch-label">Sign-Ups via Website</div>
+    <div style="margin-top:10px;font-size:13px;"><span style="color:var(--muted);">2025:</span> <b>503</b> · <span style="color:var(--muted);">2026:</span> <b>923</b></div>
+  </div>
+</div>
+
+<!-- Hotel Table -->
+<div class="chart-card">
+  <h3>Enrollments by Hotel</h3>
+  <p class="chart-desc">New member sign-ups by property and booking channel. Click any column header to sort. Includes New Member + Non-Member (unattributed sign-ups).</p>
+  <div style="max-height:800px;overflow-y:auto;">
+    <table>
+      <thead>
+        <tr class="super-header">
+          <th rowspan="2" onclick="sortTable('name')" style="text-align:left;vertical-align:bottom;width:200px;">Property</th>
+          <th colspan="3" class="y26-header col-divider">2026 YTD (Q1)</th>
+          <th colspan="3" class="y25-header col-divider">2025 Full Year</th>
+          <th colspan="3" class="all-header col-divider">All-Time Total</th>
+        </tr>
+        <tr>
+          <th onclick="sortTable('pms26')" class="num col-divider" style="color:#FF5F00;">PMS</th>
+          <th onclick="sortTable('web26')" class="num" style="color:#FF5F00;">WEB</th>
+          <th onclick="sortTable('total26')" class="num" style="color:#FF5F00;">Total</th>
+          <th onclick="sortTable('pms25')" class="num col-divider">PMS</th>
+          <th onclick="sortTable('web25')" class="num">WEB</th>
+          <th onclick="sortTable('total25')" class="num">Total</th>
+          <th onclick="sortTable('pms_all')" class="num col-divider" style="color:#2E8B57;">PMS</th>
+          <th onclick="sortTable('web_all')" class="num" style="color:#2E8B57;">WEB</th>
+          <th onclick="sortTable('total_all')" class="num" style="color:#2E8B57;">Total</th>
+        </tr>
+      </thead>
+      <tbody id="hotelTableBody"></tbody>
+    </table>
+  </div>
+</div>
+
+</div>
+
+<script>
+const hotels = [{"name": "Aberdeen, SD", "pms26": 5, "web26": 2, "pms_res26": 5, "web_res26": 2, "pms_rev26": 1072, "web_rev26": 738, "pms25": 32, "web25": 11, "pms_res25": 35, "web_res25": 11, "pms_rev25": 11134, "web_rev25": 4166}, {"name": "Anchorage, AK", "pms26": 2, "web26": 8, "pms_res26": 2, "web_res26": 9, "pms_rev26": 674, "web_rev26": 5691, "pms25": 3, "web25": 7, "pms_res25": 3, "web_res25": 7, "pms_rev25": 636, "web_rev25": 3855}, {"name": "Atlanta West/Lithia Springs, GA", "pms26": 20, "web26": 16, "pms_res26": 20, "web_res26": 16, "pms_rev26": 3724, "web_rev26": 4314, "pms25": 4, "web25": 2, "pms_res25": 4, "web_res25": 2, "pms_rev25": 2513, "web_rev25": 377}, {"name": "Billings, MT", "pms26": 73, "web26": 38, "pms_res26": 79, "web_res26": 41, "pms_rev26": 13999, "web_rev26": 7271, "pms25": 25, "web25": 5, "pms_res25": 26, "web_res25": 5, "pms_rev25": 2983, "web_rev25": 567}, {"name": "Bismarck, ND", "pms26": 82, "web26": 30, "pms_res26": 90, "web_res26": 32, "pms_rev26": 13177, "web_rev26": 5458, "pms25": 49, "web25": 16, "pms_res25": 50, "web_res25": 16, "pms_rev25": 5943, "web_rev25": 1787}, {"name": "Boise/Nampa, ID", "pms26": 3, "web26": 47, "pms_res26": 3, "web_res26": 49, "pms_rev26": 1128, "web_rev26": 14837, "pms25": 0, "web25": 63, "pms_res25": 0, "web_res25": 63, "pms_rev25": 0, "web_rev25": 13028}, {"name": "Colorado Springs, CO", "pms26": 117, "web26": 65, "pms_res26": 132, "web_res26": 77, "pms_rev26": 35226, "web_rev26": 35373, "pms25": 49, "web25": 20, "pms_res25": 52, "web_res25": 22, "pms_rev25": 8851, "web_rev25": 3939}, {"name": "Davenport/Quad Cities, IA", "pms26": 1, "web26": 21, "pms_res26": 1, "web_res26": 23, "pms_rev26": 1022, "web_rev26": 6138, "pms25": 5, "web25": 25, "pms_res25": 6, "web_res25": 25, "pms_rev25": 715, "web_rev25": 3294}, {"name": "Dickinson, ND", "pms26": 20, "web26": 17, "pms_res26": 29, "web_res26": 18, "pms_rev26": 11185, "web_rev26": 4504, "pms25": 7, "web25": 6, "pms_res25": 7, "web_res25": 7, "pms_rev25": 1202, "web_rev25": 1024}, {"name": "Fargo, ND", "pms26": 4, "web26": 33, "pms_res26": 6, "web_res26": 36, "pms_rev26": 853, "web_rev26": 6517, "pms25": 1, "web25": 7, "pms_res25": 1, "web_res25": 7, "pms_rev25": 174, "web_rev25": 1331}, {"name": "Fort Pierre, SD", "pms26": 42, "web26": 16, "pms_res26": 42, "web_res26": 18, "pms_rev26": 11912, "web_rev26": 6120, "pms25": 26, "web25": 3, "pms_res25": 26, "web_res25": 3, "pms_rev25": 5476, "web_rev25": 1287}, {"name": "Grand Forks, ND", "pms26": 35, "web26": 32, "pms_res26": 38, "web_res26": 35, "pms_rev26": 7447, "web_rev26": 10200, "pms25": 3, "web25": 3, "pms_res25": 3, "web_res25": 3, "pms_rev25": 316, "web_rev25": 924}, {"name": "Grand Rapids, MN", "pms26": 13, "web26": 21, "pms_res26": 14, "web_res26": 21, "pms_rev26": 2919, "web_rev26": 4999, "pms25": 3, "web25": 5, "pms_res25": 3, "web_res25": 5, "pms_rev25": 823, "web_rev25": 1471}, {"name": "Indianapolis Airport/Plainfield, IN", "pms26": 34, "web26": 31, "pms_res26": 42, "web_res26": 33, "pms_rev26": 12157, "web_rev26": 10629, "pms25": 8, "web25": 13, "pms_res25": 8, "web_res25": 14, "pms_rev25": 901, "web_rev25": 1307}, {"name": "Jacksonville/Camp Lejeune, NC", "pms26": 113, "web26": 28, "pms_res26": 147, "web_res26": 29, "pms_rev26": 25206, "web_rev26": 5648, "pms25": 98, "web25": 55, "pms_res25": 141, "web_res25": 58, "pms_rev25": 22481, "web_rev25": 9345}, {"name": "Jamestown, ND", "pms26": 45, "web26": 25, "pms_res26": 47, "web_res26": 26, "pms_rev26": 9426, "web_rev26": 5024, "pms25": 11, "web25": 14, "pms_res25": 12, "web_res25": 15, "pms_rev25": 1738, "web_rev25": 1916}, {"name": "Kalispell, MT", "pms26": 87, "web26": 56, "pms_res26": 107, "web_res26": 58, "pms_rev26": 37180, "web_rev26": 22019, "pms25": 46, "web25": 74, "pms_res25": 64, "web_res25": 77, "pms_rev25": 17274, "web_rev25": 18503}, {"name": "Kansas City East/Independence, MO", "pms26": 69, "web26": 23, "pms_res26": 92, "web_res26": 24, "pms_rev26": 19375, "web_rev26": 5653, "pms25": 34, "web25": 14, "pms_res25": 40, "web_res25": 16, "pms_rev25": 7713, "web_rev25": 5326}, {"name": "Ketchikan, AK", "pms26": 35, "web26": 38, "pms_res26": 39, "web_res26": 53, "pms_rev26": 21764, "web_rev26": 58875, "pms25": 13, "web25": 6, "pms_res25": 14, "web_res25": 6, "pms_rev25": 4849, "web_rev25": 1642}, {"name": "Loveland, CO", "pms26": 34, "web26": 12, "pms_res26": 38, "web_res26": 15, "pms_rev26": 19786, "web_rev26": 4204, "pms25": 8, "web25": 3, "pms_res25": 8, "web_res25": 3, "pms_rev25": 5045, "web_rev25": 505}, {"name": "Marion, OH", "pms26": 9, "web26": 18, "pms_res26": 14, "web_res26": 19, "pms_rev26": 2341, "web_rev26": 2933, "pms25": 2, "web25": 11, "pms_res25": 2, "web_res25": 13, "pms_rev25": 180, "web_rev25": 3082}, {"name": "Phoenix East/Mesa, AZ", "pms26": 32, "web26": 90, "pms_res26": 34, "web_res26": 97, "pms_rev26": 10838, "web_rev26": 38900, "pms25": 0, "web25": 0, "pms_res25": 0, "web_res25": 0, "pms_rev25": 0, "web_rev25": 0}, {"name": "Phoenix West/Buckeye, AZ", "pms26": 61, "web26": 25, "pms_res26": 64, "web_res26": 26, "pms_rev26": 18541, "web_rev26": 17804, "pms25": 137, "web25": 46, "pms_res25": 145, "web_res25": 48, "pms_rev25": 30447, "web_rev25": 10066}, {"name": "Pittsburgh North/Monaca, PA", "pms26": 25, "web26": 13, "pms_res26": 26, "web_res26": 13, "pms_rev26": 3934, "web_rev26": 8595, "pms25": 3, "web25": 1, "pms_res25": 3, "web_res25": 1, "pms_rev25": 287, "web_rev25": 88}, {"name": "Portland East, OR", "pms26": 12, "web26": 16, "pms_res26": 12, "web_res26": 16, "pms_rev26": 4247, "web_rev26": 2772, "pms25": 4, "web25": 5, "pms_res25": 5, "web_res25": 5, "pms_rev25": 950, "web_rev25": 1524}, {"name": "Redding, CA", "pms26": 47, "web26": 30, "pms_res26": 47, "web_res26": 32, "pms_rev26": 10243, "web_rev26": 5665, "pms25": 14, "web25": 4, "pms_res25": 15, "web_res25": 4, "pms_rev25": 5693, "web_rev25": 716}, {"name": "Sioux Falls, SD", "pms26": 40, "web26": 33, "pms_res26": 61, "web_res26": 34, "pms_rev26": 10101, "web_rev26": 5879, "pms25": 1, "web25": 2, "pms_res25": 1, "web_res25": 2, "pms_rev25": 94, "web_rev25": 182}, {"name": "Tucson North-Marana/Cortaro, AZ", "pms26": 38, "web26": 38, "pms_res26": 53, "web_res26": 40, "pms_rev26": 23153, "web_rev26": 12393, "pms25": 29, "web25": 14, "pms_res25": 33, "web_res25": 15, "pms_rev25": 9294, "web_rev25": 2038}, {"name": "Tucson South, AZ", "pms26": 44, "web26": 36, "pms_res26": 52, "web_res26": 37, "pms_rev26": 17572, "web_rev26": 10554, "pms25": 28, "web25": 17, "pms_res25": 30, "web_res25": 18, "pms_rev25": 4708, "web_rev25": 2575}, {"name": "Vancouver, WA", "pms26": 68, "web26": 16, "pms_res26": 71, "web_res26": 16, "pms_rev26": 17035, "web_rev26": 4314, "pms25": 28, "web25": 6, "pms_res25": 28, "web_res25": 6, "pms_rev25": 5060, "web_rev25": 732}, {"name": "Watertown, SD", "pms26": 6, "web26": 29, "pms_res26": 6, "web_res26": 35, "pms_rev26": 814, "web_rev26": 7999, "pms25": 14, "web25": 36, "pms_res25": 14, "web_res25": 39, "pms_rev25": 1776, "web_rev25": 7165}, {"name": "Wixom/Novi/Detroit, MI", "pms26": 14, "web26": 20, "pms_res26": 14, "web_res26": 20, "pms_rev26": 4232, "web_rev26": 4108, "pms25": 0, "web25": 9, "pms_res25": 0, "web_res25": 9, "pms_rev25": 0, "web_rev25": 1332}];
+
+// Add computed fields
+hotels.forEach(h => {
+  h.total26 = h.pms26 + h.web26;
+  h.total25 = h.pms25 + h.web25;
+  h.pms_all = h.pms26 + h.pms25;
+  h.web_all = h.web26 + h.web25;
+  h.total_all = h.total26 + h.total25;
+});
+
+let currentSort = 'total_all';
+let sortDir = 'desc';
+
+function sortTable(field) {
+  if (currentSort === field) sortDir = sortDir === 'desc' ? 'asc' : 'desc';
+  else { currentSort = field; sortDir = field === 'name' ? 'asc' : 'desc'; }
+  renderTable();
+}
+
+function fmt(n) {
+  if (n === 0) return '—';
+  return n.toLocaleString('en-US');
+}
+
+function renderTable() {
+  const sorted = [...hotels].sort((a,b) => {
+    let va = a[currentSort], vb = b[currentSort];
+    if (currentSort === 'name') return sortDir === 'asc' ? va.localeCompare(vb) : vb.localeCompare(va);
+    return sortDir === 'desc' ? vb - va : va - vb;
+  });
+
+  // Compute totals from summary
+  const t = hotels.reduce((a,h) => {
+    a.pms26 += h.pms26; a.web26 += h.web26; a.total26 += h.total26;
+    a.pms25 += h.pms25; a.web25 += h.web25; a.total25 += h.total25;
+    a.pms_all += h.pms_all; a.web_all += h.web_all; a.total_all += h.total_all;
+    return a;
+  }, {pms26:0,web26:0,total26:0,pms25:0,web25:0,total25:0,pms_all:0,web_all:0,total_all:0});
+
+  const maxAll = Math.max(...hotels.map(h => h.total_all));
+
+  document.getElementById('hotelTableBody').innerHTML = sorted.map(h => {
+    const barW = maxAll > 0 ? (h.total_all / maxAll * 100) : 0;
+    return `<tr>
+      <td class="hotel-name">${h.name}</td>
+      <td class="num col-divider">${fmt(h.pms26)}</td>
+      <td class="num">${fmt(h.web26)}</td>
+      <td class="num" style="font-weight:600;color:#FF5F00;">${fmt(h.total26)}</td>
+      <td class="num col-divider">${fmt(h.pms25)}</td>
+      <td class="num">${fmt(h.web25)}</td>
+      <td class="num" style="font-weight:600;">${fmt(h.total25)}</td>
+      <td class="num col-divider">${fmt(h.pms_all)}</td>
+      <td class="num">${fmt(h.web_all)}</td>
+      <td class="num bar-cell" style="font-weight:700;color:#2E8B57;">
+        <div class="bar-fill" style="width:${barW}%;background:#2E8B57;"></div>
+        <span style="position:relative;">${fmt(h.total_all)}</span>
+      </td>
+    </tr>`;
+  }).join('') + `<tr style="font-weight:700;background:#1C355E;border-top:2px solid #FF5F00;">
+      <td style="color:#fff;">TOTALS</td>
+      <td class="num col-divider" style="color:#fff;">${fmt(t.pms26)}</td>
+      <td class="num" style="color:#fff;">${fmt(t.web26)}</td>
+      <td class="num" style="color:#fff;">${fmt(t.total26)}</td>
+      <td class="num col-divider" style="color:#fff;">${fmt(t.pms25)}</td>
+      <td class="num" style="color:#fff;">${fmt(t.web25)}</td>
+      <td class="num" style="color:#fff;">${fmt(t.total25)}</td>
+      <td class="num col-divider" style="color:#fff;">${fmt(t.pms_all)}</td>
+      <td class="num" style="color:#fff;">${fmt(t.web_all)}</td>
+      <td class="num" style="color:#fff;">${fmt(t.total_all)}</td>
+    </tr>`;
+}
+
+renderTable();
+</script>
+<div style="text-align:center;padding:20px;font-size:12px;color:#94A3B8;">
+  My Place Hotels of America · New Member Enrollments by Hotel · Data through March 31, 2026
+  <br><em>Note: Total reflects property-level guest appearances (3,341). Members who stayed at multiple hotels are counted at each property. See the Conversion Behavior dashboard for unique member count (3,280 by email).</em>
+</div>
+</body>
+</html>

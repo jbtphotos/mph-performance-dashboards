@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Place Hotels — Website Analytics 2026 YTD vs 2025</title>
+<style>
+
+:root {
+  --bg:#EEF1F6; --card:#FFFFFF; --border:#D0D8E8;
+  --text:#1C355E; --muted:#5A6B84; --navy:#1C355E;
+  --orange:#FF5F00; --green:#2E8B57;
+  --C25:#4A7FC1; --C26:#FF5F00;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:Arial,'Helvetica Neue',Helvetica,sans-serif;
+       background:var(--bg); color:var(--text); min-height:100vh; font-size:13px; }
+.brand-bar { background:#FF5F00; height:5px; }
+.header { background:#1C355E; padding:22px 40px 18px; border-bottom:3px solid #FF5F00; }
+.header-inner { max-width:1400px; margin:0 auto;
+                display:flex; justify-content:space-between; align-items:flex-end; }
+.header-logo { display:flex; align-items:center; gap:16px; }
+.header-eyebrow { font-size:10px; font-weight:600; color:#FFD080;
+                  text-transform:uppercase; letter-spacing:2.5px; margin-bottom:4px; }
+.header h1 { font-size:20px; font-weight:700; color:#fff; line-height:1.1; }
+.header-subtitle { font-size:11px; color:rgba(255,255,255,0.65); margin-top:4px; }
+.header-meta { text-align:right; display:flex; flex-direction:column; align-items:flex-end; gap:6px; }
+.portal-btn { display:inline-flex; align-items:center; gap:5px; background:rgba(255,255,255,0.12);
+              border:1px solid rgba(255,255,255,0.3); color:rgba(255,255,255,0.85);
+              font-size:11px; font-weight:600; padding:4px 10px; border-radius:5px;
+              text-decoration:none; transition:background 0.2s; white-space:nowrap; }
+.portal-btn:hover { background:rgba(255,95,0,0.4); }
+.updated-pill { background:rgba(255,255,255,0.12); border:1px solid rgba(255,255,255,0.25);
+                color:rgba(255,255,255,0.7); font-size:10px; padding:3px 10px; border-radius:20px; }
+.main { max-width:1400px; margin:0 auto; padding:24px 40px 48px; }
+.info-bar { border-radius:8px; padding:10px 16px; margin-bottom:22px; font-size:11px;
+            color:#5A6B84; display:flex; align-items:center; gap:10px;
+            background:rgba(255,95,0,0.05); border:1px solid rgba(255,95,0,0.2); }
+.info-bar strong { color:#FF5F00; }
+.kpi-row { display:grid; grid-template-columns:repeat(5,1fr); gap:14px; margin-bottom:24px; }
+.kpi-card { background:#fff; border:1px solid var(--border); border-radius:10px;
+            padding:14px 16px; box-shadow:0 1px 4px rgba(28,53,94,0.06);
+            border-top:3px solid #FF5F00; }
+.kpi-label { font-size:9px; text-transform:uppercase; letter-spacing:0.8px;
+             color:#8ba0bf; font-weight:700; margin-bottom:5px; }
+.kpi-value { font-size:20px; font-weight:700; color:#1C355E; margin-bottom:3px; line-height:1; }
+.kpi-sub   { font-size:11px; color:#5A6B84; margin-bottom:5px; }
+.kpi-yoy  { margin-top:3px; }
+.section-hdr { display:flex; align-items:center; gap:10px; margin:24px 0 14px; }
+.section-hdr h2 { font-size:13px; font-weight:700; color:#1C355E; white-space:nowrap; }
+.section-hdr .desc { font-size:11px; color:#8ba0bf; font-style:italic; }
+.section-divider { flex:1; height:1px; background:linear-gradient(to right,#D0D8E8,transparent); }
+.grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:20px; }
+.chart-card { background:#fff; border:1px solid var(--border); border-radius:10px;
+              padding:18px 20px; box-shadow:0 1px 4px rgba(28,53,94,0.06); margin-bottom:0; }
+.chart-card h3 { font-size:11px; font-weight:700; color:var(--muted); text-transform:uppercase;
+                 letter-spacing:0.6px; border-bottom:2px solid #FF5F00;
+                 padding-bottom:7px; margin-bottom:5px; }
+.chart-desc { font-size:10px; color:#8ba0bf; font-style:italic; margin-bottom:10px; line-height:1.5; }
+.legend-row { display:flex; gap:14px; margin-bottom:8px; }
+.legend-item { display:flex; align-items:center; gap:5px; font-size:10px; color:#5A6B84; }
+.legend-swatch { width:10px; height:10px; border-radius:2px; }
+.ch-bar-section { margin-bottom:10px; }
+.ch-bar-label { font-size:11px; font-weight:600; color:#1C355E; margin-bottom:4px;
+                display:flex; align-items:center; gap:6px; }
+.bar-row { display:flex; align-items:center; gap:7px; margin-bottom:2px; }
+.bar-yr  { font-size:9px; color:#8ba0bf; width:26px; flex-shrink:0; text-align:right; }
+.bar-track { flex:1; height:16px; background:#EEF1F6; border-radius:3px; overflow:hidden; }
+.bar-fill  { height:100%; border-radius:3px; transition:width 0.7s ease; }
+.bar-val { font-size:10px; font-weight:600; color:#1C355E; width:66px; flex-shrink:0; text-align:right; }
+.delta-pill { font-size:9px; font-weight:700; padding:1px 6px; border-radius:7px; flex-shrink:0; }
+.up   { background:rgba(46,139,87,0.12);  color:#2E8B57; }
+.down { background:rgba(204,51,51,0.1);   color:#CC3333; }
+.new  { background:rgba(255,95,0,0.1);    color:#FF5F00; }
+.table-card { background:#fff; border:1px solid var(--border); border-radius:10px;
+              padding:18px 20px; box-shadow:0 1px 4px rgba(28,53,94,0.06); margin-bottom:16px; }
+.table-card h3 { font-size:11px; font-weight:700; color:var(--muted); text-transform:uppercase;
+                 letter-spacing:0.6px; border-bottom:2px solid #FF5F00;
+                 padding-bottom:7px; margin-bottom:5px; }
+table { width:100%; border-collapse:collapse; font-size:11px; }
+thead th { background:#1C355E; color:#fff; padding:7px 8px; text-align:left;
+           font-size:9px; text-transform:uppercase; letter-spacing:0.4px;
+           font-weight:700; white-space:nowrap; cursor:pointer; user-select:none; }
+thead th:hover { color:#FFD080; }
+thead th.sorted-asc::after  { content:' ▲'; font-size:7px; }
+thead th.sorted-desc::after { content:' ▼'; font-size:7px; }
+thead th.num { text-align:right; }
+tbody td { padding:6px 8px; border-bottom:1px solid var(--border); color:#1C355E; }
+tbody td.num, tfoot td.num { text-align:right; font-variant-numeric:tabular-nums; white-space:nowrap; }
+tbody td.name-cell { font-weight:600; }
+tbody td.path-cell { font-family:monospace; font-size:10px; color:#5A6B84;
+                     max-width:240px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+tbody tr:nth-child(even) { background:#F5F8FC; }
+tbody tr:hover { background:#E8F0FA; }
+tbody tr:last-child td { border-bottom:none; }
+.delta-cell { font-size:10px; font-weight:700; white-space:nowrap; }
+.delta-cell.up { color:#2E8B57; }
+.delta-cell.down { color:#CC3333; }
+.hotel-table { table-layout:fixed; width:100%; }
+.hotel-table thead th:nth-child(1) { width:19%; }
+.hotel-table thead th { width:6.75%; }
+.footer { background:#1C355E; border-top:3px solid #FF5F00; padding:14px 40px;
+          text-align:center; color:rgba(255,255,255,0.55); font-size:10px; }
+
+</style>
+</head>
+<body>
+<div class="brand-bar"></div>
+
+<div class="header">
+  <div class="header-inner">
+    <div class="header-logo">
+      <img src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyBpZD0iTXlfUGxhY2VfSG90ZWxzX0xvZ28iIGRhdGEtbmFtZT0iTXkgUGxhY2UgSG90ZWxzIExvZ28iIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgdmlld0JveD0iMCAwIDQ5My45MzEgNDg4LjQ2OCI+CiAgPGRlZnM+CiAgICA8c3R5bGU+CiAgICAgIC5jbHMtMSB7CiAgICAgICAgZmlsbDogI2UxMWIyMjsKICAgICAgfQoKICAgICAgLmNscy0yIHsKICAgICAgICBmaWxsOiAjZmZmOwogICAgICB9CgogICAgICAuY2xzLTMgewogICAgICAgIGZpbGw6ICNmZDA7CiAgICAgIH0KICAgIDwvc3R5bGU+CiAgPC9kZWZzPgogIDxnPgogICAgPHBhdGggY2xhc3M9ImNscy0zIiBkPSJNMjQ2Ljk2Niw0ODAuOTY2Yy03Mi4xNiwwLTE0My41MjUtNS41MTgtMjE4LjE4NS0xNi44NzJsLTUuNDkxLS44MzUtLjgwMy01LjQ5OEMyLjUwMiwzMjEuMDA1LDIuNTAyLDE4Mi4zMTcsMjIuNDg3LDQ1LjU2bC44MDMtNS40OTcsNS40OTEtLjgzNWM3NC42NTktMTEuMzU2LDE0Ni4wMjQtMTYuODc2LDIxOC4xODUtMTYuODc2czE0My41MjQsNS41MTksMjE4LjE4MiwxNi44NzZsNS40OTIuODM1LjgwMyw1LjQ5N2MxOS45ODYsMTM2Ljc1NywxOS45ODYsMjc1LjQ0NCwwLDQxMi4ybC0uODAzLDUuNDk4LTUuNDkyLjgzNWMtNzQuNjU3LDExLjM1NS0xNDYuMDI0LDE2Ljg3Mi0yMTguMTgyLDE2Ljg3MmgwWiIvPgogICAgPHBhdGggZD0iTTI0Ni45NjQsMjkuODUzYzcxLjczMiwwLDE0My40NjMsNS41OTcsMjE3LjA1NywxNi43OSwxOS44NjgsMTM1Ljk1NSwxOS44NjgsMjc0LjA3OCwwLDQxMC4wMzMtNzMuNTk0LDExLjE5My0xNDUuMzI0LDE2Ljc5MS0yMTcuMDU2LDE2Ljc5MXMtMTQzLjQ2My01LjU5OC0yMTcuMDU2LTE2Ljc5MWMtMTkuODY3LTEzNS45NTUtMTkuODY3LTI3NC4wNzgsMC00MTAuMDMzLDczLjU5My0xMS4xOTMsMTQ1LjMyNC0xNi43OSwyMTcuMDU1LTE2Ljc5TTI0Ni45NjQsMTQuODUzYy03Mi41MzksMC0xNDQuMjc1LDUuNTQ4LTIxOS4zMSwxNi45NmwtMTAuOTgsMS42Ny0xLjYwNiwxMC45OTFjLTIwLjA4OSwxMzcuNDc4LTIwLjA4OSwyNzYuODkzLDAsNDE0LjM3MmwxLjYwNiwxMC45ODksMTAuOTgsMS42NzFjNzUuMDM2LDExLjQxMywxNDYuNzczLDE2Ljk2MSwyMTkuMzExLDE2Ljk2MXMxNDQuMjc1LTUuNTQ4LDIxOS4zMTEtMTYuOTYxbDEwLjk4LTEuNjcxLDEuNjA1LTEwLjk4OWMyMC4wOTEtMTM3LjQ3OSwyMC4wOTEtMjc2Ljg5NCwwLTQxNC4zNzJsLTEuNjA1LTEwLjk5MS0xMC45OC0xLjY3Yy03NS4wMzUtMTEuNDEyLTE0Ni43NzItMTYuOTYtMjE5LjMxMi0xNi45NmgwWiIvPgogIDwvZz4KICA8Zz4KICAgIDxwYXRoIGNsYXNzPSJjbHMtMSIgZD0iTTM4Ni4yODksMTQ3LjE2MmMwLDc2LjgwMi02Mi4yNTQsMTM5LjA1Ny0xMzkuMDYyLDEzOS4wNTdzLTEzOS4wNTItNjIuMjU1LTEzOS4wNTItMTM5LjA1N1MxNzAuNDI4LDguMTAxLDI0Ny4yMjcsOC4xMDFzMTM5LjA2Miw2Mi4yNTQsMTM5LjA2MiwxMzkuMDYxWiIvPgogICAgPHBhdGggZD0iTTk5LjMyNywxNDYuOTQxQzk5LjMyNyw2NS43NzgsMTY1LjExMywwLDI0Ni4yNzIsMGgwYzgxLjE2MSwwLDE0Ni45MzksNjUuNzc4LDE0Ni45NDMsMTQ2Ljk0MWgwYy0uMDA0LDgxLjE2NC02NS43ODIsMTQ2LjkzNy0xNDYuOTQzLDE0Ni45NTFoMGMtODEuMTU4LS4wMTUtMTQ2Ljk0NC02NS43ODctMTQ2Ljk0NC0xNDYuOTUxaDBaTTExNS4xMDcsMTQ2Ljk0MWMuMTI4LDcyLjQ0Myw1OC43MjIsMTMxLjAzMywxMzEuMTY1LDEzMS4xNjZoMGM3Mi40NDEtLjEzMywxMzEuMDMzLTU4LjcyMywxMzEuMTc0LTEzMS4xNjZoMGMtLjE0MS03Mi40NDctNTguNzMyLTEzMS4wMzUtMTMxLjE3NC0xMzEuMTY2aDBjLTcyLjQ0My4xMzEtMTMxLjAzNyw1OC43MTktMTMxLjE2NSwxMzEuMTY2aDBaIi8+CiAgICA8Zz4KICAgICAgPHBhdGggZD0iTTg2LjQ4OSwyNTMuMzcyYy0xMC4zNjIsMC0xOS4wNzgtNC42NjctMjMuMzEzLTEyLjQ5NS0yLjUyMi00LjYzOS01LjQ5LTE0LjM0MiwyLjg4Mi0yNy4yMjEsNS42NDctOC42NzEsMTEuMzE5LTE3LjMyMiwxNi45NzItMjUuOTgybDQuOTA3LTcuNDg4YzguMDkyLTEyLjM4NywxNi4xNTctMjQuOCwyNC4yMzMtMzcuMjA0bDYuNzE3LTEwLjMzNiwxMS4wODgtMTcuMDE2LDExLjA3Ni0xNy4wMjgsMS4xODctMS44NWM2LjA2My05LjQzOSwxNS4yMDUtMjMuNywzMy42MDctMjMuNyw2LjA1OSwwLDI1LjgyNSwyLjE2MSwyNS44MjUsMzAuMDE2djQuNzI0YzMuNzM2LTUuMzksNy40NjctMTAuNzc0LDExLjIwNi0xNi4xNjcsNy44MTktMTAuOTM0LDE5LjY0Ny0xNy42NDMsMzAuOTc5LTE3LjY0Myw3LjE2NSwwLDEzLjc3NCwyLjY5MywxOC42Miw3LjU2NSwzLjk1MiwzLjk4Miw4LjY0NSwxMS4zOTcsOC41NjcsMjQuMDc2LS4xMjUsMTguOTYxLS4xMTIsMzguMjY4LS4wODYsNTYuOTNsLjAyMSwyMi40NzNjMCwxLjI3LjA3NSwyLjYxNS4xMzQsMy45OTIuMzgsOC4xMTMsMS4wMjMsMjEuNjkxLTEwLjE5NCwzMC4zMjgtNC45OSwzLjg0Ny0xMS4zMTQsNS45NjItMTcuODI0LDUuOTYyLTUuMzM2LDAtMTAuNDUzLTEuNDI0LTE0Ljc5MS00LjExOS0xMy4zMTItOC4yNTYtMTIuNTc2LTIzLjIyNC0xMi4xNDMtMzIuMTcxLjA3OS0xLjQyMi4xNDgtMi44MDkuMTQ4LTQuMDk4di0xLjI4MWwtMTYuNjY5LDI0LjU5MmMtMy4wNSw0LjQ5OC0xMS4xNjIsMTYuNDkxLTI1LjUxNSwxNy40MTQtLjU1OS4wMzktMS4xMTUuMDYxLTEuNjc2LjA2MS0xMi45MTQsMC0yMy43ODMtOS44NDQtMjUuMjk1LTIyLjkxMy0uNDU5LTMuOTc2LS43MzItNy45ODYtLjg2NS0xMS45OTRsLTMwLjk5LDQ3LjI4OWMtNi4zMTUsOS40NjUtMTcuMzQsMTUuMjg2LTI4LjgxLDE1LjI4NmgwWiIvPgogICAgICA8cGF0aCBjbGFzcz0iY2xzLTIiIGQ9Ik0xNzUuODQyLDg1Ljc4M2MxMC44NjcsMCwxMy4wOTMsOC4wOSwxMy4wOTMsMTcuMjgzdjQ1LjQ3OWMxMS40NjItMTYuNTU3LDIyLjkzNC0zMy4xMTcsMzQuNDA1LTQ5LjY3NiwxMS45MjUtMTYuNjYxLDM1LjEzNS0xNy43NjksMzQuOTcsNi42NzItLjE3OSwyNi40OS0uMDY3LDUyLjk5NC0uMDY3LDc5LjQ4MiwwLDcuOTg1LDIuMTkxLDE4LjYyMy01LjEwMSwyNC4yMzYtNS4wMjEsMy44Ny0xMi42ODUsNC40ODItMTguMTI2LDEuMTA5LTguNDQzLTUuMjQtNS45NzctMTcuMTM5LTUuOTc3LTI1LjQ0NnYtNDIuNzUzYy0xMy4zMDksMTkuNjMxLTI2LjYyMSwzOS4yNjktMzkuOTM1LDU4LjkwMi0zLjc1OSw1LjU1MS04LjU2NywxMS40LTE1LjgwNCwxMS44Ny02Ljk4MS40NTEtMTIuNzA4LTQuNzc0LTEzLjQ5LTExLjYwNC0yLjAyNy0xNy42MjctLjA3OS0zNi41NTMtLjA3OS01NC4zMDMtMTguMzY0LDI4LjAyOS0zNi43MjYsNTYuMDQzLTU1LjA5Myw4NC4wNzEtMTEuMDc3LDE2LjYxLTQxLjU3MiwxMC41MDYtMjcuOTA1LTEwLjUwMSw3LjI2LTExLjE2NiwxNC41NzUtMjIuMzA4LDIxLjg2MS0zMy40NTYsMTAuMzQ1LTE1LjgzOCwyMC42NTEtMzEuNzA1LDMwLjk2Ny00Ny41NTgsNy4zODgtMTEuMzUsMTQuNzcyLTIyLjY5NSwyMi4xNi0zNC4wNDcsNS44OTQtOS4wNzYsMTEuODI0LTE5Ljc2MiwyNC4xMi0xOS43NjIiLz4KICAgIDwvZz4KICAgIDxnPgogICAgICA8cGF0aCBkPSJNMjgxLjcsMjY4LjIxMWMtOC4xMjcsMC0xNS43OTQtNC4zMDMtMjAuNTE3LTExLjUxMi00Ljk0My03LjU2My01Ljc0Mi0xNi45OTgtMi4xNDItMjUuMjUsMy40MjYtNy44MTMsNy43MzUtMTUuMTQ0LDExLjUyOS0yMS42MDEsNS45NDctMTAuMTE2LDE5LjgxMy0zNC42ODcsMjMuODQ1LTQzLjQzM2wtNS4zMi0xOS4yMTEtMTQuNjI2LTUyLjg1OWMtMS44NDgtNi42ODgsMi4wMDItMTMuNjI3LDguNjY0LTE1LjYwM2wyNC4xNy03LjE1NGMxLjE4MS0uMzUsMi40MDItLjUyMiwzLjYwNS0uNTIyLDIuMjE1LDAsNC40MS41NzgsNi4zNjUsMS42OTYsMy4wMjUsMS43MzUsNS4xOTMsNC42NDEsNi4wMTksOC4wM2w0LjUwMiwxOC41NmM1Ljk5NC0xMy40MTMsMTIuMTExLTI3LjA3NiwxOC4yNTktNDAuNTMyLjk0NC0yLjA1OSwxLjg1Mi00LjE2NCwyLjc3NC02LjI5NywyLjg0Ni02LjU3OCw1Ljc5NS0xMy4zODksOS44NjUtMTkuODE2LDQuNTMxLTcuMTg0LDExLjc0Mi0xMS4yOTksMTkuNzczLTExLjI5OXMxNS44NzksNC4xMzEsMjAuOTEzLDExLjA0OGM0Ljk0Miw2Ljc5LDYuMzI5LDE1LjE1MiwzLjgxLDIyLjk0NC0uMTQ3LjQ0Ni0uMzA2Ljg4Ni0uNDk5LDEuMzExbC0zMi42MDMsNzIuMzU5Yy02Ljc3OCwxNC41OC0xMy45NDcsMjkuMTk3LTIxLjk2OSw0NC44MjUtLjk4NCwxLjkwNy0yLjM5OCw0LjcyNi00LjEyNyw4LjE2MS0yMC40NTksNDAuNjQ0LTM1LjkyNCw2OS41NjEtNDQuODgxLDc4LjU2Ni00Ljg2MSw0Ljg5My0xMS4wNDcsNy41ODgtMTcuNDExLDcuNTg4aDBaIi8+CiAgICAgIDxwYXRoIGNsYXNzPSJjbHMtMiIgZD0iTTM1OC40NzcsMTIzLjgzOWMtNi45MzMsMTQuODk1LTE0LjE4NSwyOS42MzQtMjEuNjg3LDQ0LjIzOS02Ljk4NiwxMy41OTktMzUuODAzLDcyLjYwMy00Ni43MDEsODMuNTY0LTEwLjUzOCwxMC41OTQtMjQuNzQ3LTIuODExLTE5LjM4MS0xNS4wOTYsMy4wNi02Ljk2OSw2Ljk5NC0xMy42OTcsMTAuODQ4LTIwLjI1MiwxLjQ0Ni0yLjQ2NywyNi45OTItNDYuNTYzLDI2LjE1Ni00OS41NzEtNi45OTQtMjUuMjU3LTEzLjk4NC01MC41MTMtMjAuOTcyLTc1Ljc3MmwyNC4xNzYtNy4xNTIsMTMuMzA2LDU0LjgyOGMxMS4xMjktMjQuODM4LDIyLjEwMi00OS43NSwzMy40MTYtNzQuNTA0LDMuNzIxLTguMTM3LDcuMDEyLTE3LjAxOSwxMS44MTQtMjQuNjA1LDcuOTU3LTEyLjU5NiwyNS43NDItLjc3MSwyMS42MTksMTEuOTYzbC0zMi41OTQsNzIuMzU4Ii8+CiAgICA8L2c+CiAgPC9nPgogIDxnPgogICAgPHBhdGggZD0iTTg0LjQxOSwzNjYuNjZoLTIwLjc4OXYzMy40NzloLTE4Ljg5OXYtOTQuNDk2aDQxLjMwOWMxNy44MTgsMCwzMi41MzQsOS44NTQsMzIuNTM0LDI5Ljk2OCwwLDIxLjg3LTE0LjU3OSwzMS4wNDktMzQuMTU0LDMxLjA0OVpNODUuMzY0LDMyNC4wMDNoLTIxLjczM3YyNC4yOTloMjIuMDAzYzguNzc2LDAsMTMuNS00LjA1MSwxMy41LTEyLjI4NXMtNS4zOTgtMTIuMDE0LTEzLjc3LTEyLjAxNFoiLz4KICAgIDxwYXRoIGQ9Ik0xMjkuNzgsNDAwLjEzOXYtOTQuNDk2aDE4Ljg5OXY3Ni4wMDJoNDcuMzg0djE4LjQ5NGgtNjYuMjgzWiIvPgogICAgPHBhdGggZD0iTTI3NC40NjYsNDAwLjEzOWwtNy40MjYtMjEuMDU5aC0zNC41NTlsLTcuNDI0LDIxLjA1OWgtMjAuMjVsMzYuMTgtOTQuNDk2aDE4LjM1OGwzNS45MDksOTQuNDk2aC0yMC43ODlaTTI1NC40ODcsMzQzLjk4MWMtMS44OTEtNS41MzQtMy43ODEtMTEuMjA1LTQuNzI2LTE0LjcxNS0uOTQ0LDMuNTEtMi44MzQsOS4xODEtNC43MjQsMTQuNzE1bC02LjA3NSwxNy4xNDVoMjEuNmwtNi4wNzQtMTcuMTQ1WiIvPgogICAgPHBhdGggZD0iTTM1My4xMTYsMzMzLjE4Yy0zLjM3NS02LjQ3OC04Ljc3NS0xMC4yNTgtMTcuMjc5LTEwLjI1OC0xNC4xNzUsMC0yMi4yNzMsMTIuNDE5LTIyLjI3MywyOS45NjgsMCwxNy4wMSw4LjIzMywyOS45NywyMi40MDgsMjkuOTcsOC41MDYsMCwxMy40OTktMy42NDQsMTguNDk0LTEyLjAxNmwxNS45Myw5LjQ1Yy02LjQ4LDEzLjM2NC0xNy44MTksMjEuMzI5LTM0Ljk2NCwyMS4zMjktMjQuNzAzLDAtNDEuMzA5LTE4Ljg5OC00MS4zMDktNDguNzMzLDAtMjguNzUzLDE3LjI3OS00OC43MzIsNDEuOTgzLTQ4LjczMiwxNy44MiwwLDI4LjYxOSw4LjY0LDM0LjU1OSwyMC45MjRsLTE3LjU0OSw4LjA5OVoiLz4KICAgIDxwYXRoIGQ9Ik0zODEuNTY3LDQwMC4xMzl2LTk0LjQ5Nmg2NS42MDd2MTguNDk0aC00Ni43MDd2MTYuMzM0aDI3LjEzM3YxOC4zNTloLTI3LjEzM3YyMi44MTRoNDguNzMzdjE4LjQ5NGgtNjcuNjMzWiIvPgogIDwvZz4KICA8Zz4KICAgIDxwYXRoIGNsYXNzPSJjbHMtMSIgZD0iTTE2OS41ODIsNDM4Ljk0djcuNTY3aDYuNjI4di03LjU2N2g1LjQ3OHYyMC40aC01LjQ3OHYtOC4wNWgtNi42Mjh2OC4wNWgtNS40Nzh2LTIwLjRoNS40NzhaIi8+CiAgICA8cGF0aCBjbGFzcz0iY2xzLTEiIGQ9Ik0yMDUuNzI2LDQ1OS42NzRjLTYuMzI2LDAtOS44MDctNC43NTMtOS44MDctMTAuNDEzLDAtNS45MzIsMy44NzQtMTAuNjUzLDEwLjE0LTEwLjY1Myw2LjU2OCwwLDkuODk3LDQuODcyLDkuODk3LDEwLjMyMSwwLDYuNTY4LTMuOTM1LDEwLjc0NS0xMC4yLDEwLjc0NWgtLjAzWk0yMDUuOTk4LDQ1NS4zNDZjMi42MzQsMCw0LjE3Ny0yLjU0Miw0LjE3Ny02LjIzNSwwLTMuNTEtMS41NzQtNi4xNzQtNC4yMzctNi4xNzQtMi42MzMsMC00LjIzNywyLjY2My00LjIzNyw2LjIwNC0uMDMsMy42NjMsMS42MDQsNi4yMDUsNC4yMzcsNi4yMDVoLjA2WiIvPgogICAgPHBhdGggY2xhc3M9ImNscy0xIiBkPSJNMjM0LjU2LDQ0My41NDJoLTUuMjA2di00LjYwMmgxNS45ODF2NC42MDJoLTUuMjk2djE1Ljc5OWgtNS40Nzh2LTE1Ljc5OVoiLz4KICAgIDxwYXRoIGNsYXNzPSJjbHMtMSIgZD0iTTI3Mi4zNjgsNDUxLjEwOGgtNy4zMjR2My43NTNoOC4yMDJ2NC40OGgtMTMuNjh2LTIwLjRoMTMuMjU3djQuNDhoLTcuNzc5djMuMjY5aDcuMzI0djQuNDE5WiIvPgogICAgPHBhdGggY2xhc3M9ImNscy0xIiBkPSJNMjg3LjYsNDM4Ljk0aDUuNDc4djE1LjgzaDcuODM5djQuNTdoLTEzLjMxN3YtMjAuNFoiLz4KICAgIDxwYXRoIGNsYXNzPSJjbHMtMSIgZD0iTTMxNi4xNzcsNDUzLjg5M2MxLjI0MS42MzYsMy4yMzksMS4yNzEsNS4yOTYsMS4yNzEsMS44NzcsMCwyLjc4NS0uNjM2LDIuNzg1LTEuNjY1LDAtLjk5OS0uOTA4LTEuNTQzLTMuMjA4LTIuMzMxLTMuNDUxLTEuMjQxLTUuNzUxLTMuMTE2LTUuNzUxLTYuMTQzLDAtMy42MDIsMy4wNTctNi4zODYsOC4yMDMtNi4zODYsMi40MjEsMCw0LjE3Ny40NTQsNS41MDksMS4wM2wtMS4xNSw0LjM4OGMtLjg3OC0uMzkzLTIuMzkxLS45NjgtNC40MTktLjk2OC0xLjY2NSwwLTIuNTczLjYwNS0yLjU3MywxLjUxMywwLDEuMDMsMS4wOSwxLjQyMiwzLjY2MywyLjM5MSwzLjY2MiwxLjM2Miw1LjI5NiwzLjI5OSw1LjI5Niw2LjE0MywwLDMuNTEyLTIuNzI0LDYuNTA3LTguNjg3LDYuNTA3LTIuNDUxLDAtNC44NDMtLjYzNi01Ljk5Mi0xLjI0bDEuMDI5LTQuNTFaIi8+CiAgPC9nPgogIDxwYXRoIGQ9Ik0yNDYuOTY2LDQxMS44ODljLTY2Ljk1NSwwLTEzMy45MTMsNi43NDMtMjAyLjIzNCwyMC4xODZ2Ny42NWM2OC40MTgtOS43MzksMTM1LjMyNi0xNC42MTMsMjAyLjIzNC0xNC42MTNzMTMzLjgxNiw0Ljg3NSwyMDIuMjMzLDE0LjYxM3YtNy42NWMtNjguMzItMTMuNDQzLTEzNS4yNzktMjAuMTg2LTIwMi4yMzMtMjAuMTg2WiIvPgogIDxwYXRoIGQ9Ik00NjUuNzU5LDMxNC44MzRjMCwzLjk5OS0zLjEzOSw3LjEzOC03LjIyNCw3LjEzOC00LjA0MiwwLTcuMjY3LTMuMTM5LTcuMjY3LTcuMTM4LDAtMy45MTMsMy4yMjUtNy4wNTIsNy4yNjctNy4wNTIsNC4wODUsMCw3LjIyNCwzLjEzOSw3LjIyNCw3LjA1MlpNNDUzLjA3NCwzMTQuODM0YzAsMy4xMzksMi4zMjIsNS42MzMsNS41MDQsNS42MzMsMy4wOTYsMCw1LjM3NS0yLjQ5NCw1LjM3NS01LjU5LDAtMy4xMzktMi4yNzktNS42NzYtNS40MTgtNS42NzZzLTUuNDYxLDIuNTM3LTUuNDYxLDUuNjMzWk00NTcuNDE3LDMxOC41MzJoLTEuNjM0di03LjA1MmMuNjQ1LS4xMjksMS41NDgtLjIxNSwyLjcwOS0uMjE1LDEuMzMzLDAsMS45MzUuMjE1LDIuNDUxLjUxNi4zODcuMzAxLjY4OC44Ni42ODgsMS41NDgsMCwuNzc0LS42MDIsMS4zNzYtMS40NjIsMS42MzR2LjA4NmMuNjg4LjI1OCwxLjA3NS43NzQsMS4yOSwxLjcyLjIxNSwxLjA3NS4zNDQsMS41MDUuNTE2LDEuNzYzaC0xLjc2M2MtLjIxNS0uMjU4LS4zNDQtLjkwMy0uNTU5LTEuNzItLjEyOS0uNzc0LS41NTktMS4xMTgtMS40NjItMS4xMThoLS43NzR2Mi44MzhaTTQ1Ny40NjEsMzE0LjUzM2guNzc0Yy45MDMsMCwxLjYzNC0uMzAxLDEuNjM0LTEuMDMyLDAtLjY0NS0uNDczLTEuMDc1LTEuNTA1LTEuMDc1LS40MywwLS43MzEuMDQzLS45MDMuMDg2djIuMDIxWiIvPgo8L3N2Zz4=" alt="My Place Hotels" style="height:42px;display:block;">
+      <div>
+        <div class="header-eyebrow">My Place Hotels of America</div>
+        <h1>Website Analytics Dashboard — 2026 YTD</h1>
+        <div class="header-subtitle">Google Analytics 4 &nbsp;·&nbsp; Jan 1 – Mar 31, 2026 vs same period 2025 &nbsp;·&nbsp; myplacehotels.com &nbsp;·&nbsp; Property WiFi excluded</div>
+      </div>
+    </div>
+    <div class="header-meta">
+      <div style="display:flex;gap:8px;">
+        <a href="ga4-website-dashboard.html" class="portal-btn">2024 vs 2025 Dashboard</a>
+        <a href="index.html" class="portal-btn">← Portal</a>
+      </div>
+      <div class="updated-pill">Jan 1 – Mar 31, 2026</div>
+    </div>
+  </div>
+</div>
+
+<div class="main">
+
+  <div class="info-bar">
+    📅 <span><strong>YoY comparison is same-period only</strong> — 2026 YTD (Jan 1–Mar 31, 2026) is compared against the identical date range in 2025 (Jan 1–Mar 31, 2025) for a clean apples-to-apples view. Monthly trend charts show all 12 months of 2025 for broader context.</span>
+  </div>
+
+  <!-- KPI Cards -->
+  <div class="kpi-row">
+    <div class="kpi-card">
+      <div class="kpi-label">2026 YTD Sessions</div>
+      <div class="kpi-value">351.2K</div>
+      <div class="kpi-sub">2025 (same period): 346.7K</div>
+      <div class="kpi-yoy"><span style="font-size:11px;font-weight:700;color:#2E8B57;background:rgba(46,139,87,0.1);padding:2px 8px;border-radius:10px;">▲ 1.3%</span> vs 2025</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">2026 YTD Revenue</div>
+      <div class="kpi-value">$3.25M</div>
+      <div class="kpi-sub">2025 (same period): $2.57M</div>
+      <div class="kpi-yoy"><span style="font-size:11px;font-weight:700;color:#2E8B57;background:rgba(46,139,87,0.1);padding:2px 8px;border-radius:10px;">▲ 26.7%</span> vs 2025</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">2026 YTD Reservations</div>
+      <div class="kpi-value">10.5K</div>
+      <div class="kpi-sub">2025 (same period): 8.6K</div>
+      <div class="kpi-yoy"><span style="font-size:11px;font-weight:700;color:#2E8B57;background:rgba(46,139,87,0.1);padding:2px 8px;border-radius:10px;">▲ 22.4%</span> vs 2025</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">2026 Reservation Rate</div>
+      <div class="kpi-value">3.00%</div>
+      <div class="kpi-sub">2025 (same period): 2.48%</div>
+      <div class="kpi-yoy"><span style="font-size:11px;font-weight:700;color:#2E8B57;background:rgba(46,139,87,0.1);padding:2px 8px;border-radius:10px;">▲ 20.9%</span> vs 2025</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Revenue per Reservation</div>
+      <div class="kpi-value">$309</div>
+      <div class="kpi-sub">2025 (same period): $298</div>
+      <div class="kpi-yoy"><span style="font-size:11px;font-weight:700;color:#2E8B57;background:rgba(46,139,87,0.1);padding:2px 8px;border-radius:10px;">▲ 3.5%</span> vs 2025</div>
+    </div>
+  </div>
+
+  <!-- Monthly Trends -->
+  <div class="section-hdr">
+    <h2>Monthly Trends</h2>
+    <span class="desc">Full 2025 (blue) + 2026 YTD (orange) — excludes Property WiFi</span>
+    <div class="section-divider"></div>
+  </div>
+
+  <div class="grid-2" style="margin-bottom:16px;">
+    <div class="chart-card">
+      <h3>Monthly Sessions</h3>
+      <p class="chart-desc">All 12 months of 2025 shown for context, with 2026 YTD (Jan–Mar) overlaid. The 2026 line begins at January.</p>
+      <div class="legend-row">
+        <div class="legend-item"><div class="legend-swatch" style="background:var(--C25);"></div>2025 (full year)</div>
+        <div class="legend-item"><div class="legend-swatch" style="background:var(--C26);"></div>2026 YTD</div>
+      </div>
+      <canvas id="cSessions" style="width:100%;display:block;" height="150"></canvas>
+    </div>
+    <div class="chart-card">
+      <h3>Monthly Page Views</h3>
+      <p class="chart-desc">Total page views across all website pages per month. Full 2025 shown for context with 2026 YTD overlaid. Excludes Property WiFi (/wifi/) pages.</p>
+      <div class="legend-row">
+        <div class="legend-item"><div class="legend-swatch" style="background:var(--C25);"></div>2025 (full year)</div>
+        <div class="legend-item"><div class="legend-swatch" style="background:var(--C26);"></div>2026 YTD</div>
+      </div>
+      <canvas id="cPageViews" style="width:100%;display:block;" height="150"></canvas>
+    </div>
+  </div>
+
+  <div class="grid-2" style="margin-bottom:16px;">
+    <div class="chart-card">
+      <h3>Monthly Website Revenue</h3>
+      <p class="chart-desc">GA4-attributed booking revenue per month. 2026 YTD vs full 2025 trend.</p>
+      <div class="legend-row">
+        <div class="legend-item"><div class="legend-swatch" style="background:var(--C25);"></div>2025</div>
+        <div class="legend-item"><div class="legend-swatch" style="background:var(--C26);"></div>2026 YTD</div>
+      </div>
+      <canvas id="cRevenue" style="width:100%;display:block;" height="150"></canvas>
+    </div>
+    <div class="chart-card">
+      <h3>Monthly Reservations</h3>
+      <p class="chart-desc">Purchase (reservation) events per month — primary booking conversion metric.</p>
+      <div class="legend-row">
+        <div class="legend-item"><div class="legend-swatch" style="background:var(--C25);"></div>2025</div>
+        <div class="legend-item"><div class="legend-swatch" style="background:var(--C26);"></div>2026 YTD</div>
+      </div>
+      <canvas id="cPurchases" style="width:100%;display:block;" height="150"></canvas>
+    </div>
+  </div>
+
+  <!-- Channel Performance -->
+  <div class="section-hdr">
+    <h2>Channel Performance</h2>
+    <span class="desc">2025 same period (Jan 1–Mar 31) vs 2026 YTD (Jan 1–Mar 31)</span>
+    <div class="section-divider"></div>
+  </div>
+  <div class="grid-2" style="margin-bottom:16px;">
+    <div class="chart-card">
+      <h3>Sessions by Channel</h3>
+      <p class="chart-desc">Session volume per channel for the same Jan 1–Mar 31 window in both years.</p>
+      <div id="chSessionBars"></div>
+    </div>
+    <div class="chart-card">
+      <h3>Website Revenue by Channel</h3>
+      <p class="chart-desc">GA4-attributed booking revenue by channel — same period comparison.</p>
+      <div id="chRevBars"></div>
+    </div>
+  </div>
+
+  <div class="section-hdr">
+    <h2>Reservation Rate by Channel</h2>
+    <span class="desc">Reservations ÷ Sessions — same period Jan 1–Mar 31</span>
+    <div class="section-divider"></div>
+  </div>
+  <div class="chart-card" style="margin-bottom:16px;">
+    <h3>Session Reservation Rate by Channel</h3>
+    <p class="chart-desc">Percentage of sessions resulting in a reservation. Same-period comparison to isolate true YoY channel intent.</p>
+    <div id="chConvBars"></div>
+  </div>
+
+  <!-- Site Pages with Revenue -->
+  <div class="section-hdr">
+    <h2>Site Page Performance</h2>
+    <span class="desc">Home page, locations index, and other site pages with attributed revenue — same period Jan 1–Mar 31</span>
+    <div class="section-divider"></div>
+  </div>
+  <div class="table-card">
+    <h3>Revenue-Generating Site Pages — 2025 vs 2026 YTD</h3>
+    <p class="chart-desc">Top 25 revenue-generating pages. Includes consolidated home page, locations index, and individual site pages. Totals reflect all pages.</p>
+    <div style="overflow-x:auto;"><table id="hubTable">
+      <thead><tr>
+        <th onclick="sortTbl('hubTable',0,false)">Page</th>
+        <th class="num" onclick="sortTbl('hubTable',1,true)">Views '25</th>
+        <th class="num" onclick="sortTbl('hubTable',2,true)">Views '26</th>
+        <th class="num" onclick="sortTbl('hubTable',3,true)">Δ Views</th>
+        <th class="num" onclick="sortTbl('hubTable',4,true)">Res '25</th>
+        <th class="num" onclick="sortTbl('hubTable',5,true)">Res '26</th>
+        <th class="num" onclick="sortTbl('hubTable',6,true)">Revenue '25</th>
+        <th class="num" onclick="sortTbl('hubTable',7,true)">Revenue '26</th>
+        <th class="num" onclick="sortTbl('hubTable',8,true)">Δ Revenue</th>
+      </tr></thead>
+      <tbody id="hubBody"></tbody>
+      <tfoot id="hubFoot"></tfoot>
+    </table></div>
+  </div>
+
+  <!-- State/City Landing Pages -->
+  <div class="section-hdr">
+    <h2>State &amp; City Landing Pages</h2>
+    <span class="desc">All /state-city/ landing pages with traffic — same period Jan 1–Mar 31 · click any column to re-sort</span>
+    <div class="section-divider"></div>
+  </div>
+  <div class="table-card">
+    <h3>State/City Pages — 2025 vs 2026 YTD</h3>
+    <p class="chart-desc">Performance of state and city browse pages. Includes all pages with page views in either year.</p>
+    <div style="overflow-x:auto;"><table id="scTable">
+      <thead><tr>
+        <th onclick="sortTbl('scTable',0,false)">Page</th>
+        <th class="num" onclick="sortTbl('scTable',1,true)">Views '25</th>
+        <th class="num" onclick="sortTbl('scTable',2,true)">Views '26</th>
+        <th class="num" onclick="sortTbl('scTable',3,true)">Δ Views</th>
+        <th class="num" onclick="sortTbl('scTable',4,true)">Res '25</th>
+        <th class="num" onclick="sortTbl('scTable',5,true)">Res '26</th>
+        <th class="num" onclick="sortTbl('scTable',6,true)">Revenue '25</th>
+        <th class="num" onclick="sortTbl('scTable',7,true)">Revenue '26</th>
+        <th class="num" onclick="sortTbl('scTable',8,true)">Δ Revenue</th>
+      </tr></thead>
+      <tbody id="scBody"></tbody>
+      <tfoot id="scFoot"></tfoot>
+    </table></div>
+  </div>
+
+  <!-- Hotel Property Pages -->
+  <div class="section-hdr">
+    <h2>Property Page Performance — 81 Hotels</h2>
+    <span class="desc">Same period Jan 1–Mar 31 · sorted by total revenue · click any column to re-sort</span>
+    <div class="section-divider"></div>
+  </div>
+  <div class="table-card">
+    <h3>Hotel Property Pages — 2025 vs 2026 YTD</h3>
+    <p class="chart-desc">Page views, reservations, and revenue per property. Both years reflect Jan 1–Mar 31 only.</p>
+    <table id="hotelTable" class="hotel-table">
+      <thead><tr>
+        <th onclick="sortTbl('hotelTable',0,false)">Property</th>
+        <th class="num" onclick="sortTbl('hotelTable',1,true)">Views '25</th>
+        <th class="num" onclick="sortTbl('hotelTable',2,true)">Views '26</th>
+        <th class="num" onclick="sortTbl('hotelTable',3,true)">Δ Views</th>
+        <th class="num" onclick="sortTbl('hotelTable',4,true)">Res '25</th>
+        <th class="num" onclick="sortTbl('hotelTable',5,true)">Res '26</th>
+        <th class="num" onclick="sortTbl('hotelTable',6,true)">Δ Res</th>
+        <th class="num" onclick="sortTbl('hotelTable',7,true)">CR '25</th>
+        <th class="num" onclick="sortTbl('hotelTable',8,true)">CR '26</th>
+        <th class="num" onclick="sortTbl('hotelTable',9,true)">Δ CR</th>
+        <th class="num" onclick="sortTbl('hotelTable',10,true)">Revenue '25</th>
+        <th class="num" onclick="sortTbl('hotelTable',11,true)">Revenue '26</th>
+        <th class="num" onclick="sortTbl('hotelTable',12,true)">Δ Revenue</th>
+      </tr></thead>
+      <tbody id="hotelBody"></tbody>
+      <tfoot id="hotelFoot"></tfoot>
+    </table>
+  </div>
+
+
+</div>
+
+<div class="footer">
+  My Place Hotels of America &nbsp;·&nbsp; Website Analytics 2026 YTD &nbsp;·&nbsp; Google Analytics 4 &nbsp;·&nbsp; Confidential — Internal Use Only
+</div>
+
+<script>
+
+const C25='#4A7FC1', C26='#FF5F00';
+
+function fmtN(n){ return n>=1e6?(n/1e6).toFixed(2)+'M':n>=1e3?(n/1e3).toFixed(1)+'K':Math.round(n).toLocaleString(); }
+function fmtR(n){ return n>=1e6?'$'+(n/1e6).toFixed(2)+'M':n>=1e3?'$'+(n/1e3).toFixed(1)+'K':'$'+Math.round(n).toLocaleString(); }
+
+// Trend chart — 2025 full year (12 pts) + 2026 YTD overlay (starts at x=0)
+function drawTrendLine(canvasId, arr25, arr26, fmtFn) {
+  const canvas = document.getElementById(canvasId); if (!canvas) return;
+  const dpr = window.devicePixelRatio || 1;
+  const W = canvas.parentElement.clientWidth || 900;
+  const H = parseInt(canvas.getAttribute('height')) || 150;
+  canvas.width = W*dpr; canvas.height = H*dpr;
+  canvas.style.width = W+'px'; canvas.style.height = H+'px';
+  const ctx = canvas.getContext('2d'); ctx.scale(dpr, dpr);
+  const PAD = {t:20,r:14,b:24,l:52};
+  const cW = W-PAD.l-PAD.r, cH = H-PAD.t-PAD.b;
+  const n = 12;
+  const maxVal = Math.max(...arr25, ...arr26) * 1.18;
+  const xp = i => PAD.l + (i/(n-1)) * cW;
+  const yp = v => PAD.t + cH * (1 - v/maxVal);
+  const moL = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  for (let i=0; i<=4; i++) {
+    const v = maxVal*i/4, y = yp(v);
+    ctx.strokeStyle='rgba(208,216,232,0.7)'; ctx.lineWidth=0.5;
+    ctx.beginPath(); ctx.moveTo(PAD.l,y); ctx.lineTo(PAD.l+cW,y); ctx.stroke();
+    ctx.fillStyle='#8ba0bf'; ctx.font='8px Arial';
+    ctx.textAlign='right'; ctx.fillText(fmtFn(v), PAD.l-4, y+3);
+  }
+  function drawLine(arr, color, fillAlpha, nPts) {
+    ctx.beginPath();
+    for (let i=0;i<nPts;i++) { i===0?ctx.moveTo(xp(i),yp(arr[i])):ctx.lineTo(xp(i),yp(arr[i])); }
+    ctx.lineTo(xp(nPts-1),PAD.t+cH); ctx.lineTo(xp(0),PAD.t+cH); ctx.closePath();
+    ctx.globalAlpha=fillAlpha; ctx.fillStyle=color; ctx.fill(); ctx.globalAlpha=1;
+    ctx.beginPath();
+    for (let i=0;i<nPts;i++) { i===0?ctx.moveTo(xp(i),yp(arr[i])):ctx.lineTo(xp(i),yp(arr[i])); }
+    ctx.strokeStyle=color; ctx.lineWidth=2; ctx.lineJoin='round'; ctx.stroke();
+    for (let i=0;i<nPts;i++) {
+      ctx.beginPath(); ctx.arc(xp(i),yp(arr[i]),3,0,Math.PI*2);
+      ctx.fillStyle=color; ctx.fill();
+    }
+  }
+  drawLine(arr25, C25, 0.07, 12);
+  drawLine(arr26, C26, 0.12, arr26.length);
+  ctx.fillStyle='#8ba0bf'; ctx.font='8px Arial'; ctx.textAlign='center';
+  for (let i=0;i<n;i++) ctx.fillText(moL[i], xp(i), H-4);
+  const p25 = arr25.indexOf(Math.max(...arr25));
+  ctx.font='bold 8px Arial'; ctx.fillStyle=C25; ctx.textAlign='center';
+  ctx.fillText(fmtFn(arr25[p25]), xp(p25), yp(arr25[p25])-6);
+  const last26 = arr26.length-1;
+  ctx.fillStyle=C26;
+  ctx.fillText(fmtFn(arr26[last26]), xp(last26), yp(arr26[last26])-6);
+}
+
+function renderHorizBars(id, channels, d25, d26, fmtFn) {
+  const el=document.getElementById(id); if(!el) return;
+  const maxV=Math.max(...channels.map(c=>Math.max(d25[c]||0,d26[c]||0)));
+  el.innerHTML=channels.map(ch=>{
+    const v25=d25[ch]||0, v26=d26[ch]||0;
+    const w25=maxV?(v25/maxV*100).toFixed(1):0, w26=maxV?(v26/maxV*100).toFixed(1):0;
+    const delta=v25>0?((v26-v25)/v25*100):999;
+    const dcls=delta>=0?'up':'down';
+    const dTxt=v25===0?'<span class="delta-pill new">New</span>'
+      :`<span class="delta-pill ${dcls}">${delta>=0?'▲':'▼'} ${Math.abs(delta).toFixed(0)}%</span>`;
+    return `<div class="ch-bar-section">
+      <div class="ch-bar-label">${ch} ${dTxt}</div>
+      <div class="bar-row"><div class="bar-yr">'25</div>
+        <div class="bar-track"><div class="bar-fill" style="width:${w25}%;background:${C25};opacity:0.75;"></div></div>
+        <div class="bar-val">${fmtFn(v25)}</div></div>
+      <div class="bar-row"><div class="bar-yr">'26</div>
+        <div class="bar-track"><div class="bar-fill" style="width:${w26}%;background:${C26};"></div></div>
+        <div class="bar-val">${fmtFn(v26)}</div></div>
+    </div>`;
+  }).join('');
+}
+
+function renderConvBars(id, channels, c25, c26) {
+  const el=document.getElementById(id); if(!el) return;
+  const rel=channels.filter(c=>(c25[c]||0)+(c26[c]||0)>0);
+  const maxR=Math.max(...rel.map(c=>Math.max(c25[c]||0,c26[c]||0)));
+  const half=Math.ceil(rel.length/2), left=rel.slice(0,half), right=rel.slice(half);
+  const barH=ch=>ch.map(c=>{
+    const v25=c25[c]||0,v26=c26[c]||0;
+    const w25=maxR?(v25/maxR*100).toFixed(1):0, w26=maxR?(v26/maxR*100).toFixed(1):0;
+    const delta=v25>0?(v26-v25):0, dcls=delta>=0?'up':'down';
+    const dTxt=v25>0?`<span class="delta-pill ${dcls}">${delta>=0?'▲':'▼'} ${Math.abs(delta).toFixed(2)}pp</span>`
+      :'<span class="delta-pill new">New</span>';
+    return `<div class="ch-bar-section">
+      <div class="ch-bar-label">${c} ${dTxt}</div>
+      <div class="bar-row"><div class="bar-yr">'25</div>
+        <div class="bar-track"><div class="bar-fill" style="width:${w25}%;background:${C25};opacity:0.75;"></div></div>
+        <div class="bar-val">${v25.toFixed(2)}%</div></div>
+      <div class="bar-row"><div class="bar-yr">'26</div>
+        <div class="bar-track"><div class="bar-fill" style="width:${w26}%;background:${C26};"></div></div>
+        <div class="bar-val">${v26.toFixed(2)}%</div></div>
+    </div>`;
+  }).join('');
+  el.innerHTML=`<div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+    <div>${barH(left)}</div><div>${barH(right)}</div></div>`;
+}
+
+let sortState={};
+function sortTbl(id, col, numeric) {
+  const tbl=document.getElementById(id);
+  const tbody=tbl.querySelector('tbody');
+  const rows=Array.from(tbody.querySelectorAll('tr'));
+  const key=id+'_'+col, asc=sortState[key]!=='asc';
+  sortState[key]=asc?'asc':'desc';
+  rows.sort((a,b)=>{
+    const rawA=a.cells[col].textContent.trim();
+    const rawB=b.cells[col].textContent.trim();
+    if (numeric) {
+      const pn=s=>{const c=s.replace(/[$+,%▲▼\s]/g,'');const m=c.match(/([-\d.]+)\s*([KMpp]*)/i);if(!m)return 0;let v=parseFloat(m[1])||0;if(m[2]==='K'||m[2]==='k')v*=1e3;if(m[2]==='M'||m[2]==='m')v*=1e6;return v;};
+      const va=pn(rawA), vb=pn(rawB);
+      return asc?va-vb:vb-va;
+    } else {
+      return asc?rawA.localeCompare(rawB):rawB.localeCompare(rawA);
+    }
+  });
+  rows.forEach(r=>tbody.appendChild(r));
+  tbl.querySelectorAll('thead th').forEach((th,i)=>{
+    th.classList.remove('sorted-asc','sorted-desc');
+    if(i===col) th.classList.add(asc?'sorted-asc':'sorted-desc');
+  });
+}
+
+function deltaCell(vA, vB, fmtFn) {
+  const d=vB-vA;
+  const cls=d>=0?'up':'down';
+  return `<td class="num delta-cell ${cls}">${d>=0?'+':''}${fmtFn(Math.abs(d))}</td>`;
+}
+
+
+const SESS25=[108237, 106918, 131521, 130678, 142011, 147726, 155916, 155428, 155329, 152108, 83970, 89512], SESS26=[108993, 111192, 131055];
+const PV25=[189448, 180120, 188424, 190942, 206481, 218774, 231487, 221669, 214385, 205680, 128397, 135738],  PV26=[168145, 170339, 196141];
+const REV25=[822187.99, 791593.74, 953700.8, 1013634.63, 1155100.64, 1302077.35, 1450383.24, 1157954.49, 1104391.13, 1010560.03, 737184.22, 732308.74],   REV26=[926365.26, 1080115.44, 1246688.57];
+const PURCH25=[2665, 2703, 3398, 3549, 3600, 3922, 4207, 3901, 3804, 3553, 2883, 2798],PURCH26=[3259, 3363, 3948];
+const CH_NAMES=["Direct", "Referral", "Cross-network", "Organic Search", "Unassigned", "Google HPA", "Paid Search", "Email", "Organic Shopping", "Organic Video", "Display", "Paid Other"];
+const CH_SESS25={"Direct": 81642, "Referral": 102282, "Cross-network": 3306, "Organic Search": 71870, "Unassigned": 32596, "Google HPA": 16212, "Paid Search": 38100, "Email": 406, "Organic Shopping": 252, "Organic Video": 10, "Display": 0, "Paid Other": 0}, CH_SESS26={"Direct": 90817, "Referral": 87859, "Cross-network": 63035, "Organic Search": 54756, "Unassigned": 19807, "Google HPA": 17109, "Paid Search": 14419, "Email": 2300, "Organic Shopping": 1101, "Organic Video": 23, "Display": 10, "Paid Other": 4};
+const CH_REV25={"Direct": 772986.36, "Referral": 154642.9, "Cross-network": 43469.61, "Organic Search": 871522.97, "Unassigned": 37757.42, "Google HPA": 342060.26, "Paid Search": 344100.82, "Email": 942.2, "Organic Shopping": 0.0, "Organic Video": 0.0, "Display": 0.0, "Paid Other": 0.0},   CH_REV26={"Direct": 1053710.99, "Referral": 219366.88, "Cross-network": 777300.97, "Organic Search": 557271.27, "Unassigned": 126551.16, "Google HPA": 295717.98, "Paid Search": 151928.15, "Email": 71321.87, "Organic Shopping": 0.0, "Organic Video": 0.0, "Display": 0.0, "Paid Other": 0.0};
+const CH_CONV25={"Direct": 3.126, "Referral": 0.426, "Cross-network": 3.327, "Organic Search": 3.882, "Unassigned": 0.439, "Google HPA": 8.228, "Paid Search": 3.669, "Email": 0.739, "Organic Shopping": 0.0, "Organic Video": 0.0, "Display": 0, "Paid Other": 0}, CH_CONV26={"Direct": 3.755, "Referral": 0.613, "Cross-network": 4.076, "Organic Search": 3.494, "Unassigned": 1.807, "Google HPA": 6.844, "Paid Search": 3.627, "Email": 3.783, "Organic Shopping": 0.0, "Organic Video": 0.0, "Display": 0.0, "Paid Other": 0.0};
+const HUB_DATA=[{"label": "Home Page", "path": "/", "v25": 46618, "v26": 62674, "ke25": 599, "ke26": 901, "r25": 216034.51, "r26": 359543.53}, {"label": "Locations Index", "path": "/locations", "v25": 11073, "v26": 15800, "ke25": 94, "ke26": 191, "r25": 20915.15, "r26": 72270.09}, {"label": "/special-offers", "path": "/special-offers", "v25": 2805, "v26": 3083, "ke25": 15, "ke26": 64, "r25": 4278.21, "r26": 17285.69}, {"label": "/reservation-list", "path": "/reservation-list", "v25": 63, "v26": 2090, "ke25": 1, "ke26": 61, "r25": 467.92, "r26": 19315.88}, {"label": "/stayrewarded", "path": "/stayrewarded", "v25": 4517, "v26": 3888, "ke25": 20, "ke26": 38, "r25": 4811.65, "r26": 14127.04}, {"label": "/signin", "path": "/signin", "v25": 6005, "v26": 3315, "ke25": 30, "ke26": 24, "r25": 7558.27, "r26": 5213.91}, {"label": "/about", "path": "/about", "v25": 1246, "v26": 1321, "ke25": 5, "ke26": 8, "r25": 2267.92, "r26": 7587.84}, {"label": "/search", "path": "/search", "v25": 5245, "v26": 1534, "ke25": 35, "ke26": 4, "r25": 8005.89, "r26": 967.72}, {"label": "/extended-stay", "path": "/extended-stay", "v25": 1112, "v26": 2008, "ke25": 0, "ke26": 3, "r25": 0.0, "r26": 7026.65}, {"label": "/special-offers/military-discount", "path": "/special-offers/military-discount", "v25": 149, "v26": 197, "ke25": 2, "ke26": 5, "r25": 407.9, "r26": 4041.16}, {"label": "/search-results", "path": "/search-results", "v25": 58, "v26": 37, "ke25": 1, "ke26": 0, "r25": 2856.96, "r26": 0.0}, {"label": "/extended-stay/medical-patients", "path": "/extended-stay/medical-patients", "v25": 34, "v26": 47, "ke25": 2, "ke26": 0, "r25": 2176.0, "r26": 0.0}, {"label": "/amenities-and-features", "path": "/amenities-and-features", "v25": 483, "v26": 1680, "ke25": 0, "ke26": 3, "r25": 0.0, "r26": 2136.3}, {"label": "/contact-us", "path": "/contact-us", "v25": 738, "v26": 921, "ke25": 6, "ke26": 2, "r25": 1813.9, "r26": 313.36}, {"label": "/corporate-groups", "path": "/corporate-groups", "v25": 904, "v26": 418, "ke25": 1, "ke26": 3, "r25": 110.95, "r26": 1274.9}, {"label": "/top-locations/south-dakota/rapid-city", "path": "/top-locations/south-dakota/rapid-city", "v25": 0, "v26": 66, "ke25": 0, "ke26": 4, "r25": 0.0, "r26": 1025.4}, {"label": "/travel-blog/welcome-to-plainfield", "path": "/travel-blog/welcome-to-plainfield", "v25": 27, "v26": 41, "ke25": 1, "ke26": 1, "r25": 259.98, "r26": 733.9}, {"label": "/travel-blog/my-place-hotels-of-america-makes-the-first-move-to-expand-brand-options-for-hoteliers", "path": "/travel-blog/my-place-hotels-of-america-makes-the-first-move-to-expand-brand-options-for-hoteliers", "v25": 326, "v26": 142, "ke25": 1, "ke26": 0, "r25": 837.45, "r26": 0.0}, {"label": "/special-offers/stay-rewarded", "path": "/special-offers/stay-rewarded", "v25": 221, "v26": 729, "ke25": 0, "ke26": 6, "r25": 0.0, "r26": 817.01}, {"label": "/security-privacy", "path": "/security-privacy", "v25": 512, "v26": 214, "ke25": 2, "ke26": 0, "r25": 677.0, "r26": 0.0}, {"label": "/ditections", "path": "/ditections", "v25": 12, "v26": 0, "ke25": 1, "ke26": 0, "r25": 660.0, "r26": 0.0}, {"label": "/travel-blog/my-place-expands-to-30th-state-with-opening-of-randolph-vermont", "path": "/travel-blog/my-place-expands-to-30th-state-with-opening-of-randolph-vermont", "v25": 88, "v26": 34, "ke25": 1, "ke26": 1, "r25": 129.0, "r26": 529.0}, {"label": "/location", "path": "/location", "v25": 0, "v26": 1562, "ke25": 0, "ke26": 1, "r25": 0.0, "r26": 628.89}, {"label": "/special-offers/breakfast-in-bed", "path": "/special-offers/breakfast-in-bed", "v25": 276, "v26": 0, "ke25": 2, "ke26": 0, "r25": 609.8, "r26": 0.0}, {"label": "/pet-policy", "path": "/pet-policy", "v25": 0, "v26": 531, "ke25": 0, "ke26": 3, "r25": 0.0, "r26": 578.16}, {"label": "/top-locations/nevada/carson-city", "path": "/top-locations/nevada/carson-city", "v25": 0, "v26": 43, "ke25": 0, "ke26": 2, "r25": 0.0, "r26": 498.0}, {"label": "/my-place-hotel-pasco-wa", "path": "/my-place-hotel-pasco-wa", "v25": 37, "v26": 30, "ke25": 1, "ke26": 0, "r25": 486.16, "r26": 0.0}, {"label": "/about/always-clean", "path": "/about/always-clean", "v25": 409, "v26": 48, "ke25": 2, "ke26": 0, "r25": 412.0, "r26": 0.0}, {"label": "/frontstretch", "path": "/frontstretch", "v25": 0, "v26": 252, "ke25": 0, "ke26": 3, "r25": 0.0, "r26": 402.5}, {"label": "/special-offers/aaa-discount", "path": "/special-offers/aaa-discount", "v25": 81, "v26": 64, "ke25": 0, "ke26": 1, "r25": 0.0, "r26": 320.4}, {"label": "/top-locations/utah/hurricane", "path": "/top-locations/utah/hurricane", "v25": 0, "v26": 228, "ke25": 0, "ke26": 1, "r25": 0.0, "r26": 306.0}, {"label": "/top-locations/south-dakota/sioux-falls", "path": "/top-locations/south-dakota/sioux-falls", "v25": 0, "v26": 28, "ke25": 0, "ke26": 1, "r25": 0.0, "r26": 303.3}, {"label": "/travel-blog/my-place-hotels-of-america-opens-my-place-hotels-grand-rapids-mn", "path": "/travel-blog/my-place-hotels-of-america-opens-my-place-hotels-grand-rapids-mn", "v25": 20, "v26": 9, "ke25": 1, "ke26": 0, "r25": 278.98, "r26": 0.0}, {"label": "/travel-blog/game-on-for-year-three-my-place-hotels---summit-league", "path": "/travel-blog/game-on-for-year-three-my-place-hotels---summit-league", "v25": 0, "v26": 45, "ke25": 0, "ke26": 2, "r25": 0.0, "r26": 271.99}, {"label": "/top-locations/arizona/mesa", "path": "/top-locations/arizona/mesa", "v25": 0, "v26": 83, "ke25": 0, "ke26": 1, "r25": 0.0, "r26": 246.1}, {"label": "/travel-blog/my-place-hotels-keeps-up-the-momentum-with-opening-64-in-portland-east-gresham-or", "path": "/travel-blog/my-place-hotels-keeps-up-the-momentum-with-opening-64-in-portland-east-gresham-or", "v25": 8, "v26": 107, "ke25": 0, "ke26": 1, "r25": 0.0, "r26": 198.0}, {"label": "/about/careers", "path": "/about/careers", "v25": 1111, "v26": 1399, "ke25": 1, "ke26": 0, "r25": 197.08, "r26": 0.0}, {"label": "/my-revpulse", "path": "/my-revpulse", "v25": 0, "v26": 47, "ke25": 0, "ke26": 2, "r25": 0.0, "r26": 190.4}, {"label": "/about/franchising-2", "path": "/about/franchising-2", "v25": 0, "v26": 105, "ke25": 0, "ke26": 2, "r25": 0.0, "r26": 169.2}, {"label": "/travel-blog/an-a-maize-ing-grand-opening-in-mitchell-sd", "path": "/travel-blog/an-a-maize-ing-grand-opening-in-mitchell-sd", "v25": 19, "v26": 0, "ke25": 1, "ke26": 0, "r25": 129.49, "r26": 0.0}, {"label": "/top-locations/south-dakota/mitchell", "path": "/top-locations/south-dakota/mitchell", "v25": 0, "v26": 54, "ke25": 0, "ke26": 1, "r25": 0.0, "r26": 124.99}, {"label": "/travel-blog/my-place-hotels-of-america-opens-largest-property-to-date-my-place-hotel-las-vegas-south-henderson-nv", "path": "/travel-blog/my-place-hotels-of-america-opens-largest-property-to-date-my-place-hotel-las-vegas-south-henderson-nv", "v25": 60, "v26": 50, "ke25": 1, "ke26": 0, "r25": 119.0, "r26": 0.0}, {"label": "/accessibility", "path": "/accessibility", "v25": 67, "v26": 90, "ke25": 0, "ke26": 1, "r25": 0.0, "r26": 113.05}, {"label": "/travel-blog/my-place-hotels-of-america-opens-location-in-mitchell-sd", "path": "/travel-blog/my-place-hotels-of-america-opens-location-in-mitchell-sd", "v25": 55, "v26": 15, "ke25": 1, "ke26": 0, "r25": 109.49, "r26": 0.0}, {"label": "/travel-blog/my-place-hotels-makes-its-29th-state-debut-with-the-opening-of-hotel-58-in-marion-ohio", "path": "/travel-blog/my-place-hotels-makes-its-29th-state-debut-with-the-opening-of-hotel-58-in-marion-ohio", "v25": 28, "v26": 41, "ke25": 0, "ke26": 1, "r25": 0.0, "r26": 101.7}, {"label": "/special-offers/senior-discount", "path": "/special-offers/senior-discount", "v25": 84, "v26": 231, "ke25": 0, "ke26": 1, "r25": 0.0, "r26": 99.0}];
+const HOTEL_DATA=[{"label": "My Place Hotel-Carson City/Reno, NV", "path": "/locations/my-place-hotel-carson-city-nv", "v25": 7562, "v26": 7099, "ke25": 168, "ke26": 248, "r25": 54452.76, "r26": 92985.51, "cr25": 2.22, "cr26": 3.49}, {"label": "My Place Hotel-Kalispell, MT", "path": "/locations/my-place-hotel-kalispell-mt", "v25": 7622, "v26": 7840, "ke25": 194, "ke26": 224, "r25": 62544.48, "r26": 82608.76, "cr25": 2.55, "cr26": 2.86}, {"label": "My Place Hotel-Loveland, CO", "path": "/locations/my-place-hotel-loveland-co", "v25": 6126, "v26": 5143, "ke25": 79, "ke26": 144, "r25": 33656.33, "r26": 103897.46, "cr25": 1.29, "cr26": 2.8}, {"label": "My Place Hotel-Tucson South, AZ", "path": "/locations/my-place-hotel-tucson-south-az", "v25": 9708, "v26": 9933, "ke25": 317, "ke26": 172, "r25": 93469.65, "r26": 44046.13, "cr25": 3.27, "cr26": 1.73}, {"label": "My Place Hotel-Randolph, VT", "path": "/locations/my-place-hotel-randolph-vt", "v25": 15256, "v26": 7181, "ke25": 219, "ke26": 247, "r25": 69711.34, "r26": 64449.78, "cr25": 1.44, "cr26": 3.44}, {"label": "My Place Hotel-Dahlgren/King George, VA", "path": "/locations/my-place-hotel-dahlgren-king-george-va", "v25": 5292, "v26": 5083, "ke25": 98, "ke26": 151, "r25": 38966.17, "r26": 89270.86, "cr25": 1.85, "cr26": 2.97}, {"label": "My Place Hotel-Boise/Meridian, ID", "path": "/locations/my-place-hotel-meridian-id", "v25": 9992, "v26": 9487, "ke25": 231, "ke26": 220, "r25": 58130.54, "r26": 66479.19, "cr25": 2.31, "cr26": 2.32}, {"label": "My Place Hotel-Moab, UT", "path": "/locations/my-place-hotel-moab-ut", "v25": 11337, "v26": 8250, "ke25": 139, "ke26": 159, "r25": 51925.41, "r26": 67101.5, "cr25": 1.23, "cr26": 1.93}, {"label": "My Place Hotel-Colorado Springs, CO", "path": "/locations/my-place-hotel-colorado-springs-co", "v25": 7154, "v26": 8366, "ke25": 163, "ke26": 268, "r25": 40747.14, "r26": 77790.25, "cr25": 2.28, "cr26": 3.2}, {"label": "My Place Hotel-Boise/Nampa, ID-Idaho Center", "path": "/locations/my-place-hotel-nampa-ididaho-center", "v25": 10279, "v26": 6774, "ke25": 275, "ke26": 161, "r25": 69155.4, "r26": 47743.13, "cr25": 2.68, "cr26": 2.38}, {"label": "My Place Hotel-Ketchikan, AK", "path": "/locations/my-place-hotel-ketchikan-ak", "v25": 6345, "v26": 3813, "ke25": 120, "ke26": 115, "r25": 46932.02, "r26": 59657.13, "cr25": 1.89, "cr26": 3.02}, {"label": "My Place Hotel-Anchorage, AK", "path": "/locations/my-place-hotel-anchorage-ak", "v25": 7984, "v26": 5315, "ke25": 139, "ke26": 83, "r25": 69399.54, "r26": 36998.75, "cr25": 1.74, "cr26": 1.56}, {"label": "My Place Hotel-Tucson North/Marana/Cortaro", "path": "/locations/my-place-hotel-tucson-north-maranacortaro-az", "v25": 10931, "v26": 6437, "ke25": 161, "ke26": 124, "r25": 58748.56, "r26": 44115.94, "cr25": 1.47, "cr26": 1.93}, {"label": "My Place Hotel-Phoenix East/Mesa, AZ", "path": "/locations/my-place-hotel-phoenix-east-mesa-az", "v25": 0, "v26": 13004, "ke25": 0, "ke26": 266, "r25": 0.0, "r26": 102350.46, "cr25": 0, "cr26": 2.05}, {"label": "My Place Hotel-North Las Vegas, NV", "path": "/locations/my-place-hotel-north-las-vegas-nv", "v25": 9233, "v26": 7364, "ke25": 90, "ke26": 78, "r25": 56092.76, "r26": 34700.64, "cr25": 0.97, "cr26": 1.06}, {"label": "My Place Hotel-St. George, UT", "path": "/locations/my-place-hotel-st-george-ut", "v25": 11404, "v26": 5770, "ke25": 164, "ke26": 127, "r25": 52328.18, "r26": 36758.31, "cr25": 1.44, "cr26": 2.2}, {"label": "My Place Hotel-Brookings, SD", "path": "/locations/my-place-hotel-brookings-sd", "v25": 6962, "v26": 5384, "ke25": 198, "ke26": 147, "r25": 43215.07, "r26": 45045.81, "cr25": 2.84, "cr26": 2.73}, {"label": "My Place Hotel-Phoenix West/Buckeye, AZ", "path": "/locations/my-place-hotel-phoenix-westbuckeye-az", "v25": 7178, "v26": 6862, "ke25": 100, "ke26": 55, "r25": 55835.05, "r26": 23389.86, "cr25": 1.39, "cr26": 0.8}, {"label": "My Place Hotel-Hurricane Zion National Park, UT", "path": "/locations/my-place-hotel-hurricane-ut", "v25": 6630, "v26": 6632, "ke25": 135, "ke26": 158, "r25": 40621.99, "r26": 36702.89, "cr25": 2.04, "cr26": 2.38}, {"label": "My Place Hotel-Missoula, MT", "path": "/locations/my-place-hotel-missoula", "v25": 5371, "v26": 5918, "ke25": 120, "ke26": 159, "r25": 34437.11, "r26": 42229.27, "cr25": 2.23, "cr26": 2.69}, {"label": "My Place Hotel-Jacksonville/Camp Lejeune, NC", "path": "/locations/my-place-hotel-jacksonville-nc", "v25": 7972, "v26": 7374, "ke25": 188, "ke26": 136, "r25": 38456.1, "r26": 37022.9, "cr25": 2.36, "cr26": 1.84}, {"label": "My Place Hotel-Minneapolis/Shakopee, MN", "path": "/locations/my-place-hotel-minneapolis-shakopee-mn", "v25": 6405, "v26": 8108, "ke25": 60, "ke26": 214, "r25": 20472.72, "r26": 53792.02, "cr25": 0.94, "cr26": 2.64}, {"label": "My Place Hotel-Rapid City, SD", "path": "/locations/my-place-hotel-rapid-city-sd", "v25": 5817, "v26": 4618, "ke25": 122, "ke26": 138, "r25": 44350.49, "r26": 29113.78, "cr25": 2.1, "cr26": 2.99}, {"label": "My Place Hotel-Pasco/Tri Cities, WA", "path": "/locations/my-place-hotel-pasco-tri-cities-wa", "v25": 4702, "v26": 5361, "ke25": 62, "ke26": 141, "r25": 21045.14, "r26": 52329.13, "cr25": 1.32, "cr26": 2.63}, {"label": "My Place Hotel-Huntersville, NC", "path": "/locations/my-place-hotel-huntersville-nc", "v25": 7250, "v26": 5950, "ke25": 111, "ke26": 137, "r25": 36508.03, "r26": 35458.6, "cr25": 1.53, "cr26": 2.3}, {"label": "My Place Hotel-Green Bay, WI", "path": "/locations/my-place-hotel-green-bay-wi", "v25": 6320, "v26": 6265, "ke25": 102, "ke26": 171, "r25": 34791.96, "r26": 35376.15, "cr25": 1.61, "cr26": 2.73}, {"label": "My Place Hotel-Marion, OH", "path": "/locations/my-place-hotel-marion-oh", "v25": 8033, "v26": 5356, "ke25": 154, "ke26": 115, "r25": 35757.91, "r26": 32602.45, "cr25": 1.92, "cr26": 2.15}, {"label": "My Place Hotel-Davenport/Quad Cities, IA", "path": "/locations/my-place-hotel-davenport-ia", "v25": 6532, "v26": 6230, "ke25": 133, "ke26": 147, "r25": 29712.09, "r26": 36813.61, "cr25": 2.04, "cr26": 2.36}, {"label": "My Place Hotel-Vancouver, WA", "path": "/locations/my-place-hotels-vancouver-wa", "v25": 6626, "v26": 5978, "ke25": 209, "ke26": 205, "r25": 36911.02, "r26": 28709.97, "cr25": 3.15, "cr26": 3.43}, {"label": "My Place Hotel-Las Vegas South/Henderson, NV", "path": "/locations/my-place-hotel-las-vegas-south-henderson-nv", "v25": 9694, "v26": 6828, "ke25": 92, "ke26": 102, "r25": 29421.85, "r26": 35209.43, "cr25": 0.95, "cr26": 1.49}, {"label": "My Place Hotel-Medford, OR", "path": "/locations/my-place-hotel-medford-or", "v25": 9026, "v26": 4816, "ke25": 220, "ke26": 104, "r25": 43181.31, "r26": 20759.85, "cr25": 2.44, "cr26": 2.16}, {"label": "My Place Hotel-Bend, OR", "path": "/locations/my-place-hotel-bend-or", "v25": 8954, "v26": 6708, "ke25": 115, "ke26": 143, "r25": 27213.76, "r26": 34777.49, "cr25": 1.28, "cr26": 2.13}, {"label": "My Place Hotel-Portland East, OR", "path": "/locations/my-place-hotel-portland-east-or", "v25": 7151, "v26": 4837, "ke25": 100, "ke26": 89, "r25": 36774.22, "r26": 24617.84, "cr25": 1.4, "cr26": 1.84}, {"label": "My Place Hotel-Jamestown, ND", "path": "/locations/my-place-hotel-jamestown-nd", "v25": 5007, "v26": 3771, "ke25": 66, "ke26": 132, "r25": 12300.58, "r26": 47487.6, "cr25": 1.32, "cr26": 3.5}, {"label": "My Place Hotel-Grand Rapids, MN", "path": "/locations/my-place-hotel-grand-rapids-mn", "v25": 5812, "v26": 4856, "ke25": 83, "ke26": 85, "r25": 27984.49, "r26": 31402.81, "cr25": 1.43, "cr26": 1.75}, {"label": "My Place Hotel-Wenatchee, WA", "path": "/locations/my-place-hotel-wenatchee-wa", "v25": 5886, "v26": 3724, "ke25": 121, "ke26": 95, "r25": 37616.56, "r26": 21157.43, "cr25": 2.06, "cr26": 2.55}, {"label": "My Place Hotel-Salt Lake City/West Jordan, UT", "path": "/locations/my-place-hotel-west-jordan-ut", "v25": 8355, "v26": 4411, "ke25": 125, "ke26": 96, "r25": 26401.75, "r26": 32321.41, "cr25": 1.5, "cr26": 2.18}, {"label": "My Place Hotel-Twin Falls, ID", "path": "/locations/my-place-hotel-twin-falls-id", "v25": 5820, "v26": 5054, "ke25": 185, "ke26": 144, "r25": 25852.95, "r26": 32085.43, "cr25": 3.18, "cr26": 2.85}, {"label": "My Place Hotel-Mitchell, SD", "path": "/locations/my-place-hotel-mitchell-sd", "v25": 6981, "v26": 3381, "ke25": 145, "ke26": 95, "r25": 28167.09, "r26": 29671.05, "cr25": 2.08, "cr26": 2.81}, {"label": "My Place Hotel-Marquette, MI", "path": "/locations/my-place-hotel-marquette-mi", "v25": 4029, "v26": 5692, "ke25": 64, "ke26": 120, "r25": 19365.62, "r26": 36760.35, "cr25": 1.59, "cr26": 2.11}, {"label": "My Place Hotel-Salt Lake City/West Valley City, UT", "path": "/locations/my-place-hotel-west-valley-city-ut", "v25": 6181, "v26": 5946, "ke25": 134, "ke26": 127, "r25": 24278.6, "r26": 30114.17, "cr25": 2.17, "cr26": 2.14}, {"label": "My Place Hotel-East Moline/Quad Cities, IL", "path": "/locations/my-place-hotel-east-molinequad-cities-il", "v25": 6000, "v26": 6345, "ke25": 131, "ke26": 148, "r25": 26655.09, "r26": 27238.79, "cr25": 2.18, "cr26": 2.33}, {"label": "My Place Hotel-Council Bluffs/Omaha East, IA", "path": "/locations/my-place-hotel-council-bluffs-ia", "v25": 5725, "v26": 5900, "ke25": 99, "ke26": 111, "r25": 26890.79, "r26": 26238.02, "cr25": 1.73, "cr26": 1.88}, {"label": "My Place Hotel-Watertown, SD", "path": "/locations/my-place-hotel-watertown-sd", "v25": 3641, "v26": 4497, "ke25": 54, "ke26": 174, "r25": 12533.22, "r26": 39245.58, "cr25": 1.48, "cr26": 3.87}, {"label": "My Place Hotel-Altoona/Des Moines, IA", "path": "/locations/my-place-hotel-altoona-des-moines-ia", "v25": 5814, "v26": 5724, "ke25": 84, "ke26": 96, "r25": 19226.79, "r26": 30456.48, "cr25": 1.44, "cr26": 1.68}, {"label": "My Place Hotel-Idaho Falls, ID", "path": "/locations/my-place-hotel-idaho-falls-id", "v25": 6560, "v26": 4556, "ke25": 128, "ke26": 108, "r25": 25697.15, "r26": 22214.61, "cr25": 1.95, "cr26": 2.37}, {"label": "My Place Hotel-Midland, TX", "path": "/locations/my-place-hotel-midland-tx", "v25": 4594, "v26": 3798, "ke25": 37, "ke26": 60, "r25": 9988.36, "r26": 36562.88, "cr25": 0.81, "cr26": 1.58}, {"label": "My Place Hotel-Billings, MT", "path": "/locations/my-place-hotel-billings-mt", "v25": 3556, "v26": 4777, "ke25": 52, "ke26": 129, "r25": 11632.77, "r26": 34018.18, "cr25": 1.46, "cr26": 2.7}, {"label": "My Place Hotel-Fort Pierre, SD", "path": "/locations/my-place-hotel-fort-pierre", "v25": 4228, "v26": 3923, "ke25": 59, "ke26": 73, "r25": 26373.88, "r26": 19081.95, "cr25": 1.4, "cr26": 1.86}, {"label": "My Place Hotel-St. Joseph, MO", "path": "/locations/my-place-hotel-st-joseph-mo", "v25": 6568, "v26": 3553, "ke25": 101, "ke26": 104, "r25": 22440.04, "r26": 21490.69, "cr25": 1.54, "cr26": 2.93}, {"label": "My Place Hotel-Bismarck, ND", "path": "/locations/my-place-hotel-bismarck-nd", "v25": 5269, "v26": 4488, "ke25": 86, "ke26": 119, "r25": 25594.35, "r26": 18268.74, "cr25": 1.63, "cr26": 2.65}, {"label": "My Place Hotel-Aberdeen, SD", "path": "/locations/my-place-hotel-aberdeen-sd", "v25": 4663, "v26": 4555, "ke25": 76, "ke26": 25, "r25": 30730.78, "r26": 12384.66, "cr25": 1.63, "cr26": 0.55}, {"label": "My Place Hotel-Bentonville, AR", "path": "/locations/my-place-hotel-bentonville-rogers-ar", "v25": 1724, "v26": 3642, "ke25": 1, "ke26": 100, "r25": 188.1, "r26": 41710.47, "cr25": 0.06, "cr26": 2.75}, {"label": "My Place Hotel-Yakima, WA", "path": "/locations/my-place-hotel-yakima-wa", "v25": 4382, "v26": 2897, "ke25": 58, "ke26": 73, "r25": 25455.12, "r26": 15036.58, "cr25": 1.32, "cr26": 2.52}, {"label": "My Place Hotel-Overland Park, KS", "path": "/locations/my-place-hotel-overland-park-ks", "v25": 6898, "v26": 5078, "ke25": 61, "ke26": 83, "r25": 18696.39, "r26": 21495.19, "cr25": 0.88, "cr26": 1.63}, {"label": "My Place Hotel-Bozeman, MT", "path": "/locations/my-place-hotel-bozeman-mt", "v25": 5565, "v26": 4353, "ke25": 67, "ke26": 91, "r25": 16470.36, "r26": 22999.0, "cr25": 1.2, "cr26": 2.09}, {"label": "My Place Hotel-South Omaha/La Vista, NE", "path": "/locations/my-place-hotel-la-vista-ne", "v25": 3926, "v26": 3588, "ke25": 75, "ke26": 67, "r25": 20508.53, "r26": 17479.23, "cr25": 1.91, "cr26": 1.87}, {"label": "My Place Hotel-Augusta, GA", "path": "/locations/my-place-hotel-augusta", "v25": 212, "v26": 5025, "ke25": 0, "ke26": 78, "r25": 0.0, "r26": 37095.99, "cr25": 0.0, "cr26": 1.55}, {"label": "My Place Hotel-Nashville East/Lebanon, TN", "path": "/locations/my-place-lebanon-tn", "v25": 5865, "v26": 4537, "ke25": 63, "ke26": 62, "r25": 15882.47, "r26": 19353.29, "cr25": 1.07, "cr26": 1.37}, {"label": "My Place Hotel-Hastings, NE", "path": "/locations/my-place-hotel-hastings-ne", "v25": 4609, "v26": 3624, "ke25": 70, "ke26": 74, "r25": 18827.23, "r26": 16305.7, "cr25": 1.52, "cr26": 2.04}, {"label": "My Place Hotel-Beatrice, NE", "path": "/locations/my-place-hotel-beatrice-ne", "v25": 4749, "v26": 2413, "ke25": 87, "ke26": 65, "r25": 22157.44, "r26": 12698.93, "cr25": 1.83, "cr26": 2.69}, {"label": "My Place Hotel-Sioux Falls, SD", "path": "/locations/my-place-hotel-sioux-falls-sd", "v25": 5421, "v26": 5986, "ke25": 53, "ke26": 123, "r25": 14459.95, "r26": 19354.67, "cr25": 0.98, "cr26": 2.05}, {"label": "My Place Hotel-Ankeny/Des Moines, IA", "path": "/locations/my-place-hotel-ankeny-des-moines-ia", "v25": 7916, "v26": 4017, "ke25": 83, "ke26": 54, "r25": 15367.0, "r26": 18320.35, "cr25": 1.05, "cr26": 1.34}, {"label": "My Place Hotel-Cheyenne, WY", "path": "/locations/my-place-hotel-cheyenne-wy", "v25": 3698, "v26": 3889, "ke25": 64, "ke26": 40, "r25": 19575.69, "r26": 13914.03, "cr25": 1.73, "cr26": 1.03}, {"label": "My Place Hotel-Kansas City East/Independence, MO", "path": "/locations/my-place-hotel-independence-mo", "v25": 4242, "v26": 4699, "ke25": 47, "ke26": 94, "r25": 13785.34, "r26": 17875.04, "cr25": 1.11, "cr26": 2.0}, {"label": "My Place Hotel-Wixom/Novi/Detroit, MI", "path": "/locations/my-place-hotel-wixom-mi", "v25": 4048, "v26": 4517, "ke25": 71, "ke26": 59, "r25": 16364.2, "r26": 14633.19, "cr25": 1.75, "cr26": 1.31}, {"label": "My Place Hotel-Mount Pleasant, WI", "path": "/locations/my-place-hotel-mount-pleasant-wi", "v25": 5526, "v26": 3182, "ke25": 41, "ke26": 66, "r25": 10079.3, "r26": 20686.41, "cr25": 0.74, "cr26": 2.07}, {"label": "My Place Hotel-Indianapolis Airport/Plainfeild", "path": "/locations/my-place-hotel-indianapolis-airportplainfield-in", "v25": 4258, "v26": 4664, "ke25": 52, "ke26": 100, "r25": 9330.04, "r26": 21285.96, "cr25": 1.22, "cr26": 2.14}, {"label": "My Place Hotel-Grand Forks, ND", "path": "/locations/my-place-hotel-grand-forks-nd", "v25": 4182, "v26": 4052, "ke25": 30, "ke26": 82, "r25": 11232.63, "r26": 18605.23, "cr25": 0.72, "cr26": 2.02}, {"label": "My Place Hotel-Fargo, ND", "path": "/locations/my-place-hotel-fargo-nd", "v25": 5785, "v26": 4699, "ke25": 35, "ke26": 107, "r25": 7841.98, "r26": 20894.77, "cr25": 0.61, "cr26": 2.28}, {"label": "My Place Hotel-Raleigh/Garner, NC", "path": "/locations/my-place-hotel-raleigh-garner-nc", "v25": 561, "v26": 5463, "ke25": 2, "ke26": 101, "r25": 235.6, "r26": 27930.05, "cr25": 0.36, "cr26": 1.85}, {"label": "My Place Hotel-Savannah Aiport/Pooler, GA", "path": "/locations/savannah-airport-pooler-ga", "v25": 3042, "v26": 4211, "ke25": 10, "ke26": 98, "r25": 2068.2, "r26": 23325.79, "cr25": 0.33, "cr26": 2.33}, {"label": "My Place Hotel-Amarillo West/Medical Center, TX", "path": "/locations/my-place-hotel-amarillo-tx", "v25": 4538, "v26": 4164, "ke25": 96, "ke26": 114, "r25": 10728.17, "r26": 14412.08, "cr25": 2.12, "cr26": 2.74}, {"label": "My Place Hotel-Dickinson, ND", "path": "/locations/my-place-hotel-dickinson-nd", "v25": 3770, "v26": 2836, "ke25": 24, "ke26": 52, "r25": 9854.54, "r26": 13370.55, "cr25": 0.64, "cr26": 1.83}, {"label": "My Place Hotel-Atlanta West/Lithia Springs, GA", "path": "/locations/my-place-hotel-lithia-springs-ga", "v25": 3418, "v26": 3257, "ke25": 8, "ke26": 38, "r25": 2371.33, "r26": 15586.21, "cr25": 0.23, "cr26": 1.17}, {"label": "My Place Hotel-Pittsburgh North/Monaca, PA", "path": "/locations/my-place-beavervalley-pa", "v25": 3757, "v26": 3292, "ke25": 39, "ke26": 36, "r25": 11226.74, "r26": 6057.5, "cr25": 1.04, "cr26": 1.09}, {"label": "My Place Hotel-Redding, CA", "path": "/locations/my-place-hotel-redding-ca", "v25": 384, "v26": 3915, "ke25": 0, "ke26": 70, "r25": 0.0, "r26": 14570.62, "cr25": 0.0, "cr26": 1.79}, {"label": "My Place Hotel-Lubbock, TX", "path": "/locations/my-place-hotel-lubbock-tx", "v25": 2405, "v26": 3177, "ke25": 19, "ke26": 45, "r25": 4735.88, "r26": 9510.63, "cr25": 0.79, "cr26": 1.42}, {"label": "My Place Hotel-Rock Springs, WY", "path": "/locations/my-place-hotel-rock-springs-wy", "v25": 2907, "v26": 1753, "ke25": 15, "ke26": 33, "r25": 6288.04, "r26": 4278.28, "cr25": 0.52, "cr26": 1.88}, {"label": "My Place Hotel-Port Charlotte/Punta Gorda, FL", "path": "/locations/my-place-hotel-punta-gorda-fl", "v25": 0, "v26": 654, "ke25": 0, "ke26": 1, "r25": 0.0, "r26": 80.0, "cr25": 0, "cr26": 0.15}, {"label": "My Place Hotel-Jonesboro, AR", "path": "/locations/my-place-hotel-jonesboro-ar", "v25": 0, "v26": 2047, "ke25": 0, "ke26": 0, "r25": 0.0, "r26": 0.0, "cr25": 0, "cr26": 0.0}];
+const SC_DATA=[{"label": "/state-city/utah/hurricane", "path": "/state-city/utah/hurricane", "v25": 0, "v26": 309, "ke25": 0, "ke26": 5, "r25": 0.0, "r26": 770.0}, {"label": "/state-city/utah/moab", "path": "/state-city/utah/moab", "v25": 0, "v26": 135, "ke25": 0, "ke26": 0, "r25": 0.0, "r26": 0.0}, {"label": "/state-city/utah/st-george", "path": "/state-city/utah/st-george", "v25": 0, "v26": 127, "ke25": 0, "ke26": 0, "r25": 0.0, "r26": 0.0}, {"label": "/state-city/utah", "path": "/state-city/utah", "v25": 0, "v26": 96, "ke25": 0, "ke26": 1, "r25": 0.0, "r26": 95.0}, {"label": "/state-city/arizona/tucson", "path": "/state-city/arizona/tucson", "v25": 0, "v26": 80, "ke25": 0, "ke26": 0, "r25": 0.0, "r26": 0.0}, {"label": "/state-city/south-dakota/aberdeen", "path": "/state-city/south-dakota/aberdeen", "v25": 0, "v26": 51, "ke25": 0, "ke26": 0, "r25": 0.0, "r26": 0.0}, {"label": "/state-city/south-dakota", "path": "/state-city/south-dakota", "v25": 0, "v26": 46, "ke25": 0, "ke26": 0, "r25": 0.0, "r26": 0.0}, {"label": "/state-city/south-dakota/mitchell", "path": "/state-city/south-dakota/mitchell", "v25": 0, "v26": 43, "ke25": 0, "ke26": 1, "r25": 0.0, "r26": 151.49}, {"label": "/state-city/nevada/henderson", "path": "/state-city/nevada/henderson", "v25": 0, "v26": 39, "ke25": 0, "ke26": 1, "r25": 0.0, "r26": 135.0}, {"label": "/state-city/nevada/carson-city", "path": "/state-city/nevada/carson-city", "v25": 0, "v26": 37, "ke25": 0, "ke26": 1, "r25": 0.0, "r26": 139.0}, {"label": "/state-city/georgia/pooler", "path": "/state-city/georgia/pooler", "v25": 0, "v26": 35, "ke25": 0, "ke26": 0, "r25": 0.0, "r26": 0.0}, {"label": "/state-city/south-dakota/sioux-falls", "path": "/state-city/south-dakota/sioux-falls", "v25": 0, "v26": 34, "ke25": 0, "ke26": 0, "r25": 0.0, "r26": 0.0}, {"label": "/state-city/georgia/augusta", "path": "/state-city/georgia/augusta", "v25": 0, "v26": 30, "ke25": 0, "ke26": 0, "r25": 0.0, "r26": 0.0}, {"label": "/state-city/georgia/lithia-springs", "path": "/state-city/georgia/lithia-springs", "v25": 0, "v26": 29, "ke25": 0, "ke26": 0, "r25": 0.0, "r26": 0.0}, {"label": "/state-city/south-dakota/brookings", "path": "/state-city/south-dakota/brookings", "v25": 0, "v26": 23, "ke25": 0, "ke26": 1, "r25": 0.0, "r26": 850.0}, {"label": "/state-city/south-dakota/rapid-city", "path": "/state-city/south-dakota/rapid-city", "v25": 0, "v26": 14, "ke25": 0, "ke26": 1, "r25": 0.0, "r26": 774.16}, {"label": "/state-city/nevada/north-las-vegas", "path": "/state-city/nevada/north-las-vegas", "v25": 0, "v26": 14, "ke25": 0, "ke26": 0, "r25": 0.0, "r26": 0.0}, {"label": "/state-city/arizona/buckeye", "path": "/state-city/arizona/buckeye", "v25": 0, "v26": 11, "ke25": 0, "ke26": 0, "r25": 0.0, "r26": 0.0}, {"label": "/state-city/arizona", "path": "/state-city/arizona", "v25": 0, "v26": 8, "ke25": 0, "ke26": 0, "r25": 0.0, "r26": 0.0}, {"label": "/state-city/idaho/twin-falls", "path": "/state-city/idaho/twin-falls", "v25": 0, "v26": 6, "ke25": 0, "ke26": 0, "r25": 0.0, "r26": 0.0}, {"label": "/state-city/nevada/las-vegas", "path": "/state-city/nevada/las-vegas", "v25": 0, "v26": 5, "ke25": 0, "ke26": 0, "r25": 0.0, "r26": 0.0}, {"label": "/state-city/georgia", "path": "/state-city/georgia", "v25": 0, "v26": 4, "ke25": 0, "ke26": 0, "r25": 0.0, "r26": 0.0}, {"label": "/state-city/utah/salt-lake-city", "path": "/state-city/utah/salt-lake-city", "v25": 0, "v26": 4, "ke25": 0, "ke26": 0, "r25": 0.0, "r26": 0.0}, {"label": "/state-city/idaho/meridian", "path": "/state-city/idaho/meridian", "v25": 0, "v26": 3, "ke25": 0, "ke26": 0, "r25": 0.0, "r26": 0.0}, {"label": "/state-city/arizona/marana", "path": "/state-city/arizona/marana", "v25": 0, "v26": 2, "ke25": 0, "ke26": 0, "r25": 0.0, "r26": 0.0}, {"label": "/state-city/idaho/nampa", "path": "/state-city/idaho/nampa", "v25": 0, "v26": 1, "ke25": 0, "ke26": 0, "r25": 0.0, "r26": 0.0}];
+
+
+function renderHubTable() {
+  const top25 = HUB_DATA.slice(0, 25);
+  document.getElementById('hubBody').innerHTML = top25.map(r=>{
+    return `<tr>
+      <td class="path-cell">${r.label}</td>
+      <td class="num">${r.v25.toLocaleString()}</td>
+      <td class="num">${r.v26.toLocaleString()}</td>
+      ${deltaCell(r.v25,r.v26,n=>Math.round(n).toLocaleString())}
+      <td class="num">${r.ke25.toLocaleString()}</td>
+      <td class="num">${r.ke26.toLocaleString()}</td>
+      <td class="num">${fmtR(r.r25)}</td>
+      <td class="num">${fmtR(r.r26)}</td>
+      ${deltaCell(r.r25,r.r26,fmtR)}
+    </tr>`;
+  }).join('');
+  // Totals from ALL hub pages (not just top 25)
+  const tv25=HUB_DATA.reduce((s,r)=>s+r.v25,0), tv26=HUB_DATA.reduce((s,r)=>s+r.v26,0);
+  const tk25=HUB_DATA.reduce((s,r)=>s+r.ke25,0), tk26=HUB_DATA.reduce((s,r)=>s+r.ke26,0);
+  const tr25=HUB_DATA.reduce((s,r)=>s+r.r25,0), tr26=HUB_DATA.reduce((s,r)=>s+r.r26,0);
+  document.getElementById('hubFoot').innerHTML = `<tr style="font-weight:700;border-top:2px solid #1C355E">
+    <td class="path-cell">All Site Pages Total (${HUB_DATA.length} pages)</td>
+    <td class="num">${tv25.toLocaleString()}</td>
+    <td class="num">${tv26.toLocaleString()}</td>
+    ${deltaCell(tv25,tv26,n=>Math.round(n).toLocaleString())}
+    <td class="num">${tk25.toLocaleString()}</td>
+    <td class="num">${tk26.toLocaleString()}</td>
+    <td class="num">${fmtR(tr25)}</td>
+    <td class="num">${fmtR(tr26)}</td>
+    ${deltaCell(tr25,tr26,fmtR)}
+  </tr>`;
+}
+
+function renderStateCityTable() {
+  document.getElementById('scBody').innerHTML = SC_DATA.map(r=>{
+    return `<tr>
+      <td class="path-cell">${r.label}</td>
+      <td class="num">${r.v25.toLocaleString()}</td>
+      <td class="num">${r.v26.toLocaleString()}</td>
+      ${deltaCell(r.v25,r.v26,n=>Math.round(n).toLocaleString())}
+      <td class="num">${r.ke25.toLocaleString()}</td>
+      <td class="num">${r.ke26.toLocaleString()}</td>
+      <td class="num">${fmtR(r.r25)}</td>
+      <td class="num">${fmtR(r.r26)}</td>
+      ${deltaCell(r.r25,r.r26,fmtR)}
+    </tr>`;
+  }).join('');
+  const tv25=SC_DATA.reduce((s,r)=>s+r.v25,0), tv26=SC_DATA.reduce((s,r)=>s+r.v26,0);
+  const tk25=SC_DATA.reduce((s,r)=>s+r.ke25,0), tk26=SC_DATA.reduce((s,r)=>s+r.ke26,0);
+  const tr25=SC_DATA.reduce((s,r)=>s+r.r25,0), tr26=SC_DATA.reduce((s,r)=>s+r.r26,0);
+  document.getElementById('scFoot').innerHTML = `<tr style="font-weight:700;border-top:2px solid #1C355E">
+    <td class="path-cell">All State/City Pages (${SC_DATA.length} pages)</td>
+    <td class="num">${tv25.toLocaleString()}</td>
+    <td class="num">${tv26.toLocaleString()}</td>
+    ${deltaCell(tv25,tv26,n=>Math.round(n).toLocaleString())}
+    <td class="num">${tk25.toLocaleString()}</td>
+    <td class="num">${tk26.toLocaleString()}</td>
+    <td class="num">${fmtR(tr25)}</td>
+    <td class="num">${fmtR(tr26)}</td>
+    ${deltaCell(tr25,tr26,fmtR)}
+  </tr>`;
+}
+
+function fmtCR(v) { return v.toFixed(1)+'%'; }
+function deltaCR(a,b) {
+  const diff = b - a;
+  if(Math.abs(diff)<0.05) return '<td class="num delta-cell">—</td>';
+  const cls = diff>0?'up':'down';
+  const arrow = diff>0?'▲':'▼';
+  return `<td class="num delta-cell ${cls}">${arrow} ${Math.abs(diff).toFixed(1)}pp</td>`;
+}
+function renderHotelTable() {
+  document.getElementById('hotelBody').innerHTML = HOTEL_DATA.map(r=>{
+    return `<tr>
+      <td class="name-cell">${r.label}</td>
+      <td class="num">${r.v25.toLocaleString()}</td>
+      <td class="num">${r.v26.toLocaleString()}</td>
+      ${deltaCell(r.v25,r.v26,n=>Math.round(n).toLocaleString())}
+      <td class="num">${r.ke25.toLocaleString()}</td>
+      <td class="num">${r.ke26.toLocaleString()}</td>
+      ${deltaCell(r.ke25,r.ke26,n=>Math.round(n).toLocaleString())}
+      <td class="num">${fmtCR(r.cr25)}</td>
+      <td class="num">${fmtCR(r.cr26)}</td>
+      ${deltaCR(r.cr25,r.cr26)}
+      <td class="num">${fmtR(r.r25)}</td>
+      <td class="num">${fmtR(r.r26)}</td>
+      ${deltaCell(r.r25,r.r26,fmtR)}
+    </tr>`;
+  }).join('');
+  // Totals row
+  const tv25=HOTEL_DATA.reduce((s,r)=>s+r.v25,0), tv26=HOTEL_DATA.reduce((s,r)=>s+r.v26,0);
+  const tk25=HOTEL_DATA.reduce((s,r)=>s+r.ke25,0), tk26=HOTEL_DATA.reduce((s,r)=>s+r.ke26,0);
+  const tr25=HOTEL_DATA.reduce((s,r)=>s+r.r25,0), tr26=HOTEL_DATA.reduce((s,r)=>s+r.r26,0);
+  const tcr25=tv25?tk25/tv25*100:0, tcr26=tv26?tk26/tv26*100:0;
+  document.getElementById('hotelFoot').innerHTML = `<tr style="font-weight:700;border-top:2px solid #1C355E">
+    <td class="name-cell">All Properties Total</td>
+    <td class="num">${tv25.toLocaleString()}</td>
+    <td class="num">${tv26.toLocaleString()}</td>
+    ${deltaCell(tv25,tv26,n=>Math.round(n).toLocaleString())}
+    <td class="num">${tk25.toLocaleString()}</td>
+    <td class="num">${tk26.toLocaleString()}</td>
+    ${deltaCell(tk25,tk26,n=>Math.round(n).toLocaleString())}
+    <td class="num">${fmtCR(tcr25)}</td>
+    <td class="num">${fmtCR(tcr26)}</td>
+    ${deltaCR(tcr25,tcr26)}
+    <td class="num">${fmtR(tr25)}</td>
+    <td class="num">${fmtR(tr26)}</td>
+    ${deltaCell(tr25,tr26,fmtR)}
+  </tr>`;
+}
+
+window.addEventListener('load', ()=>{
+  drawTrendLine('cSessions',  SESS25,  SESS26, fmtN);
+  drawTrendLine('cPageViews', PV25,    PV26,   fmtN);
+  drawTrendLine('cRevenue',   REV25,   REV26,  fmtR);
+  drawTrendLine('cPurchases', PURCH25, PURCH26,fmtN);
+  renderHorizBars('chSessionBars', CH_NAMES, CH_SESS25, CH_SESS26, fmtN);
+  renderHorizBars('chRevBars',     CH_NAMES, CH_REV25,  CH_REV26,  fmtR);
+  renderConvBars('chConvBars', CH_NAMES, CH_CONV25, CH_CONV26);
+  renderHubTable();
+  renderStateCityTable();
+  renderHotelTable();
+});
+window.addEventListener('resize', ()=>{
+  drawTrendLine('cSessions',  SESS25,  SESS26, fmtN);
+  drawTrendLine('cPageViews', PV25,    PV26,   fmtN);
+  drawTrendLine('cRevenue',   REV25,   REV26,  fmtR);
+  drawTrendLine('cPurchases', PURCH25, PURCH26,fmtN);
+});
+</script>
+</body>
+</html>

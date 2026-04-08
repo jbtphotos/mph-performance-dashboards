@@ -1,0 +1,1007 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Channel Performance Dashboard — 2025 vs 2024</title>
+<style>
+  :root {
+    --bg:         #EEF1F6;
+    --card:       #FFFFFF;
+    --card-hover: #F4F7FB;
+    --border:     #D0D8E8;
+    --text:       #1C355E;
+    --muted:      #5A6B84;
+    --navy:       #1C355E;
+    --orange:     #FF5F00;
+    --green:      #2E8B57;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif;
+          background: var(--bg); color: var(--text); min-height:100vh; }
+
+  .brand-bar { background: #FF5F00; height: 5px; }
+  .header { padding: 22px 32px 16px; background: #1C355E;
+             border-bottom: 3px solid #FF5F00; }
+  .header-inner { display:flex; justify-content:space-between; align-items:flex-start; }
+  .header h1 { font-size: 22px; font-weight: 700; color: #FFFFFF; }
+  .header-eyebrow { font-size:13px; font-weight:400; color:#FFD080;
+                     display:block; letter-spacing:2px; text-transform:uppercase;
+                     margin-bottom:3px; }
+  .header .subtitle { color: rgba(255,255,255,0.70); font-size:13px; margin-top:4px; }
+  .year-badge { background: linear-gradient(135deg,#FF5F00,#cc4800);
+                 color:#fff; font-size:11px; font-weight:700;
+                 padding:3px 12px; border-radius:12px; margin-top:6px;
+                 display:inline-block; }
+
+  .dashboard { padding: 22px 32px; max-width:1600px; margin:0 auto; }
+
+  /* KPI Cards */
+  .kpi-row { display:grid; grid-template-columns:repeat(6,1fr); gap:14px; margin-bottom:22px; }
+  .kpi-card { background:var(--card); border:1px solid var(--border);
+               border-top:3px solid #1C355E; border-radius:8px; padding:16px;
+               box-shadow:0 1px 4px rgba(28,53,94,0.07); }
+  .kpi-card.accent { border-top-color:#FF5F00; }
+  .kpi-card.green  { border-top-color:#2E8B57; }
+  .kpi-label { font-size:10px; text-transform:uppercase; letter-spacing:1px;
+                color:var(--muted); font-weight:700; margin-bottom:6px; }
+  .kpi-value { font-size:24px; font-weight:700; color:#1C355E; }
+  .kpi-sub   { font-size:11px; color:var(--muted); margin-top:4px; }
+  .kpi-yoy   { font-size:11px; margin-top:5px; }
+
+  /* Year tabs */
+  .year-toggle { display:flex; gap:8px; margin-bottom:10px; }
+  .ytab { padding:4px 14px; border-radius:14px; font-size:11px; font-weight:700;
+           cursor:pointer; border:2px solid transparent; transition:all 0.15s; }
+  .ytab.y25  { background:#1C355E; color:#fff; border-color:#1C355E; }
+  .ytab.y24  { background:rgba(255,95,0,0.12); color:#FF5F00; border-color:#FF5F00; }
+  .ytab.y24.active { background:#FF5F00; color:#fff; }
+  .ytab.y25.inactive { background:rgba(28,53,94,0.12); color:#1C355E; }
+
+  /* Section titles */
+  .section-row { display:flex; align-items:center; gap:10px; margin-bottom:12px; }
+  .section-title { font-size:14px; font-weight:700; color:#1C355E; }
+  .section-pill { font-size:10px; font-weight:700; text-transform:uppercase;
+                   letter-spacing:0.8px; color:#FF5F00; background:rgba(255,95,0,0.10);
+                   padding:2px 8px; border-radius:10px; }
+
+  /* Cards */
+  .chart-card { background:var(--card); border:1px solid var(--border);
+                 border-radius:8px; padding:18px 20px;
+                 box-shadow:0 1px 4px rgba(28,53,94,0.06); margin-bottom:22px; }
+  .chart-card h3 { font-size:12px; font-weight:700; color:var(--muted);
+                    text-transform:uppercase; letter-spacing:0.6px;
+                    border-bottom:2px solid #FF5F00; padding-bottom:8px;
+                    margin-bottom:14px; }
+
+  .grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:18px; margin-bottom:22px; }
+  .grid-3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:18px; margin-bottom:22px; }
+
+  /* Donut */
+  .donut-wrap { display:flex; align-items:center; gap:20px; }
+  .donut-legend { flex:1; }
+  .leg-item { display:flex; align-items:center; gap:7px; margin-bottom:7px;
+               font-size:12px; color:var(--text); }
+  .leg-dot { width:10px; height:10px; border-radius:50%; flex-shrink:0; }
+  .leg-val { margin-left:auto; font-weight:700; font-size:12px; color:#1C355E; }
+
+  /* Horizontal bar */
+  .hbar-group { margin-bottom:10px; }
+  .hbar-label { font-size:11px; color:var(--text); margin-bottom:3px;
+                 display:flex; justify-content:space-between; }
+  .hbar-track { height:20px; background:#E4EAF3; border-radius:5px; overflow:hidden; }
+  .hbar-fill  { height:100%; border-radius:5px; transition:width 0.8s ease;
+                 display:flex; align-items:center; padding-left:7px;
+                 font-size:10px; font-weight:700; color:white; }
+
+  /* Table */
+  .tbl-wrap { overflow-x:auto; }
+  table { width:100%; border-collapse:collapse; font-size:11px; }
+  thead th { text-align:right; background:#1C355E; color:#fff; font-weight:700;
+              padding:7px 9px; white-space:nowrap; position:sticky; top:0; }
+  thead th:first-child { text-align:left; position:sticky; left:0; z-index:2; background:#1C355E; }
+  thead th.month-hdr { font-size:10px; }
+  thead tr.sub-hdr th { background:#2a4a7f; font-size:9px; font-weight:400;
+                          color:rgba(255,255,255,0.75); padding:3px 9px; }
+  tbody td { padding:6px 9px; text-align:right; border-bottom:1px solid var(--border);
+              white-space:nowrap; color:#1C355E; }
+  tbody td:first-child { text-align:left; font-weight:700; position:sticky; left:0;
+                          background:var(--card); z-index:1; }
+  tbody tr:nth-child(even) td { background:#F5F8FC; }
+  tbody tr:nth-child(even) td:first-child { background:#F5F8FC; }
+  tbody tr:hover td { background:#E8F0FA; }
+  tbody tr.total-row td { background:#1C355E; color:#fff; font-weight:700; }
+  tbody tr.total-row td:first-child { background:#1C355E; }
+  td.up   { color:#2E8B57 !important; font-weight:700; }
+  td.down { color:#C0392B !important; font-weight:700; }
+
+  /* YoY comparison bars */
+  .yoy-bar-group { margin-bottom:12px; }
+  .yoy-bar-label { font-size:11px; color:var(--text); margin-bottom:4px;
+                    display:flex; justify-content:space-between; align-items:center; }
+  .yoy-bar-row { display:flex; gap:4px; align-items:center; margin-bottom:3px; }
+  .yoy-bar-pill { font-size:9px; font-weight:700; color:var(--muted);
+                   min-width:32px; text-align:right; margin-right:4px; }
+  .bar-25  { height:14px; border-radius:3px; background:#1C355E; min-width:2px; }
+  .bar-24  { height:14px; border-radius:3px; background:#FF5F00; opacity:0.65; min-width:2px; }
+
+  .legend-chips { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:16px; align-items:center; }
+  .chip { display:flex; align-items:center; gap:5px; font-size:11px;
+           color:var(--text); background:var(--card); border:1px solid var(--border);
+           border-radius:12px; padding:3px 10px; cursor:pointer; user-select:none;
+           transition:all 0.15s; }
+  .chip .chip-dot { width:8px; height:8px; border-radius:50%; }
+  .chip.inactive { opacity:0.35; }
+  .chip-ctrl { display:flex; align-items:center; gap:5px; margin-right:6px;
+                border-right:1px solid var(--border); padding-right:10px; }
+  .ctrl-btn { font-size:10px; font-weight:700; padding:3px 10px; border-radius:12px;
+               cursor:pointer; border:1px solid var(--border); background:var(--card);
+               color:var(--muted); transition:all 0.15s; white-space:nowrap; }
+  .ctrl-btn:hover { background:#1C355E; color:#fff; border-color:#1C355E; }
+  .solo-label { font-size:10px; font-weight:700; color:#FF5F00; padding:3px 10px;
+                 border-radius:12px; background:rgba(255,95,0,0.08);
+                 border:1px solid rgba(255,95,0,0.3); display:none; }
+  .solo-label.visible { display:inline-flex; align-items:center; gap:5px; }
+
+  .year-legend { display:flex; gap:16px; margin-bottom:14px; font-size:11px; font-weight:700; }
+  .yl-item { display:flex; align-items:center; gap:5px; }
+  .yl-swatch { width:28px; height:10px; border-radius:3px; }
+
+  .footer { text-align:center; padding:18px 32px; border-top:3px solid #FF5F00;
+             background:#1C355E; color:rgba(255,255,255,0.6); font-size:11px; }
+
+  @media (max-width:1100px) {
+    .kpi-row { grid-template-columns:repeat(3,1fr); }
+    .grid-2, .grid-3 { grid-template-columns:1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="brand-bar"></div>
+<div class="header">
+  <div style="margin-bottom:10px;">
+    <a href="index.html" style="display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3);color:rgba(255,255,255,0.85);font-size:11px;font-weight:700;padding:6px 14px;border-radius:20px;text-decoration:none;transition:background 0.2s;font-family:Arial,sans-serif;" onmouseover="this.style.background='rgba(255,95,0,0.7)'" onmouseout="this.style.background='rgba(255,255,255,0.15)'">&#8592; Dashboard Portal</a>
+  </div>
+  <img src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyBpZD0iTXlfUGxhY2VfSG90ZWxzX0xvZ28iIGRhdGEtbmFtZT0iTXkgUGxhY2UgSG90ZWxzIExvZ28iIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgdmlld0JveD0iMCAwIDQ5My45MzEgNDg4LjQ2OCI+CiAgPGRlZnM+CiAgICA8c3R5bGU+CiAgICAgIC5jbHMtMSB7CiAgICAgICAgZmlsbDogI2UxMWIyMjsKICAgICAgfQoKICAgICAgLmNscy0yIHsKICAgICAgICBmaWxsOiAjZmZmOwogICAgICB9CgogICAgICAuY2xzLTMgewogICAgICAgIGZpbGw6ICNmZDA7CiAgICAgIH0KICAgIDwvc3R5bGU+CiAgPC9kZWZzPgogIDxnPgogICAgPHBhdGggY2xhc3M9ImNscy0zIiBkPSJNMjQ2Ljk2Niw0ODAuOTY2Yy03Mi4xNiwwLTE0My41MjUtNS41MTgtMjE4LjE4NS0xNi44NzJsLTUuNDkxLS44MzUtLjgwMy01LjQ5OEMyLjUwMiwzMjEuMDA1LDIuNTAyLDE4Mi4zMTcsMjIuNDg3LDQ1LjU2bC44MDMtNS40OTcsNS40OTEtLjgzNWM3NC42NTktMTEuMzU2LDE0Ni4wMjQtMTYuODc2LDIxOC4xODUtMTYuODc2czE0My41MjQsNS41MTksMjE4LjE4MiwxNi44NzZsNS40OTIuODM1LjgwMyw1LjQ5N2MxOS45ODYsMTM2Ljc1NywxOS45ODYsMjc1LjQ0NCwwLDQxMi4ybC0uODAzLDUuNDk4LTUuNDkyLjgzNWMtNzQuNjU3LDExLjM1NS0xNDYuMDI0LDE2Ljg3Mi0yMTguMTgyLDE2Ljg3MmgwWiIvPgogICAgPHBhdGggZD0iTTI0Ni45NjQsMjkuODUzYzcxLjczMiwwLDE0My40NjMsNS41OTcsMjE3LjA1NywxNi43OSwxOS44NjgsMTM1Ljk1NSwxOS44NjgsMjc0LjA3OCwwLDQxMC4wMzMtNzMuNTk0LDExLjE5My0xNDUuMzI0LDE2Ljc5MS0yMTcuMDU2LDE2Ljc5MXMtMTQzLjQ2My01LjU5OC0yMTcuMDU2LTE2Ljc5MWMtMTkuODY3LTEzNS45NTUtMTkuODY3LTI3NC4wNzgsMC00MTAuMDMzLDczLjU5My0xMS4xOTMsMTQ1LjMyNC0xNi43OSwyMTcuMDU1LTE2Ljc5TTI0Ni45NjQsMTQuODUzYy03Mi41MzksMC0xNDQuMjc1LDUuNTQ4LTIxOS4zMSwxNi45NmwtMTAuOTgsMS42Ny0xLjYwNiwxMC45OTFjLTIwLjA4OSwxMzcuNDc4LTIwLjA4OSwyNzYuODkzLDAsNDE0LjM3MmwxLjYwNiwxMC45ODksMTAuOTgsMS42NzFjNzUuMDM2LDExLjQxMywxNDYuNzczLDE2Ljk2MSwyMTkuMzExLDE2Ljk2MXMxNDQuMjc1LTUuNTQ4LDIxOS4zMTEtMTYuOTYxbDEwLjk4LTEuNjcxLDEuNjA1LTEwLjk4OWMyMC4wOTEtMTM3LjQ3OSwyMC4wOTEtMjc2Ljg5NCwwLTQxNC4zNzJsLTEuNjA1LTEwLjk5MS0xMC45OC0xLjY3Yy03NS4wMzUtMTEuNDEyLTE0Ni43NzItMTYuOTYtMjE5LjMxMi0xNi45NmgwWiIvPgogIDwvZz4KICA8Zz4KICAgIDxwYXRoIGNsYXNzPSJjbHMtMSIgZD0iTTM4Ni4yODksMTQ3LjE2MmMwLDc2LjgwMi02Mi4yNTQsMTM5LjA1Ny0xMzkuMDYyLDEzOS4wNTdzLTEzOS4wNTItNjIuMjU1LTEzOS4wNTItMTM5LjA1N1MxNzAuNDI4LDguMTAxLDI0Ny4yMjcsOC4xMDFzMTM5LjA2Miw2Mi4yNTQsMTM5LjA2MiwxMzkuMDYxWiIvPgogICAgPHBhdGggZD0iTTk5LjMyNywxNDYuOTQxQzk5LjMyNyw2NS43NzgsMTY1LjExMywwLDI0Ni4yNzIsMGgwYzgxLjE2MSwwLDE0Ni45MzksNjUuNzc4LDE0Ni45NDMsMTQ2Ljk0MWgwYy0uMDA0LDgxLjE2NC02NS43ODIsMTQ2LjkzNy0xNDYuOTQzLDE0Ni45NTFoMGMtODEuMTU4LS4wMTUtMTQ2Ljk0NC02NS43ODctMTQ2Ljk0NC0xNDYuOTUxaDBaTTExNS4xMDcsMTQ2Ljk0MWMuMTI4LDcyLjQ0Myw1OC43MjIsMTMxLjAzMywxMzEuMTY1LDEzMS4xNjZoMGM3Mi40NDEtLjEzMywxMzEuMDMzLTU4LjcyMywxMzEuMTc0LTEzMS4xNjZoMGMtLjE0MS03Mi40NDctNTguNzMyLTEzMS4wMzUtMTMxLjE3NC0xMzEuMTY2aDBjLTcyLjQ0My4xMzEtMTMxLjAzNyw1OC43MTktMTMxLjE2NSwxMzEuMTY2aDBaIi8+CiAgICA8Zz4KICAgICAgPHBhdGggZD0iTTg2LjQ4OSwyNTMuMzcyYy0xMC4zNjIsMC0xOS4wNzgtNC42NjctMjMuMzEzLTEyLjQ5NS0yLjUyMi00LjYzOS01LjQ5LTE0LjM0MiwyLjg4Mi0yNy4yMjEsNS42NDctOC42NzEsMTEuMzE5LTE3LjMyMiwxNi45NzItMjUuOTgybDQuOTA3LTcuNDg4YzguMDkyLTEyLjM4NywxNi4xNTctMjQuOCwyNC4yMzMtMzcuMjA0bDYuNzE3LTEwLjMzNiwxMS4wODgtMTcuMDE2LDExLjA3Ni0xNy4wMjgsMS4xODctMS44NWM2LjA2My05LjQzOSwxNS4yMDUtMjMuNywzMy42MDctMjMuNyw2LjA1OSwwLDI1LjgyNSwyLjE2MSwyNS44MjUsMzAuMDE2djQuNzI0YzMuNzM2LTUuMzksNy40NjctMTAuNzc0LDExLjIwNi0xNi4xNjcsNy44MTktMTAuOTM0LDE5LjY0Ny0xNy42NDMsMzAuOTc5LTE3LjY0Myw3LjE2NSwwLDEzLjc3NCwyLjY5MywxOC42Miw3LjU2NSwzLjk1MiwzLjk4Miw4LjY0NSwxMS4zOTcsOC41NjcsMjQuMDc2LS4xMjUsMTguOTYxLS4xMTIsMzguMjY4LS4wODYsNTYuOTNsLjAyMSwyMi40NzNjMCwxLjI3LjA3NSwyLjYxNS4xMzQsMy45OTIuMzgsOC4xMTMsMS4wMjMsMjEuNjkxLTEwLjE5NCwzMC4zMjgtNC45OSwzLjg0Ny0xMS4zMTQsNS45NjItMTcuODI0LDUuOTYyLTUuMzM2LDAtMTAuNDUzLTEuNDI0LTE0Ljc5MS00LjExOS0xMy4zMTItOC4yNTYtMTIuNTc2LTIzLjIyNC0xMi4xNDMtMzIuMTcxLjA3OS0xLjQyMi4xNDgtMi44MDkuMTQ4LTQuMDk4di0xLjI4MWwtMTYuNjY5LDI0LjU5MmMtMy4wNSw0LjQ5OC0xMS4xNjIsMTYuNDkxLTI1LjUxNSwxNy40MTQtLjU1OS4wMzktMS4xMTUuMDYxLTEuNjc2LjA2MS0xMi45MTQsMC0yMy43ODMtOS44NDQtMjUuMjk1LTIyLjkxMy0uNDU5LTMuOTc2LS43MzItNy45ODYtLjg2NS0xMS45OTRsLTMwLjk5LDQ3LjI4OWMtNi4zMTUsOS40NjUtMTcuMzQsMTUuMjg2LTI4LjgxLDE1LjI4NmgwWiIvPgogICAgICA8cGF0aCBjbGFzcz0iY2xzLTIiIGQ9Ik0xNzUuODQyLDg1Ljc4M2MxMC44NjcsMCwxMy4wOTMsOC4wOSwxMy4wOTMsMTcuMjgzdjQ1LjQ3OWMxMS40NjItMTYuNTU3LDIyLjkzNC0zMy4xMTcsMzQuNDA1LTQ5LjY3NiwxMS45MjUtMTYuNjYxLDM1LjEzNS0xNy43NjksMzQuOTcsNi42NzItLjE3OSwyNi40OS0uMDY3LDUyLjk5NC0uMDY3LDc5LjQ4MiwwLDcuOTg1LDIuMTkxLDE4LjYyMy01LjEwMSwyNC4yMzYtNS4wMjEsMy44Ny0xMi42ODUsNC40ODItMTguMTI2LDEuMTA5LTguNDQzLTUuMjQtNS45NzctMTcuMTM5LTUuOTc3LTI1LjQ0NnYtNDIuNzUzYy0xMy4zMDksMTkuNjMxLTI2LjYyMSwzOS4yNjktMzkuOTM1LDU4LjkwMi0zLjc1OSw1LjU1MS04LjU2NywxMS40LTE1LjgwNCwxMS44Ny02Ljk4MS40NTEtMTIuNzA4LTQuNzc0LTEzLjQ5LTExLjYwNC0yLjAyNy0xNy42MjctLjA3OS0zNi41NTMtLjA3OS01NC4zMDMtMTguMzY0LDI4LjAyOS0zNi43MjYsNTYuMDQzLTU1LjA5Myw4NC4wNzEtMTEuMDc3LDE2LjYxLTQxLjU3MiwxMC41MDYtMjcuOTA1LTEwLjUwMSw3LjI2LTExLjE2NiwxNC41NzUtMjIuMzA4LDIxLjg2MS0zMy40NTYsMTAuMzQ1LTE1LjgzOCwyMC42NTEtMzEuNzA1LDMwLjk2Ny00Ny41NTgsNy4zODgtMTEuMzUsMTQuNzcyLTIyLjY5NSwyMi4xNi0zNC4wNDcsNS44OTQtOS4wNzYsMTEuODI0LTE5Ljc2MiwyNC4xMi0xOS43NjIiLz4KICAgIDwvZz4KICAgIDxnPgogICAgICA8cGF0aCBkPSJNMjgxLjcsMjY4LjIxMWMtOC4xMjcsMC0xNS43OTQtNC4zMDMtMjAuNTE3LTExLjUxMi00Ljk0My03LjU2My01Ljc0Mi0xNi45OTgtMi4xNDItMjUuMjUsMy40MjYtNy44MTMsNy43MzUtMTUuMTQ0LDExLjUyOS0yMS42MDEsNS45NDctMTAuMTE2LDE5LjgxMy0zNC42ODcsMjMuODQ1LTQzLjQzM2wtNS4zMi0xOS4yMTEtMTQuNjI2LTUyLjg1OWMtMS44NDgtNi42ODgsMi4wMDItMTMuNjI3LDguNjY0LTE1LjYwM2wyNC4xNy03LjE1NGMxLjE4MS0uMzUsMi40MDItLjUyMiwzLjYwNS0uNTIyLDIuMjE1LDAsNC40MS41NzgsNi4zNjUsMS42OTYsMy4wMjUsMS43MzUsNS4xOTMsNC42NDEsNi4wMTksOC4wM2w0LjUwMiwxOC41NmM1Ljk5NC0xMy40MTMsMTIuMTExLTI3LjA3NiwxOC4yNTktNDAuNTMyLjk0NC0yLjA1OSwxLjg1Mi00LjE2NCwyLjc3NC02LjI5NywyLjg0Ni02LjU3OCw1Ljc5NS0xMy4zODksOS44NjUtMTkuODE2LDQuNTMxLTcuMTg0LDExLjc0Mi0xMS4yOTksMTkuNzczLTExLjI5OXMxNS44NzksNC4xMzEsMjAuOTEzLDExLjA0OGM0Ljk0Miw2Ljc5LDYuMzI5LDE1LjE1MiwzLjgxLDIyLjk0NC0uMTQ3LjQ0Ni0uMzA2Ljg4Ni0uNDk5LDEuMzExbC0zMi42MDMsNzIuMzU5Yy02Ljc3OCwxNC41OC0xMy45NDcsMjkuMTk3LTIxLjk2OSw0NC44MjUtLjk4NCwxLjkwNy0yLjM5OCw0LjcyNi00LjEyNyw4LjE2MS0yMC40NTksNDAuNjQ0LTM1LjkyNCw2OS41NjEtNDQuODgxLDc4LjU2Ni00Ljg2MSw0Ljg5My0xMS4wNDcsNy41ODgtMTcuNDExLDcuNTg4aDBaIi8+CiAgICAgIDxwYXRoIGNsYXNzPSJjbHMtMiIgZD0iTTM1OC40NzcsMTIzLjgzOWMtNi45MzMsMTQuODk1LTE0LjE4NSwyOS42MzQtMjEuNjg3LDQ0LjIzOS02Ljk4NiwxMy41OTktMzUuODAzLDcyLjYwMy00Ni43MDEsODMuNTY0LTEwLjUzOCwxMC41OTQtMjQuNzQ3LTIuODExLTE5LjM4MS0xNS4wOTYsMy4wNi02Ljk2OSw2Ljk5NC0xMy42OTcsMTAuODQ4LTIwLjI1MiwxLjQ0Ni0yLjQ2NywyNi45OTItNDYuNTYzLDI2LjE1Ni00OS41NzEtNi45OTQtMjUuMjU3LTEzLjk4NC01MC41MTMtMjAuOTcyLTc1Ljc3MmwyNC4xNzYtNy4xNTIsMTMuMzA2LDU0LjgyOGMxMS4xMjktMjQuODM4LDIyLjEwMi00OS43NSwzMy40MTYtNzQuNTA0LDMuNzIxLTguMTM3LDcuMDEyLTE3LjAxOSwxMS44MTQtMjQuNjA1LDcuOTU3LTEyLjU5NiwyNS43NDItLjc3MSwyMS42MTksMTEuOTYzbC0zMi41OTQsNzIuMzU4Ii8+CiAgICA8L2c+CiAgPC9nPgogIDxnPgogICAgPHBhdGggZD0iTTg0LjQxOSwzNjYuNjZoLTIwLjc4OXYzMy40NzloLTE4Ljg5OXYtOTQuNDk2aDQxLjMwOWMxNy44MTgsMCwzMi41MzQsOS44NTQsMzIuNTM0LDI5Ljk2OCwwLDIxLjg3LTE0LjU3OSwzMS4wNDktMzQuMTU0LDMxLjA0OVpNODUuMzY0LDMyNC4wMDNoLTIxLjczM3YyNC4yOTloMjIuMDAzYzguNzc2LDAsMTMuNS00LjA1MSwxMy41LTEyLjI4NXMtNS4zOTgtMTIuMDE0LTEzLjc3LTEyLjAxNFoiLz4KICAgIDxwYXRoIGQ9Ik0xMjkuNzgsNDAwLjEzOXYtOTQuNDk2aDE4Ljg5OXY3Ni4wMDJoNDcuMzg0djE4LjQ5NGgtNjYuMjgzWiIvPgogICAgPHBhdGggZD0iTTI3NC40NjYsNDAwLjEzOWwtNy40MjYtMjEuMDU5aC0zNC41NTlsLTcuNDI0LDIxLjA1OWgtMjAuMjVsMzYuMTgtOTQuNDk2aDE4LjM1OGwzNS45MDksOTQuNDk2aC0yMC43ODlaTTI1NC40ODcsMzQzLjk4MWMtMS44OTEtNS41MzQtMy43ODEtMTEuMjA1LTQuNzI2LTE0LjcxNS0uOTQ0LDMuNTEtMi44MzQsOS4xODEtNC43MjQsMTQuNzE1bC02LjA3NSwxNy4xNDVoMjEuNmwtNi4wNzQtMTcuMTQ1WiIvPgogICAgPHBhdGggZD0iTTM1My4xMTYsMzMzLjE4Yy0zLjM3NS02LjQ3OC04Ljc3NS0xMC4yNTgtMTcuMjc5LTEwLjI1OC0xNC4xNzUsMC0yMi4yNzMsMTIuNDE5LTIyLjI3MywyOS45NjgsMCwxNy4wMSw4LjIzMywyOS45NywyMi40MDgsMjkuOTcsOC41MDYsMCwxMy40OTktMy42NDQsMTguNDk0LTEyLjAxNmwxNS45Myw5LjQ1Yy02LjQ4LDEzLjM2NC0xNy44MTksMjEuMzI5LTM0Ljk2NCwyMS4zMjktMjQuNzAzLDAtNDEuMzA5LTE4Ljg5OC00MS4zMDktNDguNzMzLDAtMjguNzUzLDE3LjI3OS00OC43MzIsNDEuOTgzLTQ4LjczMiwxNy44MiwwLDI4LjYxOSw4LjY0LDM0LjU1OSwyMC45MjRsLTE3LjU0OSw4LjA5OVoiLz4KICAgIDxwYXRoIGQ9Ik0zODEuNTY3LDQwMC4xMzl2LTk0LjQ5Nmg2NS42MDd2MTguNDk0aC00Ni43MDd2MTYuMzM0aDI3LjEzM3YxOC4zNTloLTI3LjEzM3YyMi44MTRoNDguNzMzdjE4LjQ5NGgtNjcuNjMzWiIvPgogIDwvZz4KICA8Zz4KICAgIDxwYXRoIGNsYXNzPSJjbHMtMSIgZD0iTTE2OS41ODIsNDM4Ljk0djcuNTY3aDYuNjI4di03LjU2N2g1LjQ3OHYyMC40aC01LjQ3OHYtOC4wNWgtNi42Mjh2OC4wNWgtNS40Nzh2LTIwLjRoNS40NzhaIi8+CiAgICA8cGF0aCBjbGFzcz0iY2xzLTEiIGQ9Ik0yMDUuNzI2LDQ1OS42NzRjLTYuMzI2LDAtOS44MDctNC43NTMtOS44MDctMTAuNDEzLDAtNS45MzIsMy44NzQtMTAuNjUzLDEwLjE0LTEwLjY1Myw2LjU2OCwwLDkuODk3LDQuODcyLDkuODk3LDEwLjMyMSwwLDYuNTY4LTMuOTM1LDEwLjc0NS0xMC4yLDEwLjc0NWgtLjAzWk0yMDUuOTk4LDQ1NS4zNDZjMi42MzQsMCw0LjE3Ny0yLjU0Miw0LjE3Ny02LjIzNSwwLTMuNTEtMS41NzQtNi4xNzQtNC4yMzctNi4xNzQtMi42MzMsMC00LjIzNywyLjY2My00LjIzNyw2LjIwNC0uMDMsMy42NjMsMS42MDQsNi4yMDUsNC4yMzcsNi4yMDVoLjA2WiIvPgogICAgPHBhdGggY2xhc3M9ImNscy0xIiBkPSJNMjM0LjU2LDQ0My41NDJoLTUuMjA2di00LjYwMmgxNS45ODF2NC42MDJoLTUuMjk2djE1Ljc5OWgtNS40Nzh2LTE1Ljc5OVoiLz4KICAgIDxwYXRoIGNsYXNzPSJjbHMtMSIgZD0iTTI3Mi4zNjgsNDUxLjEwOGgtNy4zMjR2My43NTNoOC4yMDJ2NC40OGgtMTMuNjh2LTIwLjRoMTMuMjU3djQuNDhoLTcuNzc5djMuMjY5aDcuMzI0djQuNDE5WiIvPgogICAgPHBhdGggY2xhc3M9ImNscy0xIiBkPSJNMjg3LjYsNDM4Ljk0aDUuNDc4djE1LjgzaDcuODM5djQuNTdoLTEzLjMxN3YtMjAuNFoiLz4KICAgIDxwYXRoIGNsYXNzPSJjbHMtMSIgZD0iTTMxNi4xNzcsNDUzLjg5M2MxLjI0MS42MzYsMy4yMzksMS4yNzEsNS4yOTYsMS4yNzEsMS44NzcsMCwyLjc4NS0uNjM2LDIuNzg1LTEuNjY1LDAtLjk5OS0uOTA4LTEuNTQzLTMuMjA4LTIuMzMxLTMuNDUxLTEuMjQxLTUuNzUxLTMuMTE2LTUuNzUxLTYuMTQzLDAtMy42MDIsMy4wNTctNi4zODYsOC4yMDMtNi4zODYsMi40MjEsMCw0LjE3Ny40NTQsNS41MDksMS4wM2wtMS4xNSw0LjM4OGMtLjg3OC0uMzkzLTIuMzkxLS45NjgtNC40MTktLjk2OC0xLjY2NSwwLTIuNTczLjYwNS0yLjU3MywxLjUxMywwLDEuMDMsMS4wOSwxLjQyMiwzLjY2MywyLjM5MSwzLjY2MiwxLjM2Miw1LjI5NiwzLjI5OSw1LjI5Niw2LjE0MywwLDMuNTEyLTIuNzI0LDYuNTA3LTguNjg3LDYuNTA3LTIuNDUxLDAtNC44NDMtLjYzNi01Ljk5Mi0xLjI0bDEuMDI5LTQuNTFaIi8+CiAgPC9nPgogIDxwYXRoIGQ9Ik0yNDYuOTY2LDQxMS44ODljLTY2Ljk1NSwwLTEzMy45MTMsNi43NDMtMjAyLjIzNCwyMC4xODZ2Ny42NWM2OC40MTgtOS43MzksMTM1LjMyNi0xNC42MTMsMjAyLjIzNC0xNC42MTNzMTMzLjgxNiw0Ljg3NSwyMDIuMjMzLDE0LjYxM3YtNy42NWMtNjguMzItMTMuNDQzLTEzNS4yNzktMjAuMTg2LTIwMi4yMzMtMjAuMTg2WiIvPgogIDxwYXRoIGQ9Ik00NjUuNzU5LDMxNC44MzRjMCwzLjk5OS0zLjEzOSw3LjEzOC03LjIyNCw3LjEzOC00LjA0MiwwLTcuMjY3LTMuMTM5LTcuMjY3LTcuMTM4LDAtMy45MTMsMy4yMjUtNy4wNTIsNy4yNjctNy4wNTIsNC4wODUsMCw3LjIyNCwzLjEzOSw3LjIyNCw3LjA1MlpNNDUzLjA3NCwzMTQuODM0YzAsMy4xMzksMi4zMjIsNS42MzMsNS41MDQsNS42MzMsMy4wOTYsMCw1LjM3NS0yLjQ5NCw1LjM3NS01LjU5LDAtMy4xMzktMi4yNzktNS42NzYtNS40MTgtNS42NzZzLTUuNDYxLDIuNTM3LTUuNDYxLDUuNjMzWk00NTcuNDE3LDMxOC41MzJoLTEuNjM0di03LjA1MmMuNjQ1LS4xMjksMS41NDgtLjIxNSwyLjcwOS0uMjE1LDEuMzMzLDAsMS45MzUuMjE1LDIuNDUxLjUxNi4zODcuMzAxLjY4OC44Ni42ODgsMS41NDgsMCwuNzc0LS42MDIsMS4zNzYtMS40NjIsMS42MzR2LjA4NmMuNjg4LjI1OCwxLjA3NS43NzQsMS4yOSwxLjcyLjIxNSwxLjA3NS4zNDQsMS41MDUuNTE2LDEuNzYzaC0xLjc2M2MtLjIxNS0uMjU4LS4zNDQtLjkwMy0uNTU5LTEuNzItLjEyOS0uNzc0LS41NTktMS4xMTgtMS40NjItMS4xMThoLS43NzR2Mi44MzhaTTQ1Ny40NjEsMzE0LjUzM2guNzc0Yy45MDMsMCwxLjYzNC0uMzAxLDEuNjM0LTEuMDMyLDAtLjY0NS0uNDczLTEuMDc1LTEuNTA1LTEuMDc1LS40MywwLS43MzEuMDQzLS45MDMuMDg2djIuMDIxWiIvPgo8L3N2Zz4=" alt="My Place Hotels" style="height:44px;display:block;margin-bottom:12px;">
+  <div class="header-inner">
+    <div>
+      <h1>
+        <span class="header-eyebrow">My Place Hotels</span>
+        Channel Performance Dashboard
+      </h1>
+      <div class="subtitle">2025 Full Year vs 2024 Full Year · Stay Date · All Properties · Excludes Cancelled Reservations</div>
+    </div>
+    <div class="year-badge">2025 vs 2024</div>
+  </div>
+</div>
+
+<div class="dashboard">
+
+  <!-- KPI CARDS -->
+  <div class="kpi-row">
+    <div class="kpi-card">
+      <div class="kpi-label">2025 Total Net Revenue</div>
+      <div class="kpi-value">$115.2M</div>
+      <div class="kpi-sub">2024: $106.9M</div>
+      <div class="kpi-yoy"><span style="color:#2E8B57;font-size:11px;font-weight:700;">▲ 7.7% vs 2024</span></div>
+    </div>
+    <div class="kpi-card green">
+      <div class="kpi-label">2025 Total Net Room Nights</div>
+      <div class="kpi-value">1,169,880</div>
+      <div class="kpi-sub">2024: 1,059,040</div>
+      <div class="kpi-yoy"><span style="color:#2E8B57;font-size:11px;font-weight:700;">▲ 10.5% vs 2024</span></div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">2025 Blended Net ADR</div>
+      <div class="kpi-value">$98.43</div>
+      <div class="kpi-sub">2024: $100.99</div>
+      <div class="kpi-yoy"><span style="color:#C0392B;font-size:11px;font-weight:700;">▼ 2.5% vs 2024</span></div>
+    </div>
+    <div class="kpi-card accent">
+      <div class="kpi-label">Top Channel — 2025 Revenue</div>
+      <div class="kpi-value">$58.6M</div>
+      <div class="kpi-sub">PMS · 50.9% of total</div>
+      <div class="kpi-yoy"><span style="color:#2E8B57;font-size:11px;font-weight:700;">▲ 5.1% vs 2024</span></div>
+    </div>
+    <div class="kpi-card green">
+      <div class="kpi-label">2025 Peak Month</div>
+      <div class="kpi-value">Jul</div>
+      <div class="kpi-sub">$12.7M · 115,838 RNs</div>
+      <div class="kpi-yoy"><span style="color:#2E8B57;font-size:11px;font-weight:700;">▲ 5.6% vs 2024</span></div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">2025 Online Channels Rev</div>
+      <div class="kpi-value">$56.6M</div>
+      <div class="kpi-sub">49.1% of 2025 total</div>
+      <div class="kpi-yoy"><span style="color:#2E8B57;font-size:11px;font-weight:700;">▲ 10.5% vs 2024</span></div>
+    </div>
+  </div>
+
+  <!-- MONTHLY REVENUE TREND — 2025 -->
+  <div class="chart-card">
+    <h3>Monthly Net Revenue by Channel — 2025</h3>
+    <p style="font-size:11px;color:var(--muted);margin-bottom:12px;">Stacked monthly net revenue broken down by booking channel. The total dollar value above each bar represents combined revenue across all active channels for that month. Use <strong>All Off</strong> + individual chip selection to isolate and analyze a single channel.</p>
+    <div class="legend-chips" id="revLegend">
+      <span class="solo-label" id="revSoloLabel">● Solo view</span>
+    </div>
+    <canvas id="revChart" height="320" style="width:100%;"></canvas>
+  </div>
+
+  <!-- MONTHLY REVENUE TREND — 2024 -->
+  <div class="chart-card">
+    <h3>Monthly Net Revenue by Channel — 2024</h3>
+    <p style="font-size:11px;color:var(--muted);margin-bottom:12px;">2024 full-year monthly revenue by channel shown for direct comparison against 2025 performance. Channel toggles are shared — selections made here also apply to the 2025 chart above.</p>
+    <div class="legend-chips" id="revLegend24">
+      <span class="solo-label" id="revSoloLabel24">● Solo view</span>
+    </div>
+    <canvas id="revChart24" height="320" style="width:100%;"></canvas>
+  </div>
+
+  <!-- MONTHLY RN TREND — 2025 -->
+  <div class="chart-card">
+    <h3>Monthly Net Room Nights by Channel — 2025</h3>
+    <p style="font-size:11px;color:var(--muted);margin-bottom:12px;">Stacked monthly room night production by booking channel. Reflects demand volume and channel mix throughout 2025. The total above each bar is the combined room nights for all active channels that month.</p>
+    <div class="legend-chips" id="rnLegend">
+      <span class="solo-label" id="rnSoloLabel">● Solo view</span>
+    </div>
+    <canvas id="rnChart" height="280" style="width:100%;"></canvas>
+  </div>
+
+  <!-- MONTHLY RN TREND — 2024 -->
+  <div class="chart-card">
+    <h3>Monthly Net Room Nights by Channel — 2024</h3>
+    <p style="font-size:11px;color:var(--muted);margin-bottom:12px;">2024 room night volume by channel. Compare alongside 2025 to identify which channels drove the +10.5% overall volume growth year-over-year.</p>
+    <div class="legend-chips" id="rnLegend24">
+      <span class="solo-label" id="rnSoloLabel24">● Solo view</span>
+    </div>
+    <canvas id="rnChart24" height="280" style="width:100%;"></canvas>
+  </div>
+
+  <!-- MONTHLY CONTRIBUTION % 2025 -->
+  <div class="chart-card">
+    <h3>Monthly Revenue Contribution % by Channel — 2025</h3>
+    <p style="font-size:11px;color:var(--muted);margin-bottom:14px;">Each bar totals 100% and shows each channel's proportional share of total monthly revenue. Useful for spotting seasonal shifts in channel mix — e.g. whether OTA share grows during peak summer months relative to PMS direct bookings.</p>
+    <canvas id="pctChart" height="260" style="width:100%;"></canvas>
+    <div class="legend-chips" id="pctLegend" style="margin-top:14px;margin-bottom:0;"></div>
+  </div>
+
+  <!-- MONTHLY CONTRIBUTION % 2024 -->
+  <div class="chart-card">
+    <h3>Monthly Revenue Contribution % by Channel — 2024</h3>
+    <p style="font-size:11px;color:var(--muted);margin-bottom:14px;">2024 channel mix by month for comparison. Note: the pilot launched Jun 7, 2024 (7 hotels) and expanded Nov 13, 2024 (32 hotels), so early 2024 reflects a smaller property set than 2025.</p>
+    <canvas id="pctChart24" height="260" style="width:100%;"></canvas>
+    <div class="legend-chips" id="pctLegend24" style="margin-top:14px;margin-bottom:0;"></div>
+  </div>
+
+  <!-- CHANNEL MIX DONUTS — side by side 2025 | 2024 -->
+  <div class="grid-2">
+    <div class="chart-card" style="margin-bottom:0;">
+      <h3>2025 Full-Year Revenue Share by Channel</h3>
+      <p style="font-size:11px;color:var(--muted);margin-bottom:12px;">Full-year 2025 revenue distribution across all 12 channels. PMS direct bookings represent the largest share, with OTA channels making up the remainder.</p>
+      <div class="donut-wrap">
+        <canvas id="revDonut25" width="200" height="200"></canvas>
+        <div class="donut-legend" id="revDonutLegend25"></div>
+      </div>
+    </div>
+    <div class="chart-card" style="margin-bottom:0;">
+      <h3>2024 Full-Year Revenue Share by Channel</h3>
+      <p style="font-size:11px;color:var(--muted);margin-bottom:12px;">Full-year 2024 revenue distribution. Compare channel mix proportions against 2025 to see how booking source share has shifted year-over-year.</p>
+      <div class="donut-wrap">
+        <canvas id="revDonut24" width="200" height="200"></canvas>
+        <div class="donut-legend" id="revDonutLegend24"></div>
+      </div>
+    </div>
+  </div>
+  <div style="height:22px;"></div>
+
+  <div class="grid-2">
+    <div class="chart-card" style="margin-bottom:0;">
+      <h3>2025 Full-Year Room Night Share by Channel</h3>
+      <p style="font-size:11px;color:var(--muted);margin-bottom:12px;">Full-year 2025 room night volume distribution by channel. Comparing this against the revenue share donut reveals which channels punch above or below their weight in terms of ADR.</p>
+      <div class="donut-wrap">
+        <canvas id="rnDonut25" width="200" height="200"></canvas>
+        <div class="donut-legend" id="rnDonutLegend25"></div>
+      </div>
+    </div>
+    <div class="chart-card" style="margin-bottom:0;">
+      <h3>2024 Full-Year Room Night Share by Channel</h3>
+      <p style="font-size:11px;color:var(--muted);margin-bottom:12px;">Full-year 2024 room night mix. Use alongside the 2025 version to identify channels that gained or lost volume share.</p>
+      <div class="donut-wrap">
+        <canvas id="rnDonut24" width="200" height="200"></canvas>
+        <div class="donut-legend" id="rnDonutLegend24"></div>
+      </div>
+    </div>
+  </div>
+  <div style="height:22px;"></div>
+
+  <!-- ADR COMPARISON -->
+  <div class="grid-2">
+    <div class="chart-card" style="margin-bottom:0;">
+      <h3>Annual Net ADR by Channel — 2025 vs 2024</h3>
+      <p style="font-size:11px;color:var(--muted);margin-bottom:12px;">Full-year average daily rate per channel with 2025 (solid) stacked above the 2024 comparison bar (faded). The ▲/▼ indicator shows year-over-year rate movement for each channel.</p>
+      <div id="adrBars"></div>
+    </div>
+    <div class="chart-card" style="margin-bottom:0;">
+      <h3>Monthly Net ADR Trend — 2025 vs 2024</h3>
+      <p style="font-size:11px;color:var(--muted);margin-bottom:12px;">Blended portfolio ADR by month for 2025 (navy line) vs 2024 (orange line). Shows seasonal rate patterns and highlights months where 2025 rates diverged from the prior year.</p>
+      <canvas id="adrLine" height="220" style="width:100%;"></canvas>
+    </div>
+  </div>
+  <div style="height:22px;"></div>
+
+  <!-- 2025 vs 2024 MONTHLY REVENUE COMPARISON -->
+  <div class="chart-card">
+    <h3>2025 vs 2024 — Monthly Net Revenue Comparison</h3>
+    <p style="font-size:11px;color:var(--muted);margin-bottom:10px;">Side-by-side monthly revenue comparison. Both years scale to the same maximum so bar lengths are directly comparable. The % shown is year-over-year growth or decline for each month.</p>
+    <div class="year-legend">
+      <div class="yl-item"><div class="yl-swatch" style="background:#1C355E;"></div> 2025</div>
+      <div class="yl-item"><div class="yl-swatch" style="background:#FF5F00;opacity:0.65;"></div> 2024</div>
+    </div>
+    <div id="yoyBars"></div>
+  </div>
+
+  <!-- DETAIL TABLES -->
+  <div class="chart-card">
+    <h3>2025 Monthly Net Revenue by Channel — Full Detail ($)</h3>
+    <p style="font-size:11px;color:var(--muted);margin-bottom:14px;">Month-by-month net revenue for every channel in 2025. The % sub-value in each cell shows that channel's share of total revenue for that month. Annual Total and Annual Share columns summarize full-year performance.</p>
+    <div class="tbl-wrap"><table id="detailTable25"></table></div>
+  </div>
+
+  <div class="chart-card">
+    <h3>2024 Monthly Net Revenue by Channel — Full Detail ($)</h3>
+    <p style="font-size:11px;color:var(--muted);margin-bottom:14px;">Month-by-month net revenue for every channel in 2024. Use alongside the 2025 table above to compare channel-level revenue at a monthly granularity.</p>
+    <div class="tbl-wrap"><table id="detailTable24"></table></div>
+  </div>
+
+  <!-- RN MERGED TABLE -->
+  <div class="chart-card">
+    <h3>Monthly Net Room Nights by Channel — 2025 with Variance vs 2024</h3>
+    <p style="font-size:11px;color:var(--muted);margin-bottom:14px;">
+      Each cell shows <strong>2025 room nights</strong> with the variance vs 2024 below in
+      <span style="color:#2E8B57;font-weight:700;">green (increase)</span> or
+      <span style="color:#C0392B;font-weight:700;">red (decrease)</span>.
+      Annual Total and Δ columns summarize the full year.
+    </p>
+    <div class="tbl-wrap"><table id="rnTableMerged"></table></div>
+  </div>
+
+  <!-- CONTRIBUTION % MERGED TABLE -->
+  <div class="chart-card">
+    <h3>Monthly Revenue Contribution % by Channel — 2025 with Variance vs 2024</h3>
+    <p style="font-size:11px;color:var(--muted);margin-bottom:14px;">
+      Each cell shows the channel's <strong>2025 % share</strong> of total net revenue with the percentage-point variance vs 2024 below in
+      <span style="color:#2E8B57;font-weight:700;">green (share gained)</span> or
+      <span style="color:#C0392B;font-weight:700;">red (share lost)</span>.
+    </p>
+    <div class="tbl-wrap"><table id="pctTableMerged"></table></div>
+  </div>
+
+</div>
+
+<div class="footer">
+  Channel Performance Dashboard · My Place Hotels · 2025 vs 2024 · Stay-date monthly reports · Excludes cancelled reservations
+</div>
+
+<script>
+// ===== DATA =====
+const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+const CHANNELS = ["PMS", "Expedia", "Website", "Booking", "GDS", "Expedia Programs", "Priceline/Agoda", "Other OTA", "HotelBeds", "BnBerry", "Hopper", "Hotel Tonight"];
+
+const COLORS = {
+  'PMS':               '#1C355E',
+  'Website':           '#2E8B57',
+  'Expedia':           '#E03030',
+  'Booking':           '#FF5F00',
+  'GDS':               '#6B4CA8',
+  'Expedia Programs':  '#0088CC',
+  'Priceline/Agoda':   '#D4822A',
+  'Other OTA':         '#6B8CAD',
+  'HotelBeds':         '#4DAA8C',
+  'Hopper':            '#9B59B6',
+  'Hotel Tonight':     '#C0392B',
+  'BnBerry':           '#95A5A6',
+};
+
+const monthlyRev25 = {"PMS": [3531143.8800001354, 3485318.990000118, 4625851.750000108, 4874883.3400001, 5614484.2500001425, 5896836.940000128, 6063441.79000015, 5673743.130000192, 5240529.800000142, 5333370.580000162, 4491525.740000086, 3741483.3500000886], "Expedia": [872237.9499999965, 1099223.3800000045, 1372647.06999999, 1531075.0399999984, 2039256.7700000075, 2177984.520000003, 2363125.780000035, 2358757.8500000252, 1862696.249999976, 1875756.0999999894, 1235772.2499999912, 1020494.7499999924], "Website": [588456.2299999952, 704823.5599999921, 848694.5499999902, 843519.5899999877, 1098586.6199999882, 1228711.9899999918, 1364009.269999991, 1263836.8399999891, 1169861.0699999882, 1125508.7999999889, 829633.5799999915, 649928.4599999958], "Booking": [418201.04999999655, 570015.0699999928, 706686.1699999878, 725289.2299999895, 998438.7499999824, 1129551.5299999907, 1272838.5399999917, 1206546.5399999907, 1004842.9499999745, 961151.6299999749, 771235.9499999862, 615165.4999999942], "GDS": [389599.88000000076, 441789.33000000083, 457630.32000000076, 497110.100000001, 619583.2199999965, 849275.9599999929, 745435.3699999922, 851489.9499999905, 658424.5699999935, 482761.9300000018, 373622.66000000096, 256382.01000000106], "Expedia Programs": [169248.76000000033, 221700.9000000002, 266925.8900000003, 266384.6900000004, 363017.53999999946, 426251.1999999988, 478230.80999999837, 473962.5099999979, 378637.69000000024, 386626.99999999884, 252300.32000000018, 230328.35999999993], "Priceline/Agoda": [94331.68999999957, 115449.03999999944, 179050.5000000004, 188092.79000000007, 152603.45000000007, 158694.8199999999, 130939.17999999977, 124553.25999999978, 127662.65000000014, 99802.43999999984, 91688.30999999984, 95248.26999999984], "Other OTA": [107035.36999999998, 113277.04000000001, 111361.25, 148046.27000000002, 93362.37000000002, 150234.69000000006, 130650.25, 106432.64, 118561.53999999996, 145277.60999999993, 103484.38, 69927.4], "HotelBeds": [22317.719999999994, 19173.649999999998, 70853.29000000007, 55815.769999999975, 75251.85000000003, 66832.06000000001, 83674.04000000008, 66893.34000000001, 71528.03000000001, 97450.0700000001, 67270.54000000004, 47817.64000000002], "BnBerry": [0.0, 1009.0, 3928.0, 4072.209999999999, 7480.4, 6613.839999999998, 22966.240000000005, 21442.950000000008, 17733.829999999998, 36857.970000000045, 47016.43000000003, 42598.60999999999], "Hopper": [7495.620000000001, 9743.889999999998, 8845.309999999998, 7386.299999999999, 10208.089999999998, 14312.080000000002, 12436.609999999995, 17202.669999999995, 10422.070000000002, 9575.16, 6955.559999999999, 4759.709999999999], "Hotel Tonight": [5222.609999999999, 8430.93, 10861.769999999997, 9465.230000000003, 7239.709999999997, 9340.359999999999, 14348.449999999993, 11272.159999999996, 10540.789999999994, 10464.699999999997, 7596.710000000001, 5455.859999999999]};
+const monthlyRn25  = {"PMS": [41204.0, 40074.0, 52128.0, 55256.0, 59729.0, 60032.0, 59735.0, 57807.0, 55767.0, 57544.0, 50150.0, 43573.0], "Expedia": [10040.0, 11866.0, 14873.0, 16478.0, 19411.0, 20159.0, 21268.0, 20323.0, 17492.0, 18572.0, 13956.0, 12944.0], "Website": [5883.0, 6532.0, 7831.0, 7838.0, 9287.0, 9780.0, 10453.0, 10040.0, 9534.0, 9523.0, 7724.0, 6560.0], "Booking": [4491.0, 5523.0, 6761.0, 6777.0, 8323.0, 9309.0, 9840.0, 9558.0, 8355.0, 8467.0, 7528.0, 6622.0], "GDS": [3813.0, 4180.0, 4180.0, 4778.0, 5442.0, 6130.0, 5718.0, 6358.0, 5692.0, 4440.0, 3726.0, 2641.0], "Expedia Programs": [2182.0, 2551.0, 3096.0, 3274.0, 3976.0, 4415.0, 4759.0, 4609.0, 3989.0, 4300.0, 3289.0, 3297.0], "Priceline/Agoda": [1147.0, 1345.0, 1855.0, 1873.0, 1387.0, 1375.0, 1161.0, 1080.0, 1207.0, 963.0, 1017.0, 1169.0], "Other OTA": [1330.0, 1419.0, 1409.0, 1929.0, 1199.0, 1936.0, 1656.0, 1359.0, 1553.0, 1914.0, 1344.0, 909.0], "HotelBeds": [329.0, 233.0, 770.0, 621.0, 742.0, 654.0, 826.0, 665.0, 756.0, 1102.0, 812.0, 623.0], "BnBerry": [0.0, 10.0, 23.0, 27.0, 54.0, 60.0, 184.0, 174.0, 154.0, 344.0, 549.0, 519.0], "Hopper": [98.0, 118.0, 104.0, 79.0, 99.0, 123.0, 99.0, 124.0, 98.0, 93.0, 85.0, 77.0], "Hotel Tonight": [69.0, 75.0, 116.0, 98.0, 70.0, 95.0, 139.0, 112.0, 110.0, 111.0, 95.0, 71.0]};
+const monthlyRev24 = {"PMS": [3277127.9300001217, 3553495.5100001595, 3991780.0400002124, 4328538.030000167, 4975710.650000229, 5579715.240000184, 5899033.730000186, 5861420.200000225, 5376414.910000205, 5340996.96000024, 4123859.5500001283, 3448611.0200001295], "Expedia": [749787.5199999914, 1103713.5799999982, 1592506.9900000123, 1592564.769999995, 2052065.019999973, 2225359.6099999878, 2430766.090000005, 2214658.9999999995, 1905972.1399999966, 1884836.5499999947, 1194868.0799999817, 863869.109999996], "Website": [470596.2799999958, 545502.5099999935, 787799.0399999884, 776392.5299999902, 917731.4199999851, 1147993.9099999866, 1188795.0099999886, 1188832.4899999907, 1072453.669999984, 1093064.519999986, 822135.1899999885, 576099.8099999966], "Booking": [359970.28999999404, 476910.24999999226, 702050.9399999909, 678612.5399999927, 914373.1199999814, 1038352.8899999745, 1096533.2599999816, 1069391.789999973, 863435.8099999814, 836018.369999982, 565548.7099999926, 462529.4899999935], "GDS": [277187.61999999953, 269954.3099999998, 302775.14999999973, 368914.59000000026, 368285.89999999985, 628606.5099999971, 709680.1999999965, 712505.6099999958, 563344.659999998, 493773.10000000085, 440922.0100000008, 369090.22000000085], "Expedia Programs": [29297.170000000013, 61622.92999999997, 101030.14000000009, 87795.00999999991, 113375.51999999987, 123613.28000000004, 272525.23000000004, 367734.28999999975, 396346.51000000065, 306281.85999999964, 210466.64000000033, 177542.72999999998], "Priceline/Agoda": [102231.5799999997, 142491.0499999994, 204257.25999999853, 158431.20999999947, 145676.75999999992, 153826.98000000004, 160281.54000000004, 141352.57999999978, 140058.81000000006, 184689.74999999988, 119409.84, 99547.41999999965], "Other OTA": [78060.85000000002, 77576.83000000005, 99085.45000000001, 107387.96999999999, 128237.08000000003, 130285.39000000007, 139703.43999999997, 156790.91999999998, 184566.23999999993, 160358.4699999999, 85388.05, 86237.86000000002], "HotelBeds": [18361.39999999999, 31943.83999999999, 33159.49, 32192.42999999999, 39941.45, 56231.20999999996, 54274.07000000003, 32718.719999999994, 32449.899999999976, 28394.989999999983, 26053.329999999984, 19466.609999999993], "BnBerry": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], "Hopper": [5825.69, 18889.79, 23074.190000000006, 20757.739999999972, 24091.01, 34169.26, 31270.379999999994, 32768.259999999995, 21266.69, 19950.97000000001, 11923.519999999997, 13295.67], "Hotel Tonight": [4109.87, 6019.739999999998, 6786.259999999996, 10143.369999999997, 11185.7, 13347.33, 21418.320000000007, 14104.299999999997, 12353.540000000005, 12218.969999999996, 8396.519999999999, 7447.550000000001]};
+const monthlyRn24  = {"PMS": [39081.0, 40751.0, 45256.0, 49008.0, 51424.0, 54234.0, 55325.0, 56439.0, 54697.0, 57812.0, 46045.0, 39826.0], "Expedia": [8932.0, 12141.0, 16418.0, 16261.0, 19341.0, 19458.0, 20211.0, 19344.0, 17399.0, 17898.0, 12772.0, 10132.0], "Website": [4613.0, 5215.0, 7346.0, 7224.0, 7641.0, 8804.0, 8822.0, 9223.0, 8865.0, 9326.0, 7514.0, 5818.0], "Booking": [3796.0, 4669.0, 6174.0, 5948.0, 7157.0, 7718.0, 7948.0, 8137.0, 6808.0, 6962.0, 5084.0, 4773.0], "GDS": [2660.0, 2470.0, 2729.0, 3590.0, 3316.0, 4707.0, 5066.0, 5133.0, 4787.0, 4580.0, 4155.0, 3642.0], "Expedia Programs": [357.0, 724.0, 1177.0, 909.0, 1064.0, 1109.0, 2471.0, 3517.0, 3941.0, 3050.0, 2428.0, 2246.0], "Priceline/Agoda": [1221.0, 1534.0, 2188.0, 1682.0, 1375.0, 1310.0, 1276.0, 1254.0, 1311.0, 1723.0, 1341.0, 1228.0], "Other OTA": [992.0, 1026.0, 1300.0, 1476.0, 1640.0, 1606.0, 1625.0, 1934.0, 2210.0, 2053.0, 1152.0, 1167.0], "HotelBeds": [228.0, 398.0, 382.0, 342.0, 424.0, 501.0, 464.0, 286.0, 324.0, 302.0, 298.0, 251.0], "BnBerry": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], "Hopper": [67.0, 196.0, 244.0, 197.0, 209.0, 263.0, 241.0, 275.0, 179.0, 177.0, 127.0, 153.0], "Hotel Tonight": [56.0, 73.0, 75.0, 105.0, 98.0, 110.0, 177.0, 137.0, 123.0, 122.0, 93.0, 101.0]};
+const monthlyAdr25 = {"PMS": [85.6990554315148, 86.97207640864696, 88.74024996163497, 88.2236017808039, 93.99930100956223, 98.22822727878678, 101.5056799196476, 98.14975919871628, 93.97187942690377, 92.6833480467149, 89.56182931206553, 85.86701282904754], "Expedia": [86.8762898406371, 92.63638799932619, 92.29120352316211, 92.91631508678228, 105.05676008448856, 108.04030557071297, 111.11180082753597, 116.06346749987823, 106.48846615595563, 100.99914387249567, 88.54773932358779, 78.83921121755195], "Website": [100.02655617881952, 107.90317819963137, 108.37626739879839, 107.61923832610204, 118.29294928394404, 125.63517280163516, 130.48974170094624, 125.88016334661246, 122.70411894273003, 118.18847001995053, 107.40983687208589, 99.07446036585301], "Booking": [93.11980627922435, 103.20750860039703, 104.52391214317228, 107.02216762579158, 119.96140213864982, 121.33972822000115, 129.35351016260077, 126.2342059008151, 120.2684560143596, 113.51737687492322, 102.44898379383451, 92.8972364844449], "GDS": [102.17673223183864, 105.69122727272747, 109.48093779904325, 104.04146086228569, 113.8521168687976, 138.54420228384876, 130.3664515564869, 133.92418213274465, 115.67543394237413, 108.73016441441482, 100.27446591519082, 97.07762589928097], "Expedia Programs": [77.56588450962435, 86.90744805958455, 86.21637273901818, 81.3636805131339, 91.30219818913467, 96.54613816534514, 100.48976885900365, 102.83413104794921, 94.92045374780653, 89.91325581395321, 76.71034356947406, 69.85998180163783], "Priceline/Agoda": [82.24210113339107, 85.83571747211855, 96.52318059299213, 100.423272824346, 110.02411679884648, 115.41441454545446, 112.78137812230815, 115.32709259259238, 105.76855840927932, 103.63700934579423, 90.155663716814, 81.47841745081253], "Other OTA": [80.47772180451126, 79.82878083157154, 79.03566359119944, 76.74767755313636, 77.86686405337784, 77.60056301652895, 78.89507850241546, 78.31688005886681, 76.34355441081775, 75.90261755485889, 76.99730654761905, 76.92783278327832], "HotelBeds": [67.83501519756837, 82.29034334763948, 92.01725974025983, 89.88046698872782, 101.41758760107821, 102.18969418960246, 101.30029055690082, 100.59148872180452, 94.61379629629631, 88.43019056261352, 82.84549261083748, 76.7538362760835], "BnBerry": [0.0, 100.9, 170.7826086956522, 150.82259259259257, 138.52592592592592, 110.23066666666664, 124.81652173913047, 123.23534482758625, 115.15474025974025, 107.1452616279071, 85.64012750455379, 82.07824662813101], "Hopper": [76.48591836734694, 82.57533898305083, 85.05105769230767, 93.49746835443037, 103.11202020202019, 116.35837398373985, 125.62232323232318, 138.73120967741932, 106.3476530612245, 102.95870967741935, 81.83011764705881, 61.81441558441557], "Hotel Tonight": [75.68999999999998, 112.4124, 93.63594827586203, 96.58397959183677, 103.42442857142854, 98.31957894736841, 103.22625899280571, 100.64428571428569, 95.82536363636358, 94.27657657657655, 79.96536842105264, 76.84309859154928]};
+const monthlyAdr24 = {"PMS": [83.8547613930074, 87.20020392138008, 88.20443786459724, 88.32309071988587, 96.75853006378789, 102.88223697311989, 106.62510131044168, 103.85407608214577, 98.29451176481717, 92.3856112917775, 89.56150613530521, 86.5919504846113], "Expedia": [83.94396775638059, 90.90796310023872, 96.99762394932466, 97.93768956398713, 106.09922030918634, 114.36733528625695, 120.26946167928381, 114.48816170388749, 109.54492442094354, 105.30989775393869, 93.55371750704523, 85.26145973154323], "Website": [102.01523520485493, 104.6025906040256, 107.24190579907274, 107.47404900332091, 120.10619290668566, 130.39458314402393, 134.75345839945462, 128.89867613574657, 120.97616130851485, 117.20614625777247, 109.41378626563595, 99.02024922653774], "Booking": [94.82884351949264, 102.14398158063659, 113.71087463556704, 114.09087760591673, 127.75927343858899, 134.5365237108026, 137.9634197282312, 131.42334890008271, 126.82664659224169, 120.08307526572564, 111.24089496459335, 96.90540331028566], "GDS": [104.20587218045095, 109.29324291497969, 110.94728838402335, 102.76172423398336, 111.06329915560912, 133.54716592309265, 140.08689301223777, 138.80880771478584, 117.6821934405678, 107.81072052401765, 106.11841395908564, 101.3427292696323], "Expedia Programs": [82.06490196078435, 85.11454419889499, 85.83699235344102, 96.58416941694159, 106.55593984962394, 111.46373309287651, 110.28944961554028, 104.5590816036394, 100.57003552397885, 100.420281967213, 86.68313014827032, 79.048410507569], "Priceline/Agoda": [83.7277477477475, 92.88855932203352, 93.35340950639787, 94.19215814506508, 105.94673454545449, 117.42517557251911, 125.61249216300943, 112.7213556618818, 106.83356979405039, 107.19080092861282, 89.04536912751678, 81.06467426710068], "Other OTA": [78.69037298387099, 75.61094541910336, 76.21957692307693, 72.75607723577235, 78.19334146341465, 81.12415317559157, 85.97134769230767, 81.0707962771458, 83.5141357466063, 78.10933755479782, 74.12157118055556, 73.8970522707798], "HotelBeds": [80.53245614035083, 80.26090452261303, 86.80494764397905, 94.12991228070172, 94.20153301886792, 112.23794411177637, 116.96997844827592, 114.40111888111886, 100.15401234567894, 94.02314569536418, 87.42728187919458, 77.5562151394422], "BnBerry": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], "Hopper": [86.95059701492536, 96.37647959183674, 94.56635245901641, 105.36923857868007, 115.267990430622, 129.92114068441066, 129.7526141078838, 119.15730909090907, 118.80832402234635, 112.71734463276842, 93.88598425196848, 86.89980392156863], "Hotel Tonight": [73.39053571428572, 82.4621917808219, 90.48346666666662, 96.60352380952378, 114.13979591836735, 121.33936363636363, 121.00745762711868, 102.95109489051093, 100.43528455284556, 100.15549180327865, 90.28516129032256, 73.7381188118812]};
+
+const moRev25 = [6205290.7600001255, 6789954.780000109, 8663335.870000077, 9151140.560000079, 11079513.020000117, 12114639.990000105, 12682096.330000158, 12176133.840000186, 10671441.240000073, 10564603.990000114, 8278102.430000055, 6779589.920000073];
+const moRn25  = [70586.0, 73926.0, 93146.0, 99028.0, 109719.0, 114068.0, 115838.0, 112209.0, 104707.0, 107373.0, 90275.0, 79005.0];
+const moAdr25 = [87.91106961720632, 91.8479936693465, 93.00813636656515, 92.409627176153, 100.98080569454804, 106.20542123996304, 109.48131295429961, 108.51298772825875, 101.91717115379176, 98.3916253620567, 91.69872533924182, 85.81216277450886];
+const moRev24 = [5372556.200000104, 6288120.340000143, 7844304.950000203, 8161730.190000143, 9690673.630000165, 11131501.610000132, 12004281.27000016, 11792278.160000185, 10568662.880000165, 10360584.510000207, 7608971.440000091, 6123737.490000117];
+const moRn24  = [62003.0, 69197.0, 83289.0, 86742.0, 93689.0, 99820.0, 103626.0, 105679.0, 100644.0, 104005.0, 81009.0, 69337.0];
+const moAdr24 = [86.6499395190572, 90.87273060971059, 94.18176409850284, 94.09202220377837, 103.43448675938653, 111.5157444399933, 115.84236842105418, 111.58582272731749, 105.0103620682819, 99.61621566271052, 93.92748262538842, 88.31846618688603];
+
+const annualRev25 = {"PMS": 58572613.54000155, "Expedia": 19809027.710000012, "Website": 11715570.559999889, "Booking": 10379962.909999853, "GDS": 6623105.299999973, "Expedia Programs": 3913615.669999995, "Priceline/Agoda": 1558116.3999999987, "Other OTA": 1397650.81, "HotelBeds": 744878.0000000003, "BnBerry": 211719.48000000007, "Hopper": 119343.07, "Hotel Tonight": 110239.28};
+const annualRn25  = {"PMS": 632999.0, "Expedia": 197382.0, "Website": 100985.0, "Booking": 91554.0, "GDS": 57098.0, "Expedia Programs": 43737.0, "Priceline/Agoda": 15579.0, "Other OTA": 17957.0, "HotelBeds": 8133.0, "BnBerry": 2098.0, "Hopper": 1197.0, "Hotel Tonight": 1161.0};
+const annualAdr25 = {"PMS": 92.53, "Expedia": 100.36, "Website": 116.01, "Booking": 113.38, "GDS": 116.0, "Expedia Programs": 89.48, "Priceline/Agoda": 100.01, "Other OTA": 77.83, "HotelBeds": 91.59, "BnBerry": 100.91, "Hopper": 99.7, "Hotel Tonight": 94.95};
+const annualRev24 = {"PMS": 55756703.77000219, "Expedia": 19810968.459999934, "Website": 10587396.379999874, "Booking": 9063727.459999831, "GDS": 5505039.879999989, "Expedia Programs": 2247631.3100000005, "Priceline/Agoda": 1752254.7799999965, "Other OTA": 1433678.55, "HotelBeds": 405187.4399999998, "BnBerry": 0, "Hopper": 257283.16999999995, "Hotel Tonight": 127531.47000000002};
+const annualRn24  = {"PMS": 589898.0, "Expedia": 190307.0, "Website": 90411.0, "Booking": 75174.0, "GDS": 46835.0, "Expedia Programs": 22993.0, "Priceline/Agoda": 17443.0, "Other OTA": 18181.0, "HotelBeds": 4200.0, "BnBerry": 0, "Hopper": 2328.0, "Hotel Tonight": 1270.0};
+const annualAdr24 = {"PMS": 94.52, "Expedia": 104.1, "Website": 117.1, "Booking": 120.57, "GDS": 117.54, "Expedia Programs": 97.75, "Priceline/Agoda": 100.46, "Other OTA": 78.86, "HotelBeds": 96.47, "BnBerry": 0, "Hopper": 110.52, "Hotel Tonight": 100.42};
+
+const grandRev25 = 115155843;
+const grandRn25  = 1169880;
+const grandRev24 = 106947403;
+const grandRn24  = 1059040;
+
+// ===== UTILS =====
+function fmtM(v)  { return '$' + (v/1e6).toFixed(1) + 'M'; }
+function fmtK(v)  { return v >= 1000 ? v.toLocaleString('en-US',{maximumFractionDigits:0}) : v.toFixed(0); }
+function fmtD(v)  { return '$' + v.toFixed(2); }
+function fmtDol(v){ return v > 0 ? '$' + Math.round(v).toLocaleString() : '—'; }
+
+// ===== CHANNEL TOGGLES =====
+const activeChannels = new Set(CHANNELS);
+
+function refreshAllCharts() {
+  drawRevChart('revChart',   monthlyRev25, moRev25);
+  drawRevChart('revChart24', monthlyRev24, moRev24);
+  drawRnChart('rnChart',    monthlyRn25,  moRn25);
+  drawRnChart('rnChart24',  monthlyRn24,  moRn24);
+  drawPctChart('pctChart',   monthlyRev25, moRev25);
+  drawPctChart('pctChart24', monthlyRev24, moRev24);
+}
+
+function updateSoloLabels() {
+  const active = CHANNELS.filter(c => activeChannels.has(c));
+  const isSolo = active.length === 1;
+  const soloName = isSolo ? active[0] : '';
+  const soloColor = isSolo ? COLORS[soloName] : '#FF5F00';
+  ['revSoloLabel','revSoloLabel24','rnSoloLabel','rnSoloLabel24'].forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    if (isSolo) {
+      el.classList.add('visible');
+      el.style.color = soloColor;
+      el.style.background = soloColor + '15';
+      el.style.borderColor = soloColor + '50';
+      el.innerHTML = `<span style="width:8px;height:8px;border-radius:50%;background:${soloColor};display:inline-block;"></span> ${soloName} — solo view`;
+    } else {
+      el.classList.remove('visible');
+    }
+  });
+}
+
+function renderChips(containerId) {
+  const el = document.getElementById(containerId);
+  if (!el) return;
+  // Keep the solo label if it exists
+  const soloEl = el.querySelector('.solo-label');
+  el.innerHTML = `<div class="chip-ctrl">
+    <button class="ctrl-btn" onclick="selectAllChannels()">All On</button>
+    <button class="ctrl-btn" onclick="deselectAllChannels()">All Off</button>
+  </div>` +
+  CHANNELS.map(ch => `
+    <div class="chip ${activeChannels.has(ch)?'':'inactive'}" data-ch="${ch}" onclick="toggleChannel('${ch}')">
+      <div class="chip-dot" style="background:${COLORS[ch]}"></div>
+      ${ch}
+    </div>`).join('');
+  if (soloEl) el.appendChild(soloEl);
+}
+
+function selectAllChannels() {
+  CHANNELS.forEach(c => activeChannels.add(c));
+  ['revLegend','revLegend24','rnLegend','rnLegend24','pctLegend','pctLegend24'].forEach(renderChips);
+  updateSoloLabels();
+  refreshAllCharts();
+}
+
+function deselectAllChannels() {
+  activeChannels.clear();
+  ['revLegend','revLegend24','rnLegend','rnLegend24','pctLegend','pctLegend24'].forEach(renderChips);
+  updateSoloLabels();
+  refreshAllCharts();
+}
+
+function toggleChannel(ch) {
+  if (activeChannels.has(ch)) activeChannels.delete(ch);
+  else activeChannels.add(ch);
+  ['revLegend','revLegend24','rnLegend','rnLegend24','pctLegend','pctLegend24'].forEach(renderChips);
+  updateSoloLabels();
+  refreshAllCharts();
+}
+
+// ===== STACKED BAR CHART =====
+function drawStackedBar(canvasId, dataByChannel, totals, fmtFn) {
+  const canvas = document.getElementById(canvasId);
+  if (!canvas) return;
+  const dpr = window.devicePixelRatio || 1;
+  const W = canvas.parentElement.clientWidth;
+  const H = parseInt(canvas.getAttribute('height'));
+  canvas.width  = W * dpr; canvas.height = H * dpr;
+  canvas.style.width = W+'px'; canvas.style.height = H+'px';
+  const ctx = canvas.getContext('2d');
+  ctx.scale(dpr, dpr);
+
+  const active = CHANNELS.filter(c => activeChannels.has(c));
+  const isSolo = active.length === 1;
+  const soloChannel = isSolo ? active[0] : null;
+
+  // Use active-channel totals (for proper scale when channels hidden)
+  const activeTotals = MONTHS.map((_,mi) =>
+    active.reduce((s,ch) => s + (dataByChannel[ch][mi]||0), 0));
+
+  // Scale: leave 14% headroom at top so total labels always fit
+  const maxVal = Math.max(...activeTotals, 1) * 1.14;
+
+  const PAD = {l:62,r:20,t:14,b:40};
+  const chartW = W - PAD.l - PAD.r;
+  const chartH = H - PAD.t - PAD.b;
+  const nBars = MONTHS.length;
+  const barW = (chartW/nBars)*0.72;
+  const gap  = (chartW/nBars)*0.28;
+
+  // Grid lines
+  const nGrid = 5;
+  for (let i=0;i<=nGrid;i++) {
+    const y = PAD.t + chartH - (i/nGrid)*chartH;
+    ctx.strokeStyle='#E4EAF3'; ctx.lineWidth=1;
+    ctx.beginPath(); ctx.moveTo(PAD.l,y); ctx.lineTo(PAD.l+chartW,y); ctx.stroke();
+    ctx.fillStyle='#5A6B84'; ctx.font='10px Arial'; ctx.textAlign='right';
+    ctx.fillText(fmtFn(maxVal*i/nGrid), PAD.l-5, y+3);
+  }
+
+  MONTHS.forEach((mo,mi) => {
+    const x = PAD.l + mi*(barW+gap) + gap/2;
+    let yBase = PAD.t + chartH;
+
+    // Draw stacked segments bottom→top
+    [...active].reverse().forEach(ch => {
+      const val = dataByChannel[ch][mi]||0;
+      const bH = (val/maxVal)*chartH;
+      if (bH < 0.5) return;
+      ctx.fillStyle = COLORS[ch];
+      ctx.fillRect(x, yBase-bH, barW, bH);
+
+      // In solo mode: draw value label inside each bar segment
+      if (isSolo && bH > 14) {
+        ctx.fillStyle = 'rgba(255,255,255,0.92)';
+        ctx.font = 'bold 10px Arial'; ctx.textAlign='center';
+        ctx.fillText(fmtFn(val), x+barW/2, yBase - bH/2 + 3);
+      }
+      yBase -= bH;
+    });
+
+    // Month label
+    ctx.fillStyle='#1C355E'; ctx.font='bold 11px Arial'; ctx.textAlign='center';
+    ctx.fillText(mo, x+barW/2, PAD.t+chartH+16);
+
+    // Total label above bar — always draw (14% headroom guarantees space)
+    const tot = activeTotals[mi];
+    if (tot > 0) {
+      const topY = PAD.t + chartH - (tot/maxVal)*chartH;
+      // Draw a small white pill background so text is always legible
+      const label = fmtFn(tot);
+      ctx.font = 'bold 10px Arial'; ctx.textAlign='center';
+      const tw = ctx.measureText(label).width;
+      ctx.fillStyle = 'rgba(255,255,255,0.82)';
+      ctx.fillRect(x+barW/2-tw/2-2, topY-12, tw+4, 13);
+      ctx.fillStyle = isSolo ? COLORS[soloChannel] : '#1C355E';
+      ctx.fillText(label, x+barW/2, topY-2);
+    }
+  });
+
+  // Y axis line
+  ctx.strokeStyle='#D0D8E8'; ctx.lineWidth=1;
+  ctx.beginPath(); ctx.moveTo(PAD.l,PAD.t); ctx.lineTo(PAD.l,PAD.t+chartH); ctx.stroke();
+
+  // Empty state message
+  if (active.length === 0) {
+    ctx.fillStyle='#5A6B84'; ctx.font='13px Arial'; ctx.textAlign='center';
+    ctx.fillText('No channels selected — use the chips above to add channels', W/2, H/2);
+  }
+}
+
+function drawRevChart(id, data, totals) { drawStackedBar(id, data, totals, fmtM); }
+function drawRnChart(id, data, totals)  { drawStackedBar(id, data, totals, v=>fmtK(v)); }
+
+// ===== 100% CONTRIBUTION CHART =====
+function drawPctChart(canvasId, monthlyRev, moRevTotal) {
+  const canvas = document.getElementById(canvasId);
+  if (!canvas) return;
+  const dpr = window.devicePixelRatio||1;
+  const W = canvas.parentElement.clientWidth;
+  const H = parseInt(canvas.getAttribute('height'));
+  canvas.width=W*dpr; canvas.height=H*dpr;
+  canvas.style.width=W+'px'; canvas.style.height=H+'px';
+  const ctx=canvas.getContext('2d'); ctx.scale(dpr,dpr);
+
+  const PAD={l:46,r:20,t:16,b:36};
+  const chartW=W-PAD.l-PAD.r, chartH=H-PAD.t-PAD.b;
+  const nBars=MONTHS.length;
+  const barW=(chartW/nBars)*0.72, gap=(chartW/nBars)*0.28;
+
+  [0,25,50,75,100].forEach(pct=>{
+    const y=PAD.t+chartH-(pct/100)*chartH;
+    ctx.strokeStyle='#E4EAF3'; ctx.lineWidth=1;
+    ctx.beginPath(); ctx.moveTo(PAD.l,y); ctx.lineTo(PAD.l+chartW,y); ctx.stroke();
+    ctx.fillStyle='#5A6B84'; ctx.font='10px Arial'; ctx.textAlign='right';
+    ctx.fillText(pct+'%', PAD.l-4, y+3);
+  });
+
+  MONTHS.forEach((mo,mi)=>{
+    const moTotal=moRevTotal[mi];
+    if (moTotal===0) return;
+    const x=PAD.l+mi*(barW+gap)+gap/2;
+    let yBase=PAD.t+chartH;
+    const active=CHANNELS.filter(c=>activeChannels.has(c));
+    const activeTot=active.reduce((s,ch)=>s+(monthlyRev[ch][mi]||0),0);
+    if (activeTot===0) return;
+    [...active].reverse().forEach(ch=>{
+      const val=monthlyRev[ch][mi]||0;
+      const bH=(val/activeTot)*chartH;
+      if (bH<0.5) return;
+      ctx.fillStyle=COLORS[ch]; ctx.fillRect(x,yBase-bH,barW,bH);
+      if (bH>16) {
+        ctx.fillStyle='rgba(255,255,255,0.92)';
+        ctx.font='bold 9px Arial'; ctx.textAlign='center';
+        ctx.fillText((val/activeTot*100).toFixed(0)+'%', x+barW/2, yBase-bH/2+3);
+      }
+      yBase-=bH;
+    });
+    ctx.fillStyle='#1C355E'; ctx.font='bold 11px Arial'; ctx.textAlign='center';
+    ctx.fillText(mo, x+barW/2, PAD.t+chartH+16);
+  });
+  ctx.strokeStyle='#D0D8E8'; ctx.lineWidth=1;
+  ctx.beginPath(); ctx.moveTo(PAD.l,PAD.t); ctx.lineTo(PAD.l,PAD.t+chartH); ctx.stroke();
+}
+
+// ===== ADR LINE (dual lines 2025 + 2024) =====
+function drawAdrLine() {
+  const canvas=document.getElementById('adrLine');
+  if (!canvas) return;
+  const dpr=window.devicePixelRatio||1;
+  const W=canvas.parentElement.clientWidth;
+  const H=parseInt(canvas.getAttribute('height'));
+  canvas.width=W*dpr; canvas.height=H*dpr;
+  canvas.style.width=W+'px'; canvas.style.height=H+'px';
+  const ctx=canvas.getContext('2d'); ctx.scale(dpr,dpr);
+
+  const PAD={l:55,r:20,t:20,b:36};
+  const chartW=W-PAD.l-PAD.r, chartH=H-PAD.t-PAD.b;
+
+  const allVals=[...moAdr25,...moAdr24].filter(v=>v>0);
+  const minV=Math.min(...allVals)*0.95;
+  const maxV=Math.max(...allVals)*1.05;
+  const scY=v=>PAD.t+chartH-(v-minV)/(maxV-minV)*chartH;
+  const scX=i=>PAD.l+(i/(MONTHS.length-1))*chartW;
+
+  for (let i=0;i<=5;i++) {
+    const v=minV+(maxV-minV)*i/5;
+    const y=scY(v);
+    ctx.strokeStyle='#E4EAF3'; ctx.lineWidth=1;
+    ctx.beginPath(); ctx.moveTo(PAD.l,y); ctx.lineTo(PAD.l+chartW,y); ctx.stroke();
+    ctx.fillStyle='#5A6B84'; ctx.font='10px Arial'; ctx.textAlign='right';
+    ctx.fillText('$'+v.toFixed(0), PAD.l-5, y+3);
+  }
+
+  // Draw 2024 line first (behind)
+  ctx.strokeStyle='rgba(255,95,0,0.55)'; ctx.lineWidth=2; ctx.lineJoin='round';
+  ctx.beginPath();
+  moAdr24.forEach((v,i)=>{ const y=scY(v); i===0?ctx.moveTo(scX(i),y):ctx.lineTo(scX(i),y); });
+  ctx.stroke();
+  moAdr24.forEach((v,i)=>{
+    ctx.fillStyle='#FF5F00';
+    ctx.beginPath(); ctx.arc(scX(i),scY(v),3,0,Math.PI*2); ctx.fill();
+  });
+
+  // Draw 2025 line on top
+  ctx.strokeStyle='#1C355E'; ctx.lineWidth=2.5; ctx.lineJoin='round';
+  ctx.beginPath();
+  moAdr25.forEach((v,i)=>{ const y=scY(v); i===0?ctx.moveTo(scX(i),y):ctx.lineTo(scX(i),y); });
+  ctx.stroke();
+  moAdr25.forEach((v,i)=>{
+    ctx.fillStyle='#1C355E';
+    ctx.beginPath(); ctx.arc(scX(i),scY(v),4,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle='#1C355E'; ctx.font='bold 10px Arial'; ctx.textAlign='center';
+    ctx.fillText('$'+v.toFixed(0), scX(i), scY(v)-9);
+    ctx.fillStyle='#5A6B84'; ctx.font='10px Arial';
+    ctx.fillText(MONTHS[i], scX(i), PAD.t+chartH+14);
+  });
+
+  // Legend
+  ctx.fillStyle='#1C355E'; ctx.font='bold 10px Arial'; ctx.textAlign='left';
+  ctx.fillRect(PAD.l+10, PAD.t+6, 20, 3);
+  ctx.fillText('2025', PAD.l+34, PAD.t+10);
+  ctx.fillStyle='rgba(255,95,0,0.65)';
+  ctx.fillRect(PAD.l+80, PAD.t+6, 20, 3);
+  ctx.fillStyle='#5A6B84'; ctx.font='10px Arial';
+  ctx.fillText('2024', PAD.l+104, PAD.t+10);
+}
+
+// ===== DONUT =====
+function drawDonut(canvasId, data, legendId, year) {
+  const canvas=document.getElementById(canvasId);
+  if (!canvas) return;
+  const ctx=canvas.getContext('2d');
+  ctx.clearRect(0,0,200,200);
+  const cx=100,cy=100,r=80,inner=58;
+  const total=data.reduce((s,d)=>s+d.v,0);
+  let start=-Math.PI/2;
+  data.forEach(d=>{
+    const angle=(d.v/total)*Math.PI*2;
+    ctx.beginPath();
+    ctx.arc(cx,cy,r,start,start+angle);
+    ctx.arc(cx,cy,inner,start+angle,start,true);
+    ctx.closePath();
+    ctx.fillStyle=d.c; ctx.fill();
+    start+=angle;
+  });
+  ctx.fillStyle='#1C355E'; ctx.font='bold 14px Arial';
+  ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.fillText(year, cx, cy-7);
+  ctx.font='10px Arial'; ctx.fillStyle='#5A6B84';
+  ctx.fillText('FULL YEAR', cx, cy+9);
+  document.getElementById(legendId).innerHTML=data.slice(0,6).map(d=>`
+    <div class="leg-item">
+      <div class="leg-dot" style="background:${d.c}"></div>
+      <span>${d.label}</span>
+      <span class="leg-val">${d.pct}</span>
+    </div>`).join('') + `<div class="leg-item" style="color:var(--muted);font-size:10px;">+ ${data.length-6} more</div>`;
+}
+
+function renderDonuts() {
+  const rev25data=CHANNELS.map(ch=>({label:ch,v:annualRev25[ch],c:COLORS[ch],pct:(annualRev25[ch]/grandRev25*100).toFixed(1)+'%'}));
+  const rev24data=CHANNELS.map(ch=>({label:ch,v:annualRev24[ch],c:COLORS[ch],pct:(annualRev24[ch]/grandRev24*100).toFixed(1)+'%'}));
+  const rn25data =CHANNELS.map(ch=>({label:ch,v:annualRn25[ch], c:COLORS[ch],pct:(annualRn25[ch]/grandRn25*100).toFixed(1)+'%'}));
+  const rn24data =CHANNELS.map(ch=>({label:ch,v:annualRn24[ch], c:COLORS[ch],pct:(annualRn24[ch]/grandRn24*100).toFixed(1)+'%'}));
+  drawDonut('revDonut25',rev25data,'revDonutLegend25','2025');
+  drawDonut('revDonut24',rev24data,'revDonutLegend24','2024');
+  drawDonut('rnDonut25', rn25data, 'rnDonutLegend25', '2025');
+  drawDonut('rnDonut24', rn24data, 'rnDonutLegend24', '2024');
+}
+
+// ===== ADR BARS — side by side 2025 / 2024 =====
+function renderAdrBars() {
+  const sorted=[...CHANNELS].sort((a,b)=>annualAdr25[b]-annualAdr25[a]);
+  const maxAdr=Math.max(...sorted.map(c=>Math.max(annualAdr25[c],annualAdr24[c])));
+  document.getElementById('adrBars').innerHTML=sorted.map(ch=>{
+    const v25=annualAdr25[ch], v24=annualAdr24[ch];
+    const pct25=(v25/maxAdr*100).toFixed(1);
+    const pct24=(v24/maxAdr*100).toFixed(1);
+    const delta=v24>0?((v25-v24)/v24*100):null;
+    const dStr=delta!==null?(delta>=0?`<span style="color:#2E8B57;font-size:10px;">▲${delta.toFixed(1)}%</span>`:`<span style="color:#C0392B;font-size:10px;">▼${Math.abs(delta).toFixed(1)}%</span>`):'';
+    return `<div class="hbar-group">
+      <div class="hbar-label">
+        <span style="display:flex;align-items:center;gap:6px;">
+          <span style="width:8px;height:8px;border-radius:50%;background:${COLORS[ch]};display:inline-block;"></span>
+          ${ch}
+        </span>
+        <span>${fmtD(v25)} <span style="color:#5A6B84;font-size:10px;">/ ${fmtD(v24).replace('$','')} 2024</span> ${dStr}</span>
+      </div>
+      <div class="hbar-track" style="margin-bottom:3px;">
+        <div class="hbar-fill" style="width:${pct25}%;background:${COLORS[ch]};">2025</div>
+      </div>
+      <div class="hbar-track" style="height:14px;">
+        <div class="hbar-fill" style="width:${pct24}%;background:${COLORS[ch]};opacity:0.5;height:100%;">2024</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ===== 2025 vs 2024 MONTHLY YoY BARS =====
+function renderYoyBars() {
+  const maxVal=Math.max(...moRev25,...moRev24);
+  document.getElementById('yoyBars').innerHTML=MONTHS.map((mo,i)=>{
+    const v25=moRev25[i], v24=moRev24[i];
+    const p25=(v25/maxVal*100).toFixed(1);
+    const p24=(v24/maxVal*100).toFixed(1);
+    const delta=v24>0?((v25-v24)/v24*100):null;
+    const dStr=delta!==null
+      ?(delta>=0
+        ?`<span style="color:#2E8B57;font-weight:700;">▲${delta.toFixed(1)}% YoY</span>`
+        :`<span style="color:#C0392B;font-weight:700;">▼${Math.abs(delta).toFixed(1)}% YoY</span>`)
+      :'<span style="color:#95A5A6;">No 2024 data</span>';
+    return `<div class="yoy-bar-group">
+      <div class="yoy-bar-label">
+        <span style="font-weight:700;min-width:36px;">${mo}</span>
+        <span style="color:#1C355E;font-weight:600;margin-left:8px;">2025: ${fmtM(v25)}</span>
+        <span style="color:#FF5F00;margin-left:8px;">2024: ${v24>0?fmtM(v24):'n/a'}</span>
+        <span style="margin-left:auto;">${dStr}</span>
+      </div>
+      <div class="yoy-bar-row">
+        <div class="yoy-bar-pill">2025</div>
+        <div style="flex:1;overflow:hidden;"><div class="bar-25" style="width:${p25}%;"></div></div>
+      </div>
+      ${v24>0?`<div class="yoy-bar-row">
+        <div class="yoy-bar-pill">2024</div>
+        <div style="flex:1;overflow:hidden;"><div class="bar-24" style="width:${p24}%;"></div></div>
+      </div>`:''}</div>`;
+  }).join('');
+}
+
+// ===== DETAIL TABLE =====
+function renderTable(tableId, dataByChannel, moTotals, fmtFn, showPct) {
+  let html='<thead><tr><th>Channel</th>'+
+    MONTHS.map(m=>`<th class="month-hdr">${m}</th>`).join('')+
+    '<th>Annual Total</th>'+(showPct?'<th>Ann. Share</th>':'')+
+    '</tr></thead><tbody>';
+  const annTotal=moTotals.reduce((s,v)=>s+v,0);
+  CHANNELS.forEach(ch=>{
+    const annCh=dataByChannel[ch].reduce((s,v)=>s+v,0);
+    html+=`<tr>
+      <td style="color:${COLORS[ch]}">● ${ch}</td>
+      ${dataByChannel[ch].map((v,mi)=>{
+        const pct=moTotals[mi]>0?(v/moTotals[mi]*100).toFixed(1)+'%':'—';
+        return showPct
+          ?`<td><div style="font-size:11px;">${fmtFn(v)}</div><div style="font-size:9px;color:#5A6B84;">${pct}</div></td>`
+          :`<td>${fmtFn(v)}</td>`;
+      }).join('')}
+      <td style="font-weight:700;">${fmtFn(annCh)}</td>
+      ${showPct?`<td style="font-weight:700;color:#FF5F00;">${annTotal>0?(annCh/annTotal*100).toFixed(1)+'%':'—'}</td>`:''}</tr>`;
+  });
+  html+='<tr class="total-row"><td>TOTAL</td>'+
+    moTotals.map(v=>`<td>${fmtFn(v)}</td>`).join('')+
+    `<td>${fmtFn(annTotal)}</td>`+
+    (showPct?'<td>100%</td>':'')+
+    '</tr></tbody>';
+  document.getElementById(tableId).innerHTML=html;
+}
+
+// ===== PCT TABLE =====
+function renderPctTable(tableId, monthlyRev, moRevTotal) {
+  let html='<thead><tr><th>Channel</th>'+
+    MONTHS.map(m=>`<th class="month-hdr">${m}</th>`).join('')+
+    '<th>Ann. Share</th></tr></thead><tbody>';
+  const annTotal=moRevTotal.reduce((s,v)=>s+v,0);
+  CHANNELS.forEach(ch=>{
+    const annCh=monthlyRev[ch].reduce((s,v)=>s+v,0);
+    html+=`<tr>
+      <td style="color:${COLORS[ch]}">● ${ch}</td>
+      ${monthlyRev[ch].map((v,mi)=>{
+        const pct=moRevTotal[mi]>0?(v/moRevTotal[mi]*100):0;
+        const bg=pct>40?'rgba(28,53,94,0.12)':pct>20?'rgba(28,53,94,0.06)':'transparent';
+        return `<td style="background:${bg};font-weight:${pct>20?'700':'400'};">${pct>0?pct.toFixed(1)+'%':'—'}</td>`;
+      }).join('')}
+      <td style="font-weight:700;color:#FF5F00;">${annTotal>0?(annCh/annTotal*100).toFixed(1)+'%':'—'}</td>
+    </tr>`;
+  });
+  html+='<tr class="total-row"><td>TOTAL</td>'+
+    MONTHS.map(()=>'<td>100%</td>').join('')+'<td>100%</td></tr></tbody>';
+  document.getElementById(tableId).innerHTML=html;
+}
+
+// ===== MERGED RN TABLE (2025 + Δ vs 2024) =====
+function renderMergedRnTable() {
+  let html='<thead><tr><th>Channel</th>'+
+    MONTHS.map(m=>`<th class="month-hdr" style="min-width:72px;">${m}</th>`).join('')+
+    '<th style="min-width:80px;">2025 Total</th><th style="min-width:72px;">Δ vs 2024</th></tr></thead><tbody>';
+
+  CHANNELS.forEach(ch=>{
+    const ann25=monthlyRn25[ch].reduce((s,v)=>s+v,0);
+    const ann24=monthlyRn24[ch].reduce((s,v)=>s+v,0);
+    const annDelta=ann25-ann24;
+    const annPct=ann24>0?((ann25-ann24)/ann24*100):null;
+    const annDeltaStr=annDelta>=0
+      ?`<span style="color:#2E8B57;font-size:9px;font-weight:700;">▲${Math.round(annDelta).toLocaleString()}</span>`
+      :`<span style="color:#C0392B;font-size:9px;font-weight:700;">▼${Math.round(Math.abs(annDelta)).toLocaleString()}</span>`;
+    const annPctStr=annPct!==null
+      ?(annPct>=0?`<span style="color:#2E8B57;font-size:9px;">+${annPct.toFixed(1)}%</span>`:`<span style="color:#C0392B;font-size:9px;">${annPct.toFixed(1)}%</span>`)
+      :'';
+
+    html+=`<tr>
+      <td style="color:${COLORS[ch]}">● ${ch}</td>
+      ${monthlyRn25[ch].map((v25,mi)=>{
+        const v24=monthlyRn24[ch][mi]||0;
+        const delta=v25-v24;
+        const pct=v24>0?((v25-v24)/v24*100):null;
+        const deltaStr=delta>=0
+          ?`<div style="color:#2E8B57;font-size:9px;font-weight:700;">▲${Math.round(delta).toLocaleString()}</div>`
+          :`<div style="color:#C0392B;font-size:9px;font-weight:700;">▼${Math.round(Math.abs(delta)).toLocaleString()}</div>`;
+        const pctStr=pct!==null
+          ?(pct>=0?`<span style="color:#2E8B57;font-size:8px;">(+${pct.toFixed(0)}%)</span>`:`<span style="color:#C0392B;font-size:8px;">(${pct.toFixed(0)}%)</span>`)
+          :'';
+        return `<td><div style="font-weight:600;">${v25>0?Math.round(v25).toLocaleString():'—'}</div>${v24>0||v25>0?deltaStr+'<div>'+pctStr+'</div>':''}</td>`;
+      }).join('')}
+      <td style="font-weight:700;">${ann25>0?Math.round(ann25).toLocaleString():'—'}</td>
+      <td>${annDeltaStr}<br>${annPctStr}</td>
+    </tr>`;
+  });
+
+  // Totals row
+  const totAnn25=moRn25.reduce((s,v)=>s+v,0);
+  const totAnn24=moRn24.reduce((s,v)=>s+v,0);
+  const totAnnDelta=totAnn25-totAnn24;
+  const totAnnPct=totAnn24>0?((totAnn25-totAnn24)/totAnn24*100):0;
+  html+='<tr class="total-row"><td>TOTAL</td>'+
+    moRn25.map((v25,mi)=>{
+      const v24=moRn24[mi];
+      const d=v25-v24;
+      const p=v24>0?((v25-v24)/v24*100):0;
+      const ds=d>=0?`▲${Math.round(d).toLocaleString()}`:`▼${Math.round(Math.abs(d)).toLocaleString()}`;
+      return `<td><div>${Math.round(v25).toLocaleString()}</div><div style="font-size:9px;opacity:0.8;">${ds} (${p>=0?'+':''}${p.toFixed(0)}%)</div></td>`;
+    }).join('')+
+    `<td>${Math.round(totAnn25).toLocaleString()}</td>`+
+    `<td>${totAnnDelta>=0?'▲':'▼'}${Math.round(Math.abs(totAnnDelta)).toLocaleString()} (${totAnnPct>=0?'+':''}${totAnnPct.toFixed(1)}%)</td>`+
+    '</tr></tbody>';
+  document.getElementById('rnTableMerged').innerHTML=html;
+}
+
+// ===== MERGED PCT TABLE (2025 % + Δ pp vs 2024) =====
+function renderMergedPctTable() {
+  let html='<thead><tr><th>Channel</th>'+
+    MONTHS.map(m=>`<th class="month-hdr" style="min-width:72px;">${m}</th>`).join('')+
+    '<th style="min-width:80px;">2025 Ann.</th><th style="min-width:72px;">Δ pp</th></tr></thead><tbody>';
+
+  const annTotal25=moRev25.reduce((s,v)=>s+v,0);
+  const annTotal24=moRev24.reduce((s,v)=>s+v,0);
+
+  CHANNELS.forEach(ch=>{
+    const annCh25=monthlyRev25[ch].reduce((s,v)=>s+v,0);
+    const annCh24=monthlyRev24[ch].reduce((s,v)=>s+v,0);
+    const annShare25=annTotal25>0?(annCh25/annTotal25*100):0;
+    const annShare24=annTotal24>0?(annCh24/annTotal24*100):0;
+    const annDeltaPp=annShare25-annShare24;
+    const annDeltaStr=annDeltaPp>=0
+      ?`<span style="color:#2E8B57;font-weight:700;font-size:10px;">+${annDeltaPp.toFixed(1)} pp</span>`
+      :`<span style="color:#C0392B;font-weight:700;font-size:10px;">${annDeltaPp.toFixed(1)} pp</span>`;
+
+    html+=`<tr>
+      <td style="color:${COLORS[ch]}">● ${ch}</td>
+      ${monthlyRev25[ch].map((v25,mi)=>{
+        const moTotal25=moRev25[mi];
+        const moTotal24=moRev24[mi];
+        const v24=monthlyRev24[ch][mi]||0;
+        const pct25=moTotal25>0?(v25/moTotal25*100):0;
+        const pct24=moTotal24>0?(v24/moTotal24*100):0;
+        const deltaPp=pct25-pct24;
+        const bg=pct25>40?'rgba(28,53,94,0.12)':pct25>20?'rgba(28,53,94,0.06)':'transparent';
+        const deltaStr=(moTotal24>0||moTotal25>0)
+          ?(deltaPp>=0
+            ?`<div style="color:#2E8B57;font-size:9px;font-weight:700;">+${deltaPp.toFixed(1)} pp</div>`
+            :`<div style="color:#C0392B;font-size:9px;font-weight:700;">${deltaPp.toFixed(1)} pp</div>`)
+          :'';
+        return `<td style="background:${bg};font-weight:${pct25>20?'700':'400'};">
+          <div>${pct25>0?pct25.toFixed(1)+'%':'—'}</div>
+          ${deltaStr}
+        </td>`;
+      }).join('')}
+      <td style="font-weight:700;color:#FF5F00;">${annShare25.toFixed(1)}%</td>
+      <td>${annDeltaStr}</td>
+    </tr>`;
+  });
+
+  html+='<tr class="total-row"><td>TOTAL</td>'+
+    MONTHS.map(()=>'<td><div>100%</div><div style="font-size:9px;opacity:0.8;">— pp</div></td>').join('')+
+    '<td>100%</td><td>— pp</td></tr></tbody>';
+  document.getElementById('pctTableMerged').innerHTML=html;
+}
+
+// ===== INIT =====
+function init() {
+  ['revLegend','revLegend24','rnLegend','rnLegend24','pctLegend','pctLegend24'].forEach(renderChips);
+  updateSoloLabels();
+  drawRevChart('revChart', monthlyRev25, moRev25);
+  drawRevChart('revChart24', monthlyRev24, moRev24);
+  drawRnChart('rnChart', monthlyRn25, moRn25);
+  drawRnChart('rnChart24', monthlyRn24, moRn24);
+  drawPctChart('pctChart', monthlyRev25, moRev25);
+  drawPctChart('pctChart24', monthlyRev24, moRev24);
+  drawAdrLine();
+  renderDonuts();
+  renderAdrBars();
+  renderYoyBars();
+  renderTable('detailTable25', monthlyRev25, moRev25, fmtDol, true);
+  renderTable('detailTable24', monthlyRev24, moRev24, fmtDol, true);
+  renderMergedRnTable();
+  renderMergedPctTable();
+}
+
+window.addEventListener('resize', ()=>{
+  drawRevChart('revChart', monthlyRev25, moRev25);
+  drawRevChart('revChart24', monthlyRev24, moRev24);
+  drawRnChart('rnChart', monthlyRn25, moRn25);
+  drawRnChart('rnChart24', monthlyRn24, moRn24);
+  drawPctChart('pctChart', monthlyRev25, moRev25);
+  drawPctChart('pctChart24', monthlyRev24, moRev24);
+  drawAdrLine();
+});
+window.addEventListener('load', init);
+</script>
+</body>
+</html>

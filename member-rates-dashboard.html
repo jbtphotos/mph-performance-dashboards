@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>2025 Member Rates Pilot — Executive Dashboard</title>
+<style>
+  :root {
+    --bg: #0f1117;
+    --card: #1a1d28;
+    --card-hover: #22263a;
+    --border: #2a2e3f;
+    --text: #e4e6ef;
+    --muted: #8b8fa3;
+    --accent: #6c7cff;
+    --accent2: #00d4aa;
+    --accent3: #ff6c8a;
+    --accent4: #ffa64d;
+    --positive: #00d4aa;
+    --negative: #ff6c8a;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); min-height:100vh; }
+
+  .header { padding: 28px 32px 20px; border-bottom: 1px solid var(--border); }
+  .header h1 { font-size: 22px; font-weight: 700; letter-spacing: -0.3px; }
+  .header .subtitle { color: var(--muted); font-size: 13px; margin-top: 4px; }
+  .pilot-badge { display: inline-block; background: linear-gradient(135deg, var(--accent), #8b5cf6); color: white; font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 12px; margin-left: 12px; vertical-align: middle; }
+
+  .dashboard { padding: 24px 32px; max-width: 1440px; margin: 0 auto; }
+
+  /* KPI Cards */
+  .kpi-row { display: grid; grid-template-columns: repeat(6, 1fr); gap: 14px; margin-bottom: 24px; }
+  .kpi-card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 18px 16px; transition: background 0.2s; }
+  .kpi-card:hover { background: var(--card-hover); }
+  .kpi-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.8px; color: var(--muted); font-weight: 600; margin-bottom: 8px; }
+  .kpi-value { font-size: 26px; font-weight: 700; letter-spacing: -0.5px; }
+  .kpi-sub { font-size: 11px; color: var(--muted); margin-top: 6px; }
+  .kpi-sub span { font-weight: 600; }
+  .kpi-sub .pms { color: var(--accent); }
+  .kpi-sub .web { color: var(--accent2); }
+
+  /* Sections */
+  .section-title { font-size: 15px; font-weight: 700; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+  .section-title .dot { width: 8px; height: 8px; border-radius: 50%; }
+
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 24px; }
+
+  .chart-card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 20px; }
+  .chart-card h3 { font-size: 13px; font-weight: 600; margin-bottom: 16px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
+
+  /* Bar Charts */
+  .bar-group { margin-bottom: 14px; }
+  .bar-label { font-size: 12px; color: var(--text); margin-bottom: 5px; display: flex; justify-content: space-between; }
+  .bar-track { height: 22px; background: #1e2235; border-radius: 6px; overflow: hidden; position: relative; }
+  .bar-fill { height: 100%; border-radius: 6px; transition: width 0.8s ease; display: flex; align-items: center; padding-left: 8px; font-size: 10px; font-weight: 600; color: white; }
+
+  /* Donut / Pie */
+  .donut-container { display: flex; align-items: center; gap: 24px; }
+  .donut-legend { flex: 1; }
+  .legend-item { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; font-size: 13px; }
+  .legend-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+  .legend-value { margin-left: auto; font-weight: 600; font-size: 13px; }
+
+  /* Hotel Table */
+  .table-container { background: var(--card); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; margin-bottom: 24px; }
+  .table-header-bar { padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); }
+  .table-header-bar h3 { font-size: 13px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
+  .sort-controls { display: flex; gap: 6px; }
+  .sort-btn { background: transparent; border: 1px solid var(--border); color: var(--muted); font-size: 11px; padding: 4px 10px; border-radius: 6px; cursor: pointer; transition: all 0.2s; }
+  .sort-btn:hover, .sort-btn.active { background: var(--accent); color: white; border-color: var(--accent); }
+
+  table { width: 100%; border-collapse: collapse; }
+  thead th { text-align: left; font-size: 10px; text-transform: uppercase; letter-spacing: 0.4px; color: var(--muted); font-weight: 600; padding: 8px 10px; border-bottom: 1px solid var(--border); cursor: pointer; user-select: none; white-space: nowrap; }
+  thead th:hover { color: var(--accent); }
+  thead th.sorted-asc::after { content: ' ▲'; font-size: 8px; }
+  thead th.sorted-desc::after { content: ' ▼'; font-size: 9px; }
+  thead th.group-pms { border-bottom: 2px solid var(--accent); }
+  thead th.group-web { border-bottom: 2px solid var(--accent2); }
+  thead tr.super-header th { padding: 6px 10px; font-size: 11px; font-weight: 700; border-bottom: none; }
+  thead tr.super-header th.pms-header { color: var(--accent); text-align: center; }
+  thead tr.super-header th.web-header { color: var(--accent2); text-align: center; }
+  tbody td { padding: 7px 10px; font-size: 12px; border-bottom: 1px solid var(--border); white-space: nowrap; }
+  tbody tr:hover { background: var(--card-hover); }
+  tbody tr:last-child td { border-bottom: none; }
+  .hotel-name { font-weight: 600; max-width: 200px; overflow: hidden; text-overflow: ellipsis; }
+  .num { text-align: right; font-variant-numeric: tabular-nums; }
+  td.pms-col { background: rgba(108,124,255,0.04); }
+  td.web-col { background: rgba(0,212,170,0.04); }
+  .col-divider { border-left: 2px solid var(--border); }
+
+  /* Tooltip */
+  .tooltip { position: fixed; background: #2a2e42; border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px; font-size: 12px; pointer-events: none; z-index: 100; display: none; max-width: 260px; box-shadow: 0 8px 24px rgba(0,0,0,0.4); }
+
+  /* Footer */
+  .footer { text-align: center; padding: 20px; color: var(--muted); font-size: 11px; border-top: 1px solid var(--border); }
+
+  /* Responsive */
+  @media (max-width: 1100px) {
+    .kpi-row { grid-template-columns: repeat(3, 1fr); }
+    .grid-2, .grid-3 { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Member Rates Pilot <span class="pilot-badge">2025 PILOT</span></h1>
+  <div class="subtitle">Full-year performance report · Jan 1 – Dec 31, 2025 · Pilot launched Jun 7 (7 hotels) · Expanded Nov 13 (31 hotels)</div>
+</div>
+
+<div class="dashboard">
+
+  <!-- KPI CARDS -->
+  <div class="kpi-row" id="kpiRow"></div>
+
+  <!-- CHANNEL & MEMBER TYPE CHARTS -->
+  <div class="grid-2">
+    <div class="chart-card">
+      <h3>Net Revenue by Channel</h3>
+      <div class="donut-container">
+        <canvas id="channelDonut" width="160" height="160"></canvas>
+        <div class="donut-legend" id="channelLegend"></div>
+      </div>
+    </div>
+    <div class="chart-card">
+      <h3>Net Reservations by Member Type</h3>
+      <div class="donut-container">
+        <canvas id="memberDonut" width="160" height="160"></canvas>
+        <div class="donut-legend" id="memberLegend"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- METRIC COMPARISON BARS -->
+  <div class="grid-3">
+    <div class="chart-card">
+      <h3>ADR Comparison</h3>
+      <div id="adrBars"></div>
+    </div>
+    <div class="chart-card">
+      <h3>Revenue per Booking</h3>
+      <div id="rpbBars"></div>
+    </div>
+    <div class="chart-card">
+      <h3>Avg Length of Stay</h3>
+      <div id="losBars"></div>
+    </div>
+  </div>
+
+  <!-- NEW MEMBER SIGN-UPS WIDGET -->
+  <div class="chart-card" style="margin-bottom:24px;" id="newMemberWidget">
+    <h3>New Member Sign-Ups by Channel</h3>
+    <div id="newMemberContent"></div>
+  </div>
+
+  <!-- CANCEL RATE & NEW VS CURRENT -->
+  <div class="grid-2">
+    <div class="chart-card">
+      <h3>Cancellation Rate by Channel & Type</h3>
+      <div id="cancelBars"></div>
+    </div>
+    <div class="chart-card">
+      <h3>New Member vs Current Member — Key Metrics</h3>
+      <div id="newVsCurrent"></div>
+    </div>
+  </div>
+
+  <!-- HOTEL TABLE -->
+  <div class="table-container">
+    <div class="table-header-bar">
+      <h3>Hotel-by-Hotel Breakdown — PMS & Web by Member Type (All 31 Properties)</h3>
+      <div class="sort-controls">
+        <button class="sort-btn active" onclick="sortTable('total_rev')">Total Revenue</button>
+        <button class="sort-btn" onclick="sortTable('pms_cm_rev')">PMS CM Rev</button>
+        <button class="sort-btn" onclick="sortTable('web_cm_rev')">Web CM Rev</button>
+        <button class="sort-btn" onclick="sortTable('name')">A–Z</button>
+      </div>
+    </div>
+    <div style="overflow-x:auto;">
+      <table>
+        <thead>
+          <tr class="super-header">
+            <th rowspan="2" onclick="sortTable('name')" style="vertical-align:bottom;">Property</th>
+            <th rowspan="2" onclick="sortTable('guests')" class="num" style="vertical-align:bottom;">Guests</th>
+            <th colspan="4" class="pms-header col-divider">PMS (Property)</th>
+            <th colspan="4" class="web-header col-divider">WEB (Website)</th>
+            <th rowspan="2" onclick="sortTable('total_rev')" class="num col-divider" style="vertical-align:bottom;">Total Rev</th>
+          </tr>
+          <tr>
+            <th onclick="sortTable('pms_cm_rev')" class="num group-pms col-divider">CM Rev</th>
+            <th onclick="sortTable('pms_nm_rev')" class="num group-pms">NM Rev</th>
+            <th onclick="sortTable('pms_cm_res')" class="num group-pms">CM Res</th>
+            <th onclick="sortTable('pms_nm_res')" class="num group-pms">NM Res</th>
+            <th onclick="sortTable('web_cm_rev')" class="num group-web col-divider">CM Rev</th>
+            <th onclick="sortTable('web_nm_rev')" class="num group-web">NM Rev</th>
+            <th onclick="sortTable('web_cm_res')" class="num group-web">CM Res</th>
+            <th onclick="sortTable('web_nm_res')" class="num group-web">NM Res</th>
+          </tr>
+        </thead>
+        <tbody id="hotelTableBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<div class="footer">
+  Member Rates Pilot Dashboard · Data source: 2025 production reports · Rate codes: MEMBER RATE, MEMBER RATE HOTEL · Excludes cancelled reservations
+</div>
+
+<div class="tooltip" id="tooltip"></div>
+
+<script>
+// ===== DATA =====
+const summary = {
+  pms: { total: {guests:1305,gross_res:2018,net_res:1778,gross_rn:4271,net_rn:3810,gross_rev:419857,net_rev:370005,gross_adr:98.30,net_adr:97.11,net_rpb:267.43,net_los:2.85,cancel_rate:0.1189},
+         current: {guests:671,net_res:999,net_rn:2203,net_rev:210749,net_adr:95.66,net_rpb:266.06,net_los:2.87,cancel_rate:0.1151},
+         new_mem: {guests:677,net_res:779,net_rn:1607,net_rev:159256,net_adr:99.10,net_rpb:204.44,net_los:2.06,cancel_rate:0.1237}},
+  web: { total: {guests:1105,gross_res:1563,net_res:1305,gross_rn:2794,net_rn:2332,gross_rev:336178,net_rev:276177,gross_adr:120.32,net_adr:118.43,net_rpb:215.08,net_los:1.81,cancel_rate:0.1651},
+         current: {guests:632,net_res:780,net_rn:1433,net_rev:171081,net_adr:119.39,net_rpb:223.35,net_los:1.87,cancel_rate:0.1640},
+         new_mem: {guests:503,net_res:525,net_rn:899,net_rev:105095,net_adr:116.90,net_rpb:200.18,net_los:1.71,cancel_rate:0.1667}},
+  grand: {guests:2371,gross_res:3581,net_res:3083,gross_rn:7065,net_rn:6142,gross_rev:756035,net_rev:646182,gross_adr:107.01,net_adr:105.21,net_rpb:245.27,net_los:2.41,cancel_rate:0.1391}
+};
+
+const hotels = [
+  {name:"Aberdeen, SD",guests:101,pms_cm_rev:20349,pms_cm_res:53,pms_nm_rev:11134,pms_nm_res:35,web_cm_rev:12467,web_cm_res:27,web_nm_rev:4166,web_nm_res:11},
+  {name:"Anchorage, AK",guests:24,pms_cm_rev:602,pms_cm_res:3,pms_nm_rev:636,pms_nm_res:3,web_cm_rev:5691,web_cm_res:12,web_nm_rev:3855,web_nm_res:7},
+  {name:"Atlanta West/Lithia Springs, GA",guests:11,pms_cm_rev:1004,pms_cm_res:3,pms_nm_rev:2513,pms_nm_res:4,web_cm_rev:637,web_cm_res:4,web_nm_rev:377,web_nm_res:2},
+  {name:"Billings, MT",guests:52,pms_cm_rev:2135,pms_cm_res:15,pms_nm_rev:2983,pms_nm_res:26,web_cm_rev:1270,web_cm_res:11,web_nm_rev:567,web_nm_res:5},
+  {name:"Bismarck, ND",guests:106,pms_cm_rev:5122,pms_cm_res:41,pms_nm_rev:5943,pms_nm_res:50,web_cm_rev:1507,web_cm_res:11,web_nm_rev:1787,web_nm_res:16},
+  {name:"Boise/Nampa, ID",guests:129,pms_cm_rev:237,pms_cm_res:2,pms_nm_rev:0,pms_nm_res:0,web_cm_rev:11605,web_cm_res:70,web_nm_rev:13028,web_nm_res:63},
+  {name:"Colorado Springs, CO",guests:102,pms_cm_rev:5829,pms_cm_res:46,pms_nm_rev:8851,pms_nm_res:52,web_cm_rev:3781,web_cm_res:15,web_nm_rev:3939,web_nm_res:22},
+  {name:"Davenport/Quad Cities, IA",guests:85,pms_cm_rev:1545,pms_cm_res:15,pms_nm_rev:714,pms_nm_res:6,web_cm_rev:7167,web_cm_res:53,web_nm_rev:3294,web_nm_res:25},
+  {name:"Dickinson, ND",guests:22,pms_cm_rev:756,pms_cm_res:6,pms_nm_rev:1202,pms_nm_res:7,web_cm_rev:321,web_cm_res:3,web_nm_rev:1023,web_nm_res:7},
+  {name:"Fargo, ND",guests:27,pms_cm_rev:2244,pms_cm_res:14,pms_nm_rev:174,pms_nm_res:1,web_cm_rev:4746,web_cm_res:16,web_nm_rev:1331,web_nm_res:7},
+  {name:"Fort Pierre, SD",guests:54,pms_cm_rev:2939,pms_cm_res:13,pms_nm_rev:5476,pms_nm_res:26,web_cm_rev:5025,web_cm_res:16,web_nm_rev:1287,web_nm_res:3},
+  {name:"Grand Forks, ND",guests:9,pms_cm_rev:4041,pms_cm_res:3,pms_nm_rev:316,pms_nm_res:3,web_cm_rev:183,web_cm_res:2,web_nm_rev:924,web_nm_res:3},
+  {name:"Grand Rapids, MN",guests:17,pms_cm_rev:1082,pms_cm_res:6,pms_nm_rev:823,pms_nm_res:3,web_cm_rev:782,web_cm_res:5,web_nm_rev:1471,web_nm_res:5},
+  {name:"Indianapolis Airport, IN",guests:39,pms_cm_rev:3090,pms_cm_res:8,pms_nm_rev:901,pms_nm_res:8,web_cm_rev:1954,web_cm_res:13,web_nm_rev:1307,web_nm_res:14},
+  {name:"Jacksonville/Camp Lejeune, NC",guests:344,pms_cm_rev:51137,pms_cm_res:299,pms_nm_rev:22481,pms_nm_res:141,web_cm_rev:19519,web_cm_res:94,web_nm_rev:9345,web_nm_res:58},
+  {name:"Jamestown, ND",guests:40,pms_cm_rev:780,pms_cm_res:6,pms_nm_rev:1738,pms_nm_res:12,web_cm_rev:2436,web_cm_res:11,web_nm_rev:1916,web_nm_res:15},
+  {name:"Kalispell, MT",guests:244,pms_cm_rev:25443,pms_cm_res:66,pms_nm_rev:17274,pms_nm_res:64,web_cm_rev:27372,web_cm_res:102,web_nm_rev:18504,web_nm_res:77},
+  {name:"Kansas City East, MO",guests:80,pms_cm_rev:5689,pms_cm_res:27,pms_nm_rev:7714,pms_nm_res:40,web_cm_rev:1717,web_cm_res:18,web_nm_rev:5326,web_nm_res:16},
+  {name:"Ketchikan, AK",guests:64,pms_cm_rev:11276,pms_cm_res:42,pms_nm_rev:4849,pms_nm_res:14,web_cm_rev:5909,web_cm_res:14,web_nm_rev:1642,web_nm_res:6},
+  {name:"Loveland, CO",guests:18,pms_cm_rev:906,pms_cm_res:6,pms_nm_rev:5045,pms_nm_res:8,web_cm_rev:404,web_cm_res:4,web_nm_rev:505,web_nm_res:3},
+  {name:"Marion, OH",guests:34,pms_cm_rev:2161,pms_cm_res:13,pms_nm_rev:180,pms_nm_res:2,web_cm_rev:3348,web_cm_res:16,web_nm_rev:3082,web_nm_res:13},
+  {name:"Phoenix West/Buckeye, AZ",guests:277,pms_cm_rev:23290,pms_cm_res:97,pms_nm_rev:30447,pms_nm_res:145,web_cm_rev:16818,web_cm_res:45,web_nm_rev:10066,web_nm_res:48},
+  {name:"Pittsburgh North/Monaca, PA",guests:16,pms_cm_rev:1307,pms_cm_res:7,pms_nm_rev:287,pms_nm_res:3,web_cm_rev:1049,web_cm_res:5,web_nm_rev:88,web_nm_res:1},
+  {name:"Portland East, OR",guests:32,pms_cm_rev:2003,pms_cm_res:13,pms_nm_rev:950,pms_nm_res:5,web_cm_rev:2457,web_cm_res:16,web_nm_rev:1524,web_nm_res:5},
+  {name:"Redding, CA",guests:26,pms_cm_rev:2937,pms_cm_res:6,pms_nm_rev:5693,pms_nm_res:15,web_cm_rev:1090,web_cm_res:4,web_nm_rev:716,web_nm_res:4},
+  {name:"Sioux Falls, SD",guests:33,pms_cm_rev:3181,pms_cm_res:23,pms_nm_rev:95,pms_nm_res:1,web_cm_rev:1178,web_cm_res:12,web_nm_rev:183,web_nm_res:2},
+  {name:"Tucson North-Marana, AZ",guests:88,pms_cm_rev:5168,pms_cm_res:26,pms_nm_rev:9294,pms_nm_res:33,web_cm_rev:6183,web_cm_res:31,web_nm_rev:2039,web_nm_res:15},
+  {name:"Tucson South, AZ",guests:100,pms_cm_rev:3162,pms_cm_res:27,pms_nm_rev:4708,pms_nm_res:30,web_cm_rev:6800,web_cm_res:44,web_nm_rev:2575,web_nm_res:18},
+  {name:"Vancouver, WA",guests:93,pms_cm_rev:11714,pms_cm_res:56,pms_nm_rev:5060,pms_nm_res:28,web_cm_rev:4101,web_cm_res:20,web_nm_rev:732,web_nm_res:6},
+  {name:"Watertown, SD",guests:121,pms_cm_rev:4817,pms_cm_res:34,pms_nm_rev:1777,pms_nm_res:14,web_cm_rev:11497,web_cm_res:71,web_nm_rev:7165,web_nm_res:39},
+  {name:"Wixom/Novi/Detroit, MI",guests:41,pms_cm_rev:4806,pms_cm_res:23,pms_nm_rev:0,pms_nm_res:0,web_cm_rev:2068,web_cm_res:15,web_nm_rev:1332,web_nm_res:9}
+];
+
+// ===== KPI CARDS =====
+function renderKPIs() {
+  const g = summary.grand;
+  const kpis = [
+    {label:'Net Revenue', value:'$'+fmt(g.net_rev), sub:`<span class="pms">PMS $${fmt(summary.pms.total.net_rev)}</span> · <span class="web">Web $${fmt(summary.web.total.net_rev)}</span>`},
+    {label:'Net Reservations', value:fmt(g.net_res), sub:`<span class="pms">PMS ${fmt(summary.pms.total.net_res)}</span> · <span class="web">Web ${fmt(summary.web.total.net_res)}</span>`},
+    {label:'Total Guests', value:fmt(g.guests), sub:`<span class="pms">PMS ${fmt(summary.pms.total.guests)}</span> · <span class="web">Web ${fmt(summary.web.total.guests)}</span>`},
+    {label:'Net ADR', value:'$'+g.net_adr.toFixed(2), sub:`<span class="pms">PMS $${summary.pms.total.net_adr.toFixed(2)}</span> · <span class="web">Web $${summary.web.total.net_adr.toFixed(2)}</span>`},
+    {label:'Avg Length of Stay', value:g.net_los.toFixed(2)+' nights', sub:`<span class="pms">PMS ${summary.pms.total.net_los.toFixed(2)}</span> · <span class="web">Web ${summary.web.total.net_los.toFixed(2)}</span>`},
+    {label:'Cancel Rate', value:(g.cancel_rate*100).toFixed(1)+'%', sub:`<span class="pms">PMS ${(summary.pms.total.cancel_rate*100).toFixed(1)}%</span> · <span class="web">Web ${(summary.web.total.cancel_rate*100).toFixed(1)}%</span>`}
+  ];
+  document.getElementById('kpiRow').innerHTML = kpis.map(k=>`
+    <div class="kpi-card">
+      <div class="kpi-label">${k.label}</div>
+      <div class="kpi-value">${k.value}</div>
+      <div class="kpi-sub">${k.sub}</div>
+    </div>`).join('');
+}
+
+// ===== DONUT CHARTS =====
+function drawDonut(canvasId, data, colors) {
+  const canvas = document.getElementById(canvasId);
+  const ctx = canvas.getContext('2d');
+  const cx = canvas.width/2, cy = canvas.height/2, r = 60, inner = 38;
+  const total = data.reduce((s,d)=>s+d.value,0);
+  let start = -Math.PI/2;
+
+  data.forEach((d,i) => {
+    const angle = (d.value/total)*Math.PI*2;
+    ctx.beginPath();
+    ctx.arc(cx, cy, r, start, start+angle);
+    ctx.arc(cx, cy, inner, start+angle, start, true);
+    ctx.closePath();
+    ctx.fillStyle = colors[i];
+    ctx.fill();
+    start += angle;
+  });
+
+  // Center text
+  ctx.fillStyle = '#e4e6ef';
+  ctx.font = 'bold 18px system-ui';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('$'+fmt(total), cx, cy-6);
+  ctx.font = '10px system-ui';
+  ctx.fillStyle = '#8b8fa3';
+  ctx.fillText('NET REV', cx, cy+10);
+}
+
+function renderChannelDonut() {
+  const data = [
+    {label:'PMS (Property)', value: summary.pms.total.net_rev},
+    {label:'Web', value: summary.web.total.net_rev}
+  ];
+  const colors = ['#6c7cff','#00d4aa'];
+  drawDonut('channelDonut', data, colors);
+
+  const total = data.reduce((s,d)=>s+d.value,0);
+  document.getElementById('channelLegend').innerHTML = data.map((d,i)=>`
+    <div class="legend-item">
+      <div class="legend-dot" style="background:${colors[i]}"></div>
+      <span>${d.label}</span>
+      <span class="legend-value">$${fmt(d.value)} (${(d.value/total*100).toFixed(1)}%)</span>
+    </div>`).join('');
+}
+
+function renderMemberDonut() {
+  const curr = summary.pms.current.net_res + summary.web.current.net_res;
+  const newm = summary.pms.new_mem.net_res + summary.web.new_mem.net_res;
+  const data = [
+    {label:'Current Members', value: curr},
+    {label:'New Members', value: newm}
+  ];
+  const colors = ['#6c7cff','#00d4aa'];
+
+  const canvas = document.getElementById('memberDonut');
+  const ctx = canvas.getContext('2d');
+  const cx = canvas.width/2, cy = canvas.height/2, r = 60, inner = 38;
+  const total = data.reduce((s,d)=>s+d.value,0);
+  let start = -Math.PI/2;
+
+  data.forEach((d,i) => {
+    const angle = (d.value/total)*Math.PI*2;
+    ctx.beginPath();
+    ctx.arc(cx, cy, r, start, start+angle);
+    ctx.arc(cx, cy, inner, start+angle, start, true);
+    ctx.closePath();
+    ctx.fillStyle = colors[i];
+    ctx.fill();
+    start += angle;
+  });
+
+  ctx.fillStyle = '#e4e6ef';
+  ctx.font = 'bold 18px system-ui';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(fmt(total), cx, cy-6);
+  ctx.font = '10px system-ui';
+  ctx.fillStyle = '#8b8fa3';
+  ctx.fillText('NET RES', cx, cy+10);
+
+  document.getElementById('memberLegend').innerHTML = data.map((d,i)=>`
+    <div class="legend-item">
+      <div class="legend-dot" style="background:${colors[i]}"></div>
+      <span>${d.label}</span>
+      <span class="legend-value">${fmt(d.value)} (${(d.value/total*100).toFixed(1)}%)</span>
+    </div>`).join('');
+}
+
+// ===== BAR CHARTS =====
+function renderBars(containerId, items, maxVal, prefix='', suffix='') {
+  const colors = {'PMS — Current Member':'#6c7cff','PMS — New Member':'#8b9aff','PMS — Total':'#4a5aee',
+                   'Web — Current Member':'#00d4aa','Web — New Member':'#33e0be','Web — Total':'#00b894'};
+  document.getElementById(containerId).innerHTML = items.map(d => {
+    const pct = (d.value/maxVal*100).toFixed(1);
+    const color = colors[d.label] || '#6c7cff';
+    return `<div class="bar-group">
+      <div class="bar-label"><span>${d.label}</span><span>${prefix}${d.value.toFixed(2)}${suffix}</span></div>
+      <div class="bar-track"><div class="bar-fill" style="width:${pct}%;background:${color}"></div></div>
+    </div>`;
+  }).join('');
+}
+
+function renderMetricBars() {
+  const p = summary.pms, w = summary.web;
+
+  // ADR
+  const adrItems = [
+    {label:'PMS — Current Member', value: p.current.net_adr},
+    {label:'PMS — New Member', value: p.new_mem.net_adr},
+    {label:'Web — Current Member', value: w.current.net_adr},
+    {label:'Web — New Member', value: w.new_mem.net_adr}
+  ];
+  renderBars('adrBars', adrItems, 130, '$');
+
+  // RpB
+  const rpbItems = [
+    {label:'PMS — Current Member', value: p.current.net_rpb},
+    {label:'PMS — New Member', value: p.new_mem.net_rpb},
+    {label:'Web — Current Member', value: w.current.net_rpb},
+    {label:'Web — New Member', value: w.new_mem.net_rpb}
+  ];
+  renderBars('rpbBars', rpbItems, 300, '$');
+
+  // LoS
+  const losItems = [
+    {label:'PMS — Current Member', value: p.current.net_los},
+    {label:'PMS — New Member', value: p.new_mem.net_los},
+    {label:'Web — Current Member', value: w.current.net_los},
+    {label:'Web — New Member', value: w.new_mem.net_los}
+  ];
+  renderBars('losBars', losItems, 3.5, '', ' nights');
+}
+
+// Cancel rate bars
+function renderCancelBars() {
+  const p = summary.pms, w = summary.web;
+  const items = [
+    {label:'PMS — Current Member', value: p.current.cancel_rate*100},
+    {label:'PMS — New Member', value: p.new_mem.cancel_rate*100},
+    {label:'Web — Current Member', value: w.current.cancel_rate*100},
+    {label:'Web — New Member', value: w.new_mem.cancel_rate*100}
+  ];
+  const maxVal = 25;
+  const colors = {'PMS — Current Member':'#6c7cff','PMS — New Member':'#8b9aff','Web — Current Member':'#00d4aa','Web — New Member':'#33e0be'};
+  document.getElementById('cancelBars').innerHTML = items.map(d => {
+    const pct = (d.value/maxVal*100).toFixed(1);
+    const color = colors[d.label] || '#6c7cff';
+    return `<div class="bar-group">
+      <div class="bar-label"><span>${d.label}</span><span>${d.value.toFixed(1)}%</span></div>
+      <div class="bar-track"><div class="bar-fill" style="width:${pct}%;background:${color}"></div></div>
+    </div>`;
+  }).join('');
+}
+
+// New Member Sign-Ups Widget
+function renderNewMemberWidget() {
+  const p = summary.pms.new_mem;
+  const w = summary.web.new_mem;
+  const totalRes = p.net_res + w.net_res;
+  const totalRev = p.net_rev + w.net_rev;
+  const totalGuests = p.guests + w.guests;
+  const pmsPct = (p.net_res / totalRes * 100).toFixed(1);
+  const webPct = (w.net_res / totalRes * 100).toFixed(1);
+
+  document.getElementById('newMemberContent').innerHTML = `
+    <div style="display:grid;grid-template-columns:1fr 2fr 1fr;gap:24px;align-items:center;">
+      <div style="text-align:center;padding:16px;background:#1e2235;border-radius:10px;border:1px solid var(--border);">
+        <div style="font-size:11px;text-transform:uppercase;letter-spacing:0.8px;color:var(--accent);font-weight:600;margin-bottom:8px;">PMS (Property)</div>
+        <div style="font-size:36px;font-weight:700;color:var(--accent);letter-spacing:-1px;">${fmt(p.net_res)}</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:4px;">New Member Sign-Ups</div>
+        <div style="margin-top:12px;display:flex;justify-content:space-around;">
+          <div style="text-align:center;">
+            <div style="font-size:14px;font-weight:600;">$${fmt(p.net_rev)}</div>
+            <div style="font-size:10px;color:var(--muted);">Net Revenue</div>
+          </div>
+          <div style="text-align:center;">
+            <div style="font-size:14px;font-weight:600;">${fmt(p.guests)}</div>
+            <div style="font-size:10px;color:var(--muted);">Guests</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="text-align:center;">
+        <div style="font-size:11px;text-transform:uppercase;letter-spacing:0.8px;color:var(--muted);font-weight:600;margin-bottom:6px;">Total New Member Sign-Ups</div>
+        <div style="font-size:48px;font-weight:700;letter-spacing:-2px;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;">${fmt(totalRes)}</div>
+        <div style="font-size:13px;color:var(--muted);margin-top:2px;">$${fmt(totalRev)} total net revenue · ${fmt(totalGuests)} guests</div>
+        <div style="margin-top:14px;">
+          <div style="height:12px;border-radius:6px;overflow:hidden;display:flex;background:#1e2235;">
+            <div style="width:${pmsPct}%;background:var(--accent);transition:width 0.8s ease;"></div>
+            <div style="width:${webPct}%;background:var(--accent2);transition:width 0.8s ease;"></div>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--muted);margin-top:4px;">
+            <span style="color:var(--accent);">▌ PMS ${pmsPct}%</span>
+            <span style="color:var(--accent2);">WEB (Website) ${webPct}% ▌</span>
+          </div>
+        </div>
+      </div>
+
+      <div style="text-align:center;padding:16px;background:#1e2235;border-radius:10px;border:1px solid var(--border);">
+        <div style="font-size:11px;text-transform:uppercase;letter-spacing:0.8px;color:var(--accent2);font-weight:600;margin-bottom:8px;">WEB (Website)</div>
+        <div style="font-size:36px;font-weight:700;color:var(--accent2);letter-spacing:-1px;">${fmt(w.net_res)}</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:4px;">New Member Sign-Ups</div>
+        <div style="margin-top:12px;display:flex;justify-content:space-around;">
+          <div style="text-align:center;">
+            <div style="font-size:14px;font-weight:600;">$${fmt(w.net_rev)}</div>
+            <div style="font-size:10px;color:var(--muted);">Net Revenue</div>
+          </div>
+          <div style="text-align:center;">
+            <div style="font-size:14px;font-weight:600;">${fmt(w.guests)}</div>
+            <div style="font-size:10px;color:var(--muted);">Guests</div>
+          </div>
+        </div>
+      </div>
+    </div>`;
+}
+
+// New vs Current comparison
+function renderNewVsCurrent() {
+  const currRev = summary.pms.current.net_rev + summary.web.current.net_rev;
+  const newRev = summary.pms.new_mem.net_rev + summary.web.new_mem.net_rev;
+  const currRes = summary.pms.current.net_res + summary.web.current.net_res;
+  const newRes = summary.pms.new_mem.net_res + summary.web.new_mem.net_res;
+  const currGuests = summary.pms.current.guests + summary.web.current.guests;
+  const newGuests = summary.pms.new_mem.guests + summary.web.new_mem.guests;
+
+  const metrics = [
+    {label:'Net Revenue', current:'$'+fmt(currRev), new_m:'$'+fmt(newRev), currPct: currRev/(currRev+newRev)*100, newPct: newRev/(currRev+newRev)*100},
+    {label:'Net Reservations', current:fmt(currRes), new_m:fmt(newRes), currPct: currRes/(currRes+newRes)*100, newPct: newRes/(currRes+newRes)*100},
+    {label:'Guests', current:fmt(currGuests), new_m:fmt(newGuests), currPct: currGuests/(currGuests+newGuests)*100, newPct: newGuests/(currGuests+newGuests)*100}
+  ];
+
+  document.getElementById('newVsCurrent').innerHTML = metrics.map(m => `
+    <div class="bar-group">
+      <div class="bar-label"><span>${m.label}</span><span style="color:var(--accent)">Current Member: ${m.current}</span></div>
+      <div class="bar-track" style="display:flex">
+        <div style="width:${m.currPct}%;background:#6c7cff;height:100%;border-radius:6px 0 0 6px;"></div>
+        <div style="width:${m.newPct}%;background:#00d4aa;height:100%;border-radius:0 6px 6px 0;"></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--muted);margin-top:2px;">
+        <span>Current Member ${m.currPct.toFixed(0)}%</span>
+        <span style="color:var(--accent2)">New Member: ${m.new_m} (${m.newPct.toFixed(0)}%)</span>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ===== HOTEL TABLE =====
+// Add computed total_rev to each hotel
+hotels.forEach(h => { h.total_rev = h.pms_cm_rev + h.pms_nm_rev + h.web_cm_rev + h.web_nm_rev; });
+
+let currentSort = 'total_rev';
+let sortDir = 'desc';
+
+function sortTable(field) {
+  document.querySelectorAll('.sort-btn').forEach(b => b.classList.remove('active'));
+  const btn = event?.target;
+  if (btn?.classList) btn.classList.add('active');
+
+  if (currentSort === field) sortDir = sortDir === 'desc' ? 'asc' : 'desc';
+  else { currentSort = field; sortDir = field === 'name' ? 'asc' : 'desc'; }
+
+  renderHotelTable();
+}
+
+function renderHotelTable() {
+  const sorted = [...hotels].sort((a,b) => {
+    let va = a[currentSort], vb = b[currentSort];
+    if (currentSort === 'name') { return sortDir === 'asc' ? va.localeCompare(vb) : vb.localeCompare(va); }
+    return sortDir === 'desc' ? vb - va : va - vb;
+  });
+
+  document.getElementById('hotelTableBody').innerHTML = sorted.map(h => {
+    return `<tr>
+      <td class="hotel-name">${h.name}</td>
+      <td class="num">${fmt(h.guests)}</td>
+      <td class="num pms-col col-divider">$${fmt(h.pms_cm_rev)}</td>
+      <td class="num pms-col">$${fmt(h.pms_nm_rev)}</td>
+      <td class="num pms-col">${fmt(h.pms_cm_res)}</td>
+      <td class="num pms-col">${fmt(h.pms_nm_res)}</td>
+      <td class="num web-col col-divider">$${fmt(h.web_cm_rev)}</td>
+      <td class="num web-col">$${fmt(h.web_nm_rev)}</td>
+      <td class="num web-col">${fmt(h.web_cm_res)}</td>
+      <td class="num web-col">${fmt(h.web_nm_res)}</td>
+      <td class="num col-divider" style="font-weight:600">$${fmt(h.total_rev)}</td>
+    </tr>`;
+  }).join('');
+}
+
+// ===== UTILS =====
+function fmt(n) {
+  if (n >= 1000) return n.toLocaleString('en-US', {maximumFractionDigits:0});
+  return n.toString();
+}
+
+// ===== INIT =====
+renderKPIs();
+renderChannelDonut();
+renderMemberDonut();
+renderMetricBars();
+renderNewMemberWidget();
+renderCancelBars();
+renderNewVsCurrent();
+renderHotelTable();
+</script>
+</body>
+</html>

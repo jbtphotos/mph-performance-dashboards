@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>My Place Hotels — Affiliate Channel Performance</title>
+<style>
+:root {
+  --navy: #1C355E;
+  --orange: #FF5F00;
+  --blue: #4A7FC1;
+  --green: #2E8B57;
+  --red: #CC3333;
+  --light-bg: #F4F6FA;
+  --card-bg: #fff;
+  --border: #E2E8F0;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family: 'Segoe UI',system-ui,-apple-system,sans-serif; background:var(--light-bg); color:var(--navy); }
+
+/* Header */
+.header { background:var(--navy); color:#fff; padding:24px 32px; display:flex; align-items:center; gap:20px; justify-content:space-between; }
+.header-left { display:flex; align-items:center; gap:20px; }
+.header img { height:50px; }
+.header h1 { font-size:22px; font-weight:700; }
+.header .sub { font-size:13px; opacity:0.8; margin-top:2px; }
+.portal-btn { background:rgba(255,255,255,0.12); border:1px solid rgba(255,255,255,0.25); color:rgba(255,255,255,0.8);
+               font-size:12px; padding:6px 14px; border-radius:8px; text-decoration:none; font-weight:600; }
+.portal-btn:hover { background:rgba(255,255,255,0.2); color:#fff; }
+
+.container { max-width:1400px; margin:0 auto; padding:24px 32px; }
+
+/* KPI Row */
+.kpi-row { display:grid; grid-template-columns:repeat(6,1fr); gap:14px; margin-bottom:24px; }
+.kpi { background:var(--card-bg); border-radius:10px; padding:18px 16px; text-align:center; border-top:3px solid var(--navy); box-shadow:0 1px 4px rgba(0,0,0,0.06); }
+.kpi.accent { border-top-color:var(--orange); }
+.kpi.green { border-top-color:var(--green); }
+.kpi .label { font-size:11px; text-transform:uppercase; letter-spacing:0.5px; color:#64748B; margin-bottom:6px; font-weight:600; }
+.kpi .value { font-size:26px; font-weight:700; color:var(--navy); }
+.kpi.accent .value { color:var(--orange); }
+.kpi.green .value { color:var(--green); }
+.kpi .detail { font-size:11px; color:#64748B; margin-top:4px; }
+
+/* Section */
+.section { background:var(--card-bg); border-radius:10px; padding:24px; margin-bottom:24px; box-shadow:0 1px 4px rgba(0,0,0,0.06); }
+.section h2 { font-size:17px; font-weight:700; color:var(--navy); margin-bottom:16px; padding-bottom:8px; border-bottom:2px solid var(--orange); }
+.section h3 { font-size:14px; font-weight:600; color:var(--navy); margin:16px 0 10px; }
+
+/* Chart grid */
+.chart-grid { display:grid; grid-template-columns:1fr 1fr; gap:24px; }
+.chart-box { position:relative; }
+.chart-box canvas { width:100%; }
+.chart-label { font-size:13px; font-weight:600; color:var(--navy); text-align:center; margin-bottom:8px; }
+
+/* Top partner highlight */
+.top-partner { display:grid; grid-template-columns:1fr 2fr; gap:24px; align-items:center; margin-bottom:24px; }
+.tp-info { text-align:center; padding:24px; background:var(--light-bg); border-radius:10px; }
+.tp-info .tp-name { font-size:18px; font-weight:700; color:var(--navy); margin-bottom:4px; }
+.tp-info .tp-stat { font-size:32px; font-weight:700; color:var(--orange); }
+.tp-info .tp-sub { font-size:12px; color:#64748B; margin-top:4px; }
+
+/* Table */
+table { width:100%; border-collapse:collapse; table-layout:fixed; font-size:12px; }
+th { background:var(--navy); color:#fff; padding:10px 6px; text-align:left; font-size:10px;
+     font-weight:600; text-transform:uppercase; letter-spacing:0.3px; cursor:pointer; white-space:nowrap; }
+th.num { text-align:right; }
+th:hover { background:#253f6e; }
+td { padding:7px 6px; border-bottom:1px solid var(--border); }
+td.num { text-align:right; font-variant-numeric:tabular-nums; }
+tr:hover { background:#F8FAFC; }
+.partner-name { font-weight:600; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:180px; }
+.bar-cell { position:relative; }
+.bar-fill { position:absolute; top:2px; bottom:2px; left:0; border-radius:3px; opacity:0.15; }
+.mini-bar { display:inline-block; height:8px; border-radius:4px; vertical-align:middle; margin-left:4px; }
+
+/* Growth badge */
+.growth { display:inline-block; padding:2px 8px; border-radius:10px; font-size:11px; font-weight:600; }
+.growth.up { background:rgba(46,139,87,0.12); color:var(--green); }
+.growth.down { background:rgba(204,51,51,0.12); color:var(--red); }
+
+/* Footer */
+.footer { text-align:center; padding:20px; font-size:12px; color:#94A3B8; }
+
+@media(max-width:900px) {
+  .kpi-row { grid-template-columns:repeat(3,1fr); }
+  .chart-grid { grid-template-columns:1fr; }
+  .top-partner { grid-template-columns:1fr; }
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-left">
+    <img src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyBpZD0iTXlfUGxhY2VfSG90ZWxzX0xvZ28iIGRhdGEtbmFtZT0iTXkgUGxhY2UgSG90ZWxzIExvZ28iIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgdmlld0JveD0iMCAwIDQ5My45MzEgNDg4LjQ2OCI+CiAgPGRlZnM+CiAgICA8c3R5bGU+CiAgICAgIC5jbHMtMSB7CiAgICAgICAgZmlsbDogI2UxMWIyMjsKICAgICAgfQoKICAgICAgLmNscy0yIHsKICAgICAgICBmaWxsOiAjZmZmOwogICAgICB9CgogICAgICAuY2xzLTMgewogICAgICAgIGZpbGw6ICNmZDA7CiAgICAgIH0KICAgIDwvc3R5bGU+CiAgPC9kZWZzPgogIDxnPgogICAgPHBhdGggY2xhc3M9ImNscy0zIiBkPSJNMjQ2Ljk2Niw0ODAuOTY2Yy03Mi4xNiwwLTE0My41MjUtNS41MTgtMjE4LjE4NS0xNi44NzJsLTUuNDkxLS44MzUtLjgwMy01LjQ5OEMyLjUwMiwzMjEuMDA1LDIuNTAyLDE4Mi4zMTcsMjIuNDg3LDQ1LjU2bC44MDMtNS40OTcsNS40OTEtLjgzNWM3NC42NTktMTEuMzU2LDE0Ni4wMjQtMTYuODc2LDIxOC4xODUtMTYuODc2czE0My41MjQsNS41MTksMjE4LjE4MiwxNi44NzZsNS40OTIuODM1LjgwMyw1LjQ5N2MxOS45ODYsMTM2Ljc1NywxOS45ODYsMjc1LjQ0NCwwLDQxMi4ybC0uODAzLDUuNDk4LTUuNDkyLjgzNWMtNzQuNjU3LDExLjM1NS0xNDYuMDI0LDE2Ljg3Mi0yMTguMTgyLDE2Ljg3MmgwWiIvPgogICAgPHBhdGggZD0iTTI0Ni45NjQsMjkuODUzYzcxLjczMiwwLDE0My40NjMsNS41OTcsMjE3LjA1NywxNi43OSwxOS44NjgsMTM1Ljk1NSwxOS44NjgsMjc0LjA3OCwwLDQxMC4wMzMtNzMuNTk0LDExLjE5My0xNDUuMzI0LDE2Ljc5MS0yMTcuMDU2LDE2Ljc5MXMtMTQzLjQ2My01LjU5OC0yMTcuMDU2LTE2Ljc5MWMtMTkuODY3LTEzNS45NTUtMTkuODY3LTI3NC4wNzgsMC00MTAuMDMzLDczLjU5My0xMS4xOTMsMTQ1LjMyNC0xNi43OSwyMTcuMDU1LTE2Ljc5TTI0Ni45NjQsMTQuODUzYy03Mi41MzksMC0xNDQuMjc1LDUuNTQ4LTIxOS4zMSwxNi45NmwtMTAuOTgsMS42Ny0xLjYwNiwxMC45OTFjLTIwLjA4OSwxMzcuNDc4LTIwLjA4OSwyNzYuODkzLDAsNDE0LjM3MmwxLjYwNiwxMC45ODksMTAuOTgsMS42NzFjNzUuMDM2LDExLjQxMywxNDYuNzczLDE2Ljk2MSwyMTkuMzExLDE2Ljk2MXMxNDQuMjc1LTUuNTQ4LDIxOS4zMTEtMTYuOTYxbDEwLjk4LTEuNjcxLDEuNjA1LTEwLjk4OWMyMC4wOTEtMTM3LjQ3OSwyMC4wOTEtMjc2Ljg5NCwwLTQxNC4zNzJsLTEuNjA1LTEwLjk5MS0xMC45OC0xLjY3Yy03NS4wMzUtMTEuNDEyLTE0Ni43NzItMTYuOTYtMjE5LjMxMi0xNi45NmgwWiIvPgogIDwvZz4KICA8Zz4KICAgIDxwYXRoIGNsYXNzPSJjbHMtMSIgZD0iTTM4Ni4yODksMTQ3LjE2MmMwLDc2LjgwMi02Mi4yNTQsMTM5LjA1Ny0xMzkuMDYyLDEzOS4wNTdzLTEzOS4wNTItNjIuMjU1LTEzOS4wNTItMTM5LjA1N1MxNzAuNDI4LDguMTAxLDI0Ny4yMjcsOC4xMDFzMTM5LjA2Miw2Mi4yNTQsMTM5LjA2MiwxMzkuMDYxWiIvPgogICAgPHBhdGggZD0iTTk5LjMyNywxNDYuOTQxQzk5LjMyNyw2NS43NzgsMTY1LjExMywwLDI0Ni4yNzIsMGgwYzgxLjE2MSwwLDE0Ni45MzksNjUuNzc4LDE0Ni45NDMsMTQ2Ljk0MWgwYy0uMDA0LDgxLjE2NC02NS43ODIsMTQ2LjkzNy0xNDYuOTQzLDE0Ni45NTFoMGMtODEuMTU4LS4wMTUtMTQ2Ljk0NC02NS43ODctMTQ2Ljk0NC0xNDYuOTUxaDBaTTExNS4xMDcsMTQ2Ljk0MWMuMTI4LDcyLjQ0Myw1OC43MjIsMTMxLjAzMywxMzEuMTY1LDEzMS4xNjZoMGM3Mi40NDEtLjEzMywxMzEuMDMzLTU4LjcyMywxMzEuMTc0LTEzMS4xNjZoMGMtLjE0MS03Mi40NDctNTguNzMyLTEzMS4wMzUtMTMxLjE3NC0xMzEuMTY2aDBjLTcyLjQ0My4xMzEtMTMxLjAzNyw1OC43MTktMTMxLjE2NSwxMzEuMTY2aDBaIi8+CiAgICA8Zz4KICAgICAgPHBhdGggZD0iTTg2LjQ4OSwyNTMuMzcyYy0xMC4zNjIsMC0xOS4wNzgtNC42NjctMjMuMzEzLTEyLjQ5NS0yLjUyMi00LjYzOS01LjQ5LTE0LjM0MiwyLjg4Mi0yNy4yMjEsNS42NDctOC42NzEsMTEuMzE5LTE3LjMyMiwxNi45NzItMjUuOTgybDQuOTA3LTcuNDg4YzguMDkyLTEyLjM4NywxNi4xNTctMjQuOCwyNC4yMzMtMzcuMjA0bDYuNzE3LTEwLjMzNiwxMS4wODgtMTcuMDE2LDExLjA3Ni0xNy4wMjgsMS4xODctMS44NWM2LjA2My05LjQzOSwxNS4yMDUtMjMuNywzMy42MDctMjMuNyw2LjA1OSwwLDI1LjgyNSwyLjE2MSwyNS44MjUsMzAuMDE2djQuNzI0YzMuNzM2LTUuMzksNy40NjctMTAuNzc0LDExLjIwNi0xNi4xNjcsNy44MTktMTAuOTM0LDE5LjY0Ny0xNy42NDMsMzAuOTc5LTE3LjY0Myw3LjE2NSwwLDEzLjc3NCwyLjY5MywxOC42Miw3LjU2NSwzLjk1MiwzLjk4Miw4LjY0NSwxMS4zOTcsOC41NjcsMjQuMDc2LS4xMjUsMTguOTYxLS4xMTIsMzguMjY4LS4wODYsNTYuOTNsLjAyMSwyMi40NzNjMCwxLjI3LjA3NSwyLjYxNS4xMzQsMy45OTIuMzgsOC4xMTMsMS4wMjMsMjEuNjkxLTEwLjE5NCwzMC4zMjgtNC45OSwzLjg0Ny0xMS4zMTQsNS45NjItMTcuODI0LDUuOTYyLTUuMzM2LDAtMTAuNDUzLTEuNDI0LTE0Ljc5MS00LjExOS0xMy4zMTItOC4yNTYtMTIuNTc2LTIzLjIyNC0xMi4xNDMtMzIuMTcxLjA3OS0xLjQyMi4xNDgtMi44MDkuMTQ4LTQuMDk4di0xLjI4MWwtMTYuNjY5LDI0LjU5MmMtMy4wNSw0LjQ5OC0xMS4xNjIsMTYuNDkxLTI1LjUxNSwxNy40MTQtLjU1OS4wMzktMS4xMTUuMDYxLTEuNjc2LjA2MS0xMi45MTQsMC0yMy43ODMtOS44NDQtMjUuMjk1LTIyLjkxMy0uNDU5LTMuOTc2LS43MzItNy45ODYtLjg2NS0xMS45OTRsLTMwLjk5LDQ3LjI4OWMtNi4zMTUsOS40NjUtMTcuMzQsMTUuMjg2LTI4LjgxLDE1LjI4NmgwWiIvPgogICAgICA8cGF0aCBjbGFzcz0iY2xzLTIiIGQ9Ik0xNzUuODQyLDg1Ljc4M2MxMC44NjcsMCwxMy4wOTMsOC4wOSwxMy4wOTMsMTcuMjgzdjQ1LjQ3OWMxMS40NjItMTYuNTU3LDIyLjkzNC0zMy4xMTcsMzQuNDA1LTQ5LjY3NiwxMS45MjUtMTYuNjYxLDM1LjEzNS0xNy43NjksMzQuOTcsNi42NzItLjE3OSwyNi40OS0uMDY3LDUyLjk5NC0uMDY3LDc5LjQ4MiwwLDcuOTg1LDIuMTkxLDE4LjYyMy01LjEwMSwyNC4yMzYtNS4wMjEsMy44Ny0xMi42ODUsNC40ODItMTguMTI2LDEuMTA5LTguNDQzLTUuMjQtNS45NzctMTcuMTM5LTUuOTc3LTI1LjQ0NnYtNDIuNzUzYy0xMy4zMDksMTkuNjMxLTI2LjYyMSwzOS4yNjktMzkuOTM1LDU4LjkwMi0zLjc1OSw1LjU1MS04LjU2NywxMS40LTE1LjgwNCwxMS44Ny02Ljk4MS40NTEtMTIuNzA4LTQuNzc0LTEzLjQ5LTExLjYwNC0yLjAyNy0xNy42MjctLjA3OS0zNi41NTMtLjA3OS01NC4zMDMtMTguMzY0LDI4LjAyOS0zNi43MjYsNTYuMDQzLTU1LjA5Myw4NC4wNzEtMTEuMDc3LDE2LjYxLTQxLjU3MiwxMC41MDYtMjcuOTA1LTEwLjUwMSw3LjI2LTExLjE2NiwxNC41NzUtMjIuMzA4LDIxLjg2MS0zMy40NTYsMTAuMzQ1LTE1LjgzOCwyMC42NTEtMzEuNzA1LDMwLjk2Ny00Ny41NTgsNy4zODgtMTEuMzUsMTQuNzcyLTIyLjY5NSwyMi4xNi0zNC4wNDcsNS44OTQtOS4wNzYsMTEuODI0LTE5Ljc2MiwyNC4xMi0xOS43NjIiLz4KICAgIDwvZz4KICAgIDxnPgogICAgICA8cGF0aCBkPSJNMjgxLjcsMjY4LjIxMWMtOC4xMjcsMC0xNS43OTQtNC4zMDMtMjAuNTE3LTExLjUxMi00Ljk0My03LjU2My01Ljc0Mi0xNi45OTgtMi4xNDItMjUuMjUsMy40MjYtNy44MTMsNy43MzUtMTUuMTQ0LDExLjUyOS0yMS42MDEsNS45NDctMTAuMTE2LDE5LjgxMy0zNC42ODcsMjMuODQ1LTQzLjQzM2wtNS4zMi0xOS4yMTEtMTQuNjI2LTUyLjg1OWMtMS44NDgtNi42ODgsMi4wMDItMTMuNjI3LDguNjY0LTE1LjYwM2wyNC4xNy03LjE1NGMxLjE4MS0uMzUsMi40MDItLjUyMiwzLjYwNS0uNTIyLDIuMjE1LDAsNC40MS41NzgsNi4zNjUsMS42OTYsMy4wMjUsMS43MzUsNS4xOTMsNC42NDEsNi4wMTksOC4wM2w0LjUwMiwxOC41NmM1Ljk5NC0xMy40MTMsMTIuMTExLTI3LjA3NiwxOC4yNTktNDAuNTMyLjk0NC0yLjA1OSwxLjg1Mi00LjE2NCwyLjc3NC02LjI5NywyLjg0Ni02LjU3OCw1Ljc5NS0xMy4zODksOS44NjUtMTkuODE2LDQuNTMxLTcuMTg0LDExLjc0Mi0xMS4yOTksMTkuNzczLTExLjI5OXMxNS44NzksNC4xMzEsMjAuOTEzLDExLjA0OGM0Ljk0Miw2Ljc5LDYuMzI5LDE1LjE1MiwzLjgxLDIyLjk0NC0uMTQ3LjQ0Ni0uMzA2Ljg4Ni0uNDk5LDEuMzExbC0zMi42MDMsNzIuMzU5Yy02Ljc3OCwxNC41OC0xMy45NDcsMjkuMTk3LTIxLjk2OSw0NC44MjUtLjk4NCwxLjkwNy0yLjM5OCw0LjcyNi00LjEyNyw4LjE2MS0yMC40NTksNDAuNjQ0LTM1LjkyNCw2OS41NjEtNDQuODgxLDc4LjU2Ni00Ljg2MSw0Ljg5My0xMS4wNDcsNy41ODgtMTcuNDExLDcuNTg4aDBaIi8+CiAgICAgIDxwYXRoIGNsYXNzPSJjbHMtMiIgZD0iTTM1OC40NzcsMTIzLjgzOWMtNi45MzMsMTQuODk1LTE0LjE4NSwyOS42MzQtMjEuNjg3LDQ0LjIzOS02Ljk4NiwxMy41OTktMzUuODAzLDcyLjYwMy00Ni43MDEsODMuNTY0LTEwLjUzOCwxMC41OTQtMjQuNzQ3LTIuODExLTE5LjM4MS0xNS4wOTYsMy4wNi02Ljk2OSw2Ljk5NC0xMy42OTcsMTAuODQ4LTIwLjI1MiwxLjQ0Ni0yLjQ2NywyNi45OTItNDYuNTYzLDI2LjE1Ni00OS41NzEtNi45OTQtMjUuMjU3LTEzLjk4NC01MC41MTMtMjAuOTcyLTc1Ljc3MmwyNC4xNzYtNy4xNTIsMTMuMzA2LDU0LjgyOGMxMS4xMjktMjQuODM4LDIyLjEwMi00OS43NSwzMy40MTYtNzQuNTA0LDMuNzIxLTguMTM3LDcuMDEyLTE3LjAxOSwxMS44MTQtMjQuNjA1LDcuOTU3LTEyLjU5NiwyNS43NDItLjc3MSwyMS42MTksMTEuOTYzbC0zMi41OTQsNzIuMzU4Ii8+CiAgICA8L2c+CiAgPC9nPgogIDxnPgogICAgPHBhdGggZD0iTTg0LjQxOSwzNjYuNjZoLTIwLjc4OXYzMy40NzloLTE4Ljg5OXYtOTQuNDk2aDQxLjMwOWMxNy44MTgsMCwzMi41MzQsOS44NTQsMzIuNTM0LDI5Ljk2OCwwLDIxLjg3LTE0LjU3OSwzMS4wNDktMzQuMTU0LDMxLjA0OVpNODUuMzY0LDMyNC4wMDNoLTIxLjczM3YyNC4yOTloMjIuMDAzYzguNzc2LDAsMTMuNS00LjA1MSwxMy41LTEyLjI4NXMtNS4zOTgtMTIuMDE0LTEzLjc3LTEyLjAxNFoiLz4KICAgIDxwYXRoIGQ9Ik0xMjkuNzgsNDAwLjEzOXYtOTQuNDk2aDE4Ljg5OXY3Ni4wMDJoNDcuMzg0djE4LjQ5NGgtNjYuMjgzWiIvPgogICAgPHBhdGggZD0iTTI3NC40NjYsNDAwLjEzOWwtNy40MjYtMjEuMDU5aC0zNC41NTlsLTcuNDI0LDIxLjA1OWgtMjAuMjVsMzYuMTgtOTQuNDk2aDE4LjM1OGwzNS45MDksOTQuNDk2aC0yMC43ODlaTTI1NC40ODcsMzQzLjk4MWMtMS44OTEtNS41MzQtMy43ODEtMTEuMjA1LTQuNzI2LTE0LjcxNS0uOTQ0LDMuNTEtMi44MzQsOS4xODEtNC43MjQsMTQuNzE1bC02LjA3NSwxNy4xNDVoMjEuNmwtNi4wNzQtMTcuMTQ1WiIvPgogICAgPHBhdGggZD0iTTM1My4xMTYsMzMzLjE4Yy0zLjM3NS02LjQ3OC04Ljc3NS0xMC4yNTgtMTcuMjc5LTEwLjI1OC0xNC4xNzUsMC0yMi4yNzMsMTIuNDE5LTIyLjI3MywyOS45NjgsMCwxNy4wMSw4LjIzMywyOS45NywyMi40MDgsMjkuOTcsOC41MDYsMCwxMy40OTktMy42NDQsMTguNDk0LTEyLjAxNmwxNS45Myw5LjQ1Yy02LjQ4LDEzLjM2NC0xNy44MTksMjEuMzI5LTM0Ljk2NCwyMS4zMjktMjQuNzAzLDAtNDEuMzA5LTE4Ljg5OC00MS4zMDktNDguNzMzLDAtMjguNzUzLDE3LjI3OS00OC43MzIsNDEuOTgzLTQ4LjczMiwxNy44MiwwLDI4LjYxOSw4LjY0LDM0LjU1OSwyMC45MjRsLTE3LjU0OSw4LjA5OVoiLz4KICAgIDxwYXRoIGQ9Ik0zODEuNTY3LDQwMC4xMzl2LTk0LjQ5Nmg2NS42MDd2MTguNDk0aC00Ni43MDd2MTYuMzM0aDI3LjEzM3YxOC4zNTloLTI3LjEzM3YyMi44MTRoNDguNzMzdjE4LjQ5NGgtNjcuNjMzWiIvPgogIDwvZz4KICA8Zz4KICAgIDxwYXRoIGNsYXNzPSJjbHMtMSIgZD0iTTE2OS41ODIsNDM4Ljk0djcuNTY3aDYuNjI4di03LjU2N2g1LjQ3OHYyMC40aC01LjQ3OHYtOC4wNWgtNi42Mjh2OC4wNWgtNS40Nzh2LTIwLjRoNS40NzhaIi8+CiAgICA8cGF0aCBjbGFzcz0iY2xzLTEiIGQ9Ik0yMDUuNzI2LDQ1OS42NzRjLTYuMzI2LDAtOS44MDctNC43NTMtOS44MDctMTAuNDEzLDAtNS45MzIsMy44NzQtMTAuNjUzLDEwLjE0LTEwLjY1Myw2LjU2OCwwLDkuODk3LDQuODcyLDkuODk3LDEwLjMyMSwwLDYuNTY4LTMuOTM1LDEwLjc0NS0xMC4yLDEwLjc0NWgtLjAzWk0yMDUuOTk4LDQ1NS4zNDZjMi42MzQsMCw0LjE3Ny0yLjU0Miw0LjE3Ny02LjIzNSwwLTMuNTEtMS41NzQtNi4xNzQtNC4yMzctNi4xNzQtMi42MzMsMC00LjIzNywyLjY2My00LjIzNyw2LjIwNC0uMDMsMy42NjMsMS42MDQsNi4yMDUsNC4yMzcsNi4yMDVoLjA2WiIvPgogICAgPHBhdGggY2xhc3M9ImNscy0xIiBkPSJNMjM0LjU2LDQ0My41NDJoLTUuMjA2di00LjYwMmgxNS45ODF2NC42MDJoLTUuMjk2djE1Ljc5OWgtNS40Nzh2LTE1Ljc5OVoiLz4KICAgIDxwYXRoIGNsYXNzPSJjbHMtMSIgZD0iTTI3Mi4zNjgsNDUxLjEwOGgtNy4zMjR2My43NTNoOC4yMDJ2NC40OGgtMTMuNjh2LTIwLjRoMTMuMjU3djQuNDhoLTcuNzc5djMuMjY5aDcuMzI0djQuNDE5WiIvPgogICAgPHBhdGggY2xhc3M9ImNscy0xIiBkPSJNMjg3LjYsNDM4Ljk0aDUuNDc4djE1LjgzaDcuODM5djQuNTdoLTEzLjMxN3YtMjAuNFoiLz4KICAgIDxwYXRoIGNsYXNzPSJjbHMtMSIgZD0iTTMxNi4xNzcsNDUzLjg5M2MxLjI0MS42MzYsMy4yMzksMS4yNzEsNS4yOTYsMS4yNzEsMS44NzcsMCwyLjc4NS0uNjM2LDIuNzg1LTEuNjY1LDAtLjk5OS0uOTA4LTEuNTQzLTMuMjA4LTIuMzMxLTMuNDUxLTEuMjQxLTUuNzUxLTMuMTE2LTUuNzUxLTYuMTQzLDAtMy42MDIsMy4wNTctNi4zODYsOC4yMDMtNi4zODYsMi40MjEsMCw0LjE3Ny40NTQsNS41MDksMS4wM2wtMS4xNSw0LjM4OGMtLjg3OC0uMzkzLTIuMzkxLS45NjgtNC40MTktLjk2OC0xLjY2NSwwLTIuNTczLjYwNS0yLjU3MywxLjUxMywwLDEuMDMsMS4wOSwxLjQyMiwzLjY2MywyLjM5MSwzLjY2MiwxLjM2Miw1LjI5NiwzLjI5OSw1LjI5Niw2LjE0MywwLDMuNTEyLTIuNzI0LDYuNTA3LTguNjg3LDYuNTA3LTIuNDUxLDAtNC44NDMtLjYzNi01Ljk5Mi0xLjI0bDEuMDI5LTQuNTFaIi8+CiAgPC9nPgogIDxwYXRoIGQ9Ik0yNDYuOTY2LDQxMS44ODljLTY2Ljk1NSwwLTEzMy45MTMsNi43NDMtMjAyLjIzNCwyMC4xODZ2Ny42NWM2OC40MTgtOS43MzksMTM1LjMyNi0xNC42MTMsMjAyLjIzNC0xNC42MTNzMTMzLjgxNiw0Ljg3NSwyMDIuMjMzLDE0LjYxM3YtNy42NWMtNjguMzItMTMuNDQzLTEzNS4yNzktMjAuMTg2LTIwMi4yMzMtMjAuMTg2WiIvPgogIDxwYXRoIGQ9Ik00NjUuNzU5LDMxNC44MzRjMCwzLjk5OS0zLjEzOSw3LjEzOC03LjIyNCw3LjEzOC00LjA0MiwwLTcuMjY3LTMuMTM5LTcuMjY3LTcuMTM4LDAtMy45MTMsMy4yMjUtNy4wNTIsNy4yNjctNy4wNTIsNC4wODUsMCw3LjIyNCwzLjEzOSw3LjIyNCw3LjA1MlpNNDUzLjA3NCwzMTQuODM0YzAsMy4xMzksMi4zMjIsNS42MzMsNS41MDQsNS42MzMsMy4wOTYsMCw1LjM3NS0yLjQ5NCw1LjM3NS01LjU5LDAtMy4xMzktMi4yNzktNS42NzYtNS40MTgtNS42NzZzLTUuNDYxLDIuNTM3LTUuNDYxLDUuNjMzWk00NTcuNDE3LDMxOC41MzJoLTEuNjM0di03LjA1MmMuNjQ1LS4xMjksMS41NDgtLjIxNSwyLjcwOS0uMjE1LDEuMzMzLDAsMS45MzUuMjE1LDIuNDUxLjUxNi4zODcuMzAxLjY4OC44Ni42ODgsMS41NDgsMCwuNzc0LS42MDIsMS4zNzYtMS40NjIsMS42MzR2LjA4NmMuNjg4LjI1OCwxLjA3NS43NzQsMS4yOSwxLjcyLjIxNSwxLjA3NS4zNDQsMS41MDUuNTE2LDEuNzYzaC0xLjc2M2MtLjIxNS0uMjU4LS4zNDQtLjkwMy0uNTU5LTEuNzItLjEyOS0uNzc0LS41NTktMS4xMTgtMS40NjItMS4xMThoLS43NzR2Mi44MzhaTTQ1Ny40NjEsMzE0LjUzM2guNzc0Yy45MDMsMCwxLjYzNC0uMzAxLDEuNjM0LTEuMDMyLDAtLjY0NS0uNDczLTEuMDc1LTEuNTA1LTEuMDc1LS40MywwLS43MzEuMDQzLS45MDMuMDg2djIuMDIxWiIvPgo8L3N2Zz4=" alt="My Place Hotels">
+    <div>
+      <h1>Affiliate Channel Performance</h1>
+      <div class="sub">Impact Platform · September 2025 – March 2026</div>
+    </div>
+  </div>
+  <a href="index.html" class="portal-btn">← Portal</a>
+</div>
+
+<div class="container">
+
+<!-- KPI Row -->
+<div class="kpi-row">
+  <div class="kpi accent">
+    <div class="label">Total Revenue</div>
+    <div class="value">$179.3K</div>
+    <div class="detail">7 months since launch</div>
+  </div>
+  <div class="kpi">
+    <div class="label">Total Bookings</div>
+    <div class="value">488</div>
+    <div class="detail">$367 avg booking value</div>
+  </div>
+  <div class="kpi">
+    <div class="label">Total Clicks</div>
+    <div class="value">26,462</div>
+    <div class="detail">1.84% conversion rate</div>
+  </div>
+  <div class="kpi green">
+    <div class="label">ROAS</div>
+    <div class="value">17.5x</div>
+    <div class="detail">$10,257 total cost</div>
+  </div>
+  <div class="kpi">
+    <div class="label">Avg CPA</div>
+    <div class="value">$21.02</div>
+    <div class="detail">Cost per booking</div>
+  </div>
+  <div class="kpi">
+    <div class="label">Active Affiliates</div>
+    <div class="value">16</div>
+    <div class="detail">of 63 total signed up</div>
+  </div>
+</div>
+
+<!-- Monthly Trend Charts -->
+<div class="section">
+  <h2>Monthly Performance Trends</h2>
+  <div class="chart-grid">
+    <div class="chart-box">
+      <div class="chart-label">Revenue by Month</div>
+      <canvas id="revChart" height="220"></canvas>
+    </div>
+    <div class="chart-box">
+      <div class="chart-label">Bookings by Month</div>
+      <canvas id="actionsChart" height="220"></canvas>
+    </div>
+    <div class="chart-box">
+      <div class="chart-label">Clicks by Month</div>
+      <canvas id="clicksChart" height="220"></canvas>
+    </div>
+    <div class="chart-box">
+      <div class="chart-label">Conversion Rate by Month</div>
+      <canvas id="convChart" height="220"></canvas>
+    </div>
+  </div>
+</div>
+
+<!-- Top Partner Highlight -->
+<div class="section">
+  <h2>Top Partner — Capital One</h2>
+  <div class="top-partner">
+    <div class="tp-info">
+      <div class="tp-name">Capital One</div>
+      <div class="tp-stat">$131.2K</div>
+      <div class="tp-sub">299 bookings · 1,260 clicks · 23.7% conv rate</div>
+      <div style="margin-top:8px;"><span class="growth up">73.1% of total revenue</span></div>
+    </div>
+    <div>
+      <canvas id="capOneChart" height="180"></canvas>
+    </div>
+  </div>
+</div>
+
+<!-- Partner Table -->
+<div class="section">
+  <h2>Affiliate Partner Performance</h2>
+  <div style="max-height:700px;overflow-y:auto;">
+    <table>
+      <thead>
+        <tr>
+          <th onclick="sortTable('name')" style="width:18%;text-align:left;">Partner</th>
+          <th onclick="sortTable('clicks')" class="num" style="width:8%;">Clicks</th>
+          <th onclick="sortTable('actions')" class="num" style="width:8%;">Bookings</th>
+          <th onclick="sortTable('revenue')" class="num" style="width:11%;">Revenue</th>
+          <th onclick="sortTable('cost')" class="num" style="width:10%;">Cost</th>
+          <th onclick="sortTable('roas')" class="num" style="width:7%;">ROAS</th>
+          <th onclick="sortTable('conv')" class="num" style="width:8%;">Conv %</th>
+          <th onclick="sortTable('avg_booking')" class="num" style="width:10%;">Avg Book</th>
+          <th style="width:20%;text-align:center;">Monthly Bookings</th>
+        </tr>
+      </thead>
+      <tbody id="partnerTableBody"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Monthly Summary Table -->
+<div class="section">
+  <h2>Month-by-Month Summary</h2>
+  <table>
+    <thead>
+      <tr>
+        <th style="width:14%;text-align:left;">Month</th>
+        <th class="num" style="width:10%;">Partners</th>
+        <th class="num" style="width:10%;">Active</th>
+        <th class="num" style="width:10%;">Clicks</th>
+        <th class="num" style="width:10%;">Bookings</th>
+        <th class="num" style="width:12%;">Revenue</th>
+        <th class="num" style="width:10%;">Cost</th>
+        <th class="num" style="width:8%;">ROAS</th>
+        <th class="num" style="width:8%;">Conv %</th>
+        <th class="num" style="width:8%;">MoM Rev</th>
+      </tr>
+    </thead>
+    <tbody id="monthlySummaryBody"></tbody>
+  </table>
+</div>
+
+</div>
+
+<div class="footer">
+  My Place Hotels of America · Affiliate Channel Performance Dashboard · Impact Platform · Sep 2025 – Mar 2026
+</div>
+
+<script>
+const monthly = [{"label": "Sep 2025", "key": "Sep25", "clicks": 553, "actions": 25, "revenue": 5142.13, "cost": 257.11, "active": 6, "total_partners": 31}, {"label": "Oct 2025", "key": "Oct25", "clicks": 763, "actions": 67, "revenue": 19978.76, "cost": 998.94, "active": 8, "total_partners": 27}, {"label": "Nov 2025", "key": "Nov25", "clicks": 826, "actions": 67, "revenue": 19695.88, "cost": 1720.82, "active": 7, "total_partners": 29}, {"label": "Dec 2025", "key": "Dec25", "clicks": 1049, "actions": 49, "revenue": 14029.289999999999, "cost": 1257.13, "active": 7, "total_partners": 31}, {"label": "Jan 2026", "key": "Jan26", "clicks": 3095, "actions": 93, "revenue": 34887.49, "cost": 1744.37, "active": 9, "total_partners": 30}, {"label": "Feb 2026", "key": "Feb26", "clicks": 7427, "actions": 76, "revenue": 19284.289999999997, "cost": 964.21, "active": 12, "total_partners": 34}, {"label": "Mar 2026", "key": "Mar26", "clicks": 12749, "actions": 111, "revenue": 66289.42000000001, "cost": 3314.47, "active": 10, "total_partners": 39}];
+const partners = [{"name": "Capital One", "clicks": 1260, "actions": 299, "revenue": 131242.45, "cost": 7853.82, "conv": 23.73, "roas": 16.7, "avg_booking": 438.94, "monthly": {"Sep25": {"actions": 7, "revenue": 966.39}, "Oct25": {"actions": 43, "revenue": 13427.27}, "Nov25": {"actions": 42, "revenue": 14720.59}, "Dec25": {"actions": 30, "revenue": 11113.26}, "Jan26": {"actions": 64, "revenue": 24035.8}, "Feb26": {"actions": 42, "revenue": 11198.56}, "Mar26": {"actions": 71, "revenue": 55780.58}}}, {"name": "Sovrn Commerce", "clicks": 2427, "actions": 42, "revenue": 12227.71, "cost": 611.4, "conv": 1.73, "roas": 20.0, "avg_booking": 291.14, "monthly": {"Sep25": {"actions": 6, "revenue": 1510.76}, "Oct25": {"actions": 10, "revenue": 2281.42}, "Nov25": {"actions": 6, "revenue": 1112.99}, "Dec25": {"actions": 4, "revenue": 478.46}, "Jan26": {"actions": 3, "revenue": 4226.6}, "Feb26": {"actions": 6, "revenue": 1411.08}, "Mar26": {"actions": 7, "revenue": 1206.4}}}, {"name": "S. N. TECHNOLOGIES", "clicks": 4549, "actions": 39, "revenue": 8016.99, "cost": 400.86, "conv": 0.86, "roas": 20.0, "avg_booking": 205.56, "monthly": {"Sep25": {"actions": 0, "revenue": 0}, "Oct25": {"actions": 0, "revenue": 0.0}, "Nov25": {"actions": 12, "revenue": 2752.43}, "Dec25": {"actions": 8, "revenue": 1189.81}, "Jan26": {"actions": 13, "revenue": 2604.06}, "Feb26": {"actions": 6, "revenue": 1470.69}, "Mar26": {"actions": 0, "revenue": 0.0}}}, {"name": "Skimbit Ltd.", "clicks": 798, "actions": 26, "revenue": 6230.69, "cost": 311.56, "conv": 3.26, "roas": 20.0, "avg_booking": 239.64, "monthly": {"Sep25": {"actions": 6, "revenue": 1206.84}, "Oct25": {"actions": 5, "revenue": 1669.47}, "Nov25": {"actions": 2, "revenue": 285.92}, "Dec25": {"actions": 4, "revenue": 943.2}, "Jan26": {"actions": 2, "revenue": 657.19}, "Feb26": {"actions": 3, "revenue": 803.71}, "Mar26": {"actions": 4, "revenue": 664.36}}}, {"name": "Brandreward  Coupons", "clicks": 226, "actions": 15, "revenue": 5986.55, "cost": 299.35, "conv": 6.64, "roas": 20.0, "avg_booking": 399.1, "monthly": {"Sep25": {"actions": 0, "revenue": 0.0}, "Oct25": {"actions": 0, "revenue": 0.0}, "Nov25": {"actions": 0, "revenue": 0.0}, "Dec25": {"actions": 0, "revenue": 0.0}, "Jan26": {"actions": 0, "revenue": 0.0}, "Feb26": {"actions": 2, "revenue": 333.98}, "Mar26": {"actions": 13, "revenue": 5652.57}}}, {"name": "Honey Science Corporation.", "clicks": 214, "actions": 14, "revenue": 4182.52, "cost": 209.13, "conv": 6.54, "roas": 20.0, "avg_booking": 298.75, "monthly": {"Sep25": {"actions": 2, "revenue": 876.1}, "Oct25": {"actions": 2, "revenue": 437.0}, "Nov25": {"actions": 2, "revenue": 522.2}, "Dec25": {"actions": 1, "revenue": 119.96}, "Jan26": {"actions": 2, "revenue": 173.99}, "Feb26": {"actions": 4, "revenue": 1854.27}, "Mar26": {"actions": 1, "revenue": 199.0}}}, {"name": "Muchila Holdings Ltd.", "clicks": 451, "actions": 19, "revenue": 2974.3, "cost": 148.73, "conv": 4.21, "roas": 20.0, "avg_booking": 156.54, "monthly": {"Sep25": {"actions": 2, "revenue": 237.14}, "Oct25": {"actions": 4, "revenue": 788.0}, "Nov25": {"actions": 2, "revenue": 207.75}, "Dec25": {"actions": 1, "revenue": 109.0}, "Jan26": {"actions": 5, "revenue": 716.0}, "Feb26": {"actions": 2, "revenue": 656.52}, "Mar26": {"actions": 3, "revenue": 259.89}}}, {"name": "FatCoupon Technology Ltd", "clicks": 267, "actions": 12, "revenue": 2882.86, "cost": 144.16, "conv": 4.49, "roas": 20.0, "avg_booking": 240.24, "monthly": {"Sep25": {"actions": 2, "revenue": 344.9}, "Oct25": {"actions": 1, "revenue": 638.0}, "Nov25": {"actions": 0, "revenue": 0.0}, "Dec25": {"actions": 0, "revenue": 0.0}, "Jan26": {"actions": 1, "revenue": 242.1}, "Feb26": {"actions": 3, "revenue": 435.59}, "Mar26": {"actions": 5, "revenue": 1222.27}}}, {"name": "tenereno1", "clicks": 81, "actions": 4, "revenue": 1997.15, "cost": 99.86, "conv": 4.94, "roas": 20.0, "avg_booking": 499.29, "monthly": {"Sep25": {"actions": 0, "revenue": 0.0}, "Oct25": {"actions": 0, "revenue": 0.0}, "Nov25": {"actions": 0, "revenue": 0.0}, "Dec25": {"actions": 1, "revenue": 75.6}, "Jan26": {"actions": 2, "revenue": 1838.75}, "Feb26": {"actions": 1, "revenue": 82.8}, "Mar26": {"actions": 0, "revenue": 0.0}}}, {"name": "CollabGlow", "clicks": 13887, "actions": 8, "revenue": 1139.29, "cost": 56.97, "conv": 0.06, "roas": 20.0, "avg_booking": 142.41, "monthly": {"Sep25": {"actions": 0, "revenue": 0}, "Oct25": {"actions": 0, "revenue": 0}, "Nov25": {"actions": 0, "revenue": 0}, "Dec25": {"actions": 0, "revenue": 0}, "Jan26": {"actions": 0, "revenue": 0.0}, "Feb26": {"actions": 5, "revenue": 659.79}, "Mar26": {"actions": 3, "revenue": 479.5}}}, {"name": "Rajat Kuls", "clicks": 241, "actions": 3, "revenue": 567.05, "cost": 28.35, "conv": 1.24, "roas": 20.0, "avg_booking": 189.02, "monthly": {"Sep25": {"actions": 0, "revenue": 0}, "Oct25": {"actions": 0, "revenue": 0}, "Nov25": {"actions": 0, "revenue": 0}, "Dec25": {"actions": 0, "revenue": 0}, "Jan26": {"actions": 0, "revenue": 0}, "Feb26": {"actions": 1, "revenue": 279.2}, "Mar26": {"actions": 2, "revenue": 287.85}}}, {"name": "Pickalink INC", "clicks": 1014, "actions": 2, "revenue": 537.0, "cost": 26.85, "conv": 0.2, "roas": 20.0, "avg_booking": 268.5, "monthly": {"Sep25": {"actions": 0, "revenue": 0}, "Oct25": {"actions": 0, "revenue": 0}, "Nov25": {"actions": 0, "revenue": 0}, "Dec25": {"actions": 0, "revenue": 0}, "Jan26": {"actions": 0, "revenue": 0.0}, "Feb26": {"actions": 0, "revenue": 0.0}, "Mar26": {"actions": 2, "revenue": 537.0}}}, {"name": "CouponCabin", "clicks": 12, "actions": 1, "revenue": 518.0, "cost": 25.9, "conv": 8.33, "roas": 20.0, "avg_booking": 518.0, "monthly": {"Sep25": {"actions": 0, "revenue": 0.0}, "Oct25": {"actions": 1, "revenue": 518.0}, "Nov25": {"actions": 0, "revenue": 0.0}, "Dec25": {"actions": 0, "revenue": 0.0}, "Jan26": {"actions": 0, "revenue": 0.0}, "Feb26": {"actions": 0, "revenue": 0.0}, "Mar26": {"actions": 0, "revenue": 0.0}}}, {"name": "SQUARED GmbH", "clicks": 3, "actions": 1, "revenue": 393.0, "cost": 19.65, "conv": 33.33, "roas": 20.0, "avg_booking": 393.0, "monthly": {"Sep25": {"actions": 0, "revenue": 0}, "Oct25": {"actions": 0, "revenue": 0}, "Nov25": {"actions": 0, "revenue": 0}, "Dec25": {"actions": 0, "revenue": 0.0}, "Jan26": {"actions": 1, "revenue": 393.0}, "Feb26": {"actions": 0, "revenue": 0}, "Mar26": {"actions": 0, "revenue": 0}}}, {"name": "Famesta", "clicks": 73, "actions": 2, "revenue": 313.6, "cost": 15.68, "conv": 2.74, "roas": 20.0, "avg_booking": 156.8, "monthly": {"Sep25": {"actions": 0, "revenue": 0.0}, "Oct25": {"actions": 1, "revenue": 219.6}, "Nov25": {"actions": 1, "revenue": 94.0}, "Dec25": {"actions": 0, "revenue": 0.0}, "Jan26": {"actions": 0, "revenue": 0.0}, "Feb26": {"actions": 0, "revenue": 0.0}, "Mar26": {"actions": 0, "revenue": 0.0}}}, {"name": "Kupondi", "clicks": 4, "actions": 1, "revenue": 98.1, "cost": 4.91, "conv": 25.0, "roas": 20.0, "avg_booking": 98.1, "monthly": {"Sep25": {"actions": 0, "revenue": 0}, "Oct25": {"actions": 0, "revenue": 0}, "Nov25": {"actions": 0, "revenue": 0}, "Dec25": {"actions": 0, "revenue": 0}, "Jan26": {"actions": 0, "revenue": 0.0}, "Feb26": {"actions": 1, "revenue": 98.1}, "Mar26": {"actions": 0, "revenue": 0}}}];
+const months = monthly.map(m => m.label.replace(' 20','\n'));
+const shortMonths = monthly.map(m => m.label.split(' ')[0].substring(0,3));
+
+// ── Chart Drawing Utilities ──
+function drawBarChart(canvasId, data, color, prefix, suffix, showValues) {
+  const c = document.getElementById(canvasId);
+  const ctx = c.getContext('2d');
+  const W = c.width = c.parentElement.offsetWidth;
+  const H = c.height;
+  const pad = {top:20, right:20, bottom:36, left:60};
+  const cw = W - pad.left - pad.right;
+  const ch = H - pad.top - pad.bottom;
+  const max = Math.max(...data) * 1.15;
+  const barW = Math.min(cw / data.length * 0.6, 48);
+  const gap = cw / data.length;
+
+  ctx.clearRect(0,0,W,H);
+
+  // Grid lines
+  ctx.strokeStyle = '#E2E8F0';
+  ctx.lineWidth = 1;
+  for (let i = 0; i <= 4; i++) {
+    const y = pad.top + ch - (ch * i / 4);
+    ctx.beginPath(); ctx.moveTo(pad.left, y); ctx.lineTo(W - pad.right, y); ctx.stroke();
+    ctx.fillStyle = '#94A3B8'; ctx.font = '10px Segoe UI'; ctx.textAlign = 'right';
+    let val = max * i / 4;
+    let label = prefix + (val >= 1000 ? (val/1000).toFixed(1) + 'K' : Math.round(val)) + suffix;
+    ctx.fillText(label, pad.left - 6, y + 3);
+  }
+
+  // Bars
+  data.forEach((v, i) => {
+    const x = pad.left + gap * i + (gap - barW) / 2;
+    const h = (v / max) * ch;
+    const y = pad.top + ch - h;
+
+    // Bar gradient
+    const grad = ctx.createLinearGradient(x, y, x, pad.top + ch);
+    grad.addColorStop(0, color);
+    grad.addColorStop(1, color + '40');
+    ctx.fillStyle = grad;
+    ctx.beginPath();
+    ctx.roundRect(x, y, barW, h, [4,4,0,0]);
+    ctx.fill();
+
+    // Value on top
+    if (showValues) {
+      ctx.fillStyle = '#1C355E'; ctx.font = 'bold 10px Segoe UI'; ctx.textAlign = 'center';
+      let label = prefix + (v >= 1000 ? (v/1000).toFixed(1) + 'K' : (v % 1 === 0 ? v : v.toFixed(1))) + suffix;
+      ctx.fillText(label, x + barW/2, y - 5);
+    }
+
+    // Month label
+    ctx.fillStyle = '#64748B'; ctx.font = '10px Segoe UI'; ctx.textAlign = 'center';
+    ctx.fillText(shortMonths[i], x + barW/2, pad.top + ch + 16);
+  });
+}
+
+function drawLineChart(canvasId, data, color, suffix) {
+  const c = document.getElementById(canvasId);
+  const ctx = c.getContext('2d');
+  const W = c.width = c.parentElement.offsetWidth;
+  const H = c.height;
+  const pad = {top:20, right:20, bottom:36, left:60};
+  const cw = W - pad.left - pad.right;
+  const ch = H - pad.top - pad.bottom;
+  const max = Math.max(...data) * 1.2;
+  const min = 0;
+
+  ctx.clearRect(0,0,W,H);
+
+  // Grid
+  ctx.strokeStyle = '#E2E8F0'; ctx.lineWidth = 1;
+  for (let i = 0; i <= 4; i++) {
+    const y = pad.top + ch - (ch * i / 4);
+    ctx.beginPath(); ctx.moveTo(pad.left, y); ctx.lineTo(W - pad.right, y); ctx.stroke();
+    ctx.fillStyle = '#94A3B8'; ctx.font = '10px Segoe UI'; ctx.textAlign = 'right';
+    ctx.fillText((max * i / 4).toFixed(1) + suffix, pad.left - 6, y + 3);
+  }
+
+  // Line + fill
+  const gap = cw / (data.length - 1);
+  const points = data.map((v, i) => ({
+    x: pad.left + gap * i,
+    y: pad.top + ch - ((v - min) / (max - min)) * ch
+  }));
+
+  // Fill
+  ctx.beginPath();
+  ctx.moveTo(points[0].x, pad.top + ch);
+  points.forEach(p => ctx.lineTo(p.x, p.y));
+  ctx.lineTo(points[points.length-1].x, pad.top + ch);
+  ctx.closePath();
+  ctx.fillStyle = color + '15';
+  ctx.fill();
+
+  // Line
+  ctx.beginPath();
+  points.forEach((p, i) => i === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y));
+  ctx.strokeStyle = color; ctx.lineWidth = 2.5; ctx.stroke();
+
+  // Dots + values
+  points.forEach((p, i) => {
+    ctx.beginPath(); ctx.arc(p.x, p.y, 4, 0, Math.PI*2);
+    ctx.fillStyle = color; ctx.fill();
+    ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(p.x, p.y, 2, 0, Math.PI*2); ctx.fill();
+
+    ctx.fillStyle = '#1C355E'; ctx.font = 'bold 10px Segoe UI'; ctx.textAlign = 'center';
+    ctx.fillText(data[i].toFixed(1) + suffix, p.x, p.y - 10);
+  });
+
+  // Month labels
+  data.forEach((v, i) => {
+    const x = pad.left + gap * i;
+    ctx.fillStyle = '#64748B'; ctx.font = '10px Segoe UI'; ctx.textAlign = 'center';
+    ctx.fillText(shortMonths[i], x, pad.top + ch + 16);
+  });
+}
+
+// ── Render Charts ──
+drawBarChart('revChart', monthly.map(m => m.revenue), '#FF5F00', '$', '', true);
+drawBarChart('actionsChart', monthly.map(m => m.actions), '#1C355E', '', '', true);
+drawBarChart('clicksChart', monthly.map(m => m.clicks), '#4A7FC1', '', '', true);
+drawLineChart('convChart', monthly.map(m => m.clicks > 0 ? (m.actions/m.clicks*100) : 0), '#2E8B57', '%');
+
+// Capital One monthly revenue bar
+const capOneData = monthly.map(m => {
+  const key = m.key;
+  const p = partners.find(p => p.name === 'Capital One');
+  return p && p.monthly[key] ? p.monthly[key].revenue : 0;
+});
+drawBarChart('capOneChart', capOneData, '#FF5F00', '$', '', true);
+
+// ── Partner Table ──
+let currentSort = 'revenue';
+let sortDir = 'desc';
+
+function sortTable(field) {
+  if (currentSort === field) sortDir = sortDir === 'desc' ? 'asc' : 'desc';
+  else { currentSort = field; sortDir = field === 'name' ? 'asc' : 'desc'; }
+  renderPartnerTable();
+}
+
+function fmt(n) { return n.toLocaleString('en-US'); }
+function fmtD(n) { return '$' + n.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2}); }
+
+function renderPartnerTable() {
+  const sorted = [...partners].sort((a,b) => {
+    let va = a[currentSort], vb = b[currentSort];
+    if (currentSort === 'name') return sortDir === 'asc' ? va.localeCompare(vb) : vb.localeCompare(va);
+    return sortDir === 'desc' ? vb - va : va - vb;
+  });
+
+  const maxRev = Math.max(...partners.map(p => p.revenue));
+  const maxActions = Math.max(...partners.map(p => Math.max(...Object.values(p.monthly).map(m => m.actions))));
+  const monthKeys = monthly.map(m => m.key);
+
+  const t = partners.reduce((a,p) => {
+    a.clicks += p.clicks; a.actions += p.actions; a.revenue += p.revenue; a.cost += p.cost;
+    return a;
+  }, {clicks:0, actions:0, revenue:0, cost:0});
+
+  document.getElementById('partnerTableBody').innerHTML = sorted.map(p => {
+    const barW = maxRev > 0 ? (p.revenue / maxRev * 100) : 0;
+    // Mini sparkline of monthly bookings
+    const spark = monthKeys.map(k => {
+      const v = p.monthly[k] ? p.monthly[k].actions : 0;
+      const h = maxActions > 0 ? Math.max(2, v / maxActions * 24) : 0;
+      const color = v > 0 ? '#FF5F00' : '#E2E8F0';
+      return `<span style="display:inline-block;width:12px;height:${h}px;background:${color};border-radius:2px;margin:0 1px;vertical-align:bottom;" title="${monthKeys.indexOf(k) < monthly.length ? monthly[monthKeys.indexOf(k)].label : k}: ${v} bookings"></span>`;
+    }).join('');
+
+    return `<tr>
+      <td class="partner-name" title="${p.name}">${p.name}</td>
+      <td class="num">${fmt(p.clicks)}</td>
+      <td class="num" style="font-weight:600;">${p.actions}</td>
+      <td class="num bar-cell" style="font-weight:600;color:#FF5F00;">
+        <div class="bar-fill" style="width:${barW}%;background:#FF5F00;"></div>
+        <span style="position:relative;">${fmtD(p.revenue)}</span>
+      </td>
+      <td class="num">${fmtD(p.cost)}</td>
+      <td class="num" style="color:#2E8B57;font-weight:600;">${p.roas}x</td>
+      <td class="num">${p.conv}%</td>
+      <td class="num">${fmtD(p.avg_booking)}</td>
+      <td style="text-align:center;">${spark}</td>
+    </tr>`;
+  }).join('') + `<tr style="font-weight:700;background:#1C355E;border-top:2px solid #FF5F00;">
+    <td style="color:#fff;">TOTALS</td>
+    <td class="num" style="color:#fff;">${fmt(t.clicks)}</td>
+    <td class="num" style="color:#fff;">${t.actions}</td>
+    <td class="num" style="color:#fff;">${fmtD(t.revenue)}</td>
+    <td class="num" style="color:#fff;">${fmtD(t.cost)}</td>
+    <td class="num" style="color:#fff;">${t.cost > 0 ? (t.revenue/t.cost).toFixed(1) : 0}x</td>
+    <td class="num" style="color:#fff;">${t.clicks > 0 ? (t.actions/t.clicks*100).toFixed(2) : 0}%</td>
+    <td class="num" style="color:#fff;">${t.actions > 0 ? fmtD(t.revenue/t.actions) : '$0.00'}</td>
+    <td></td>
+  </tr>`;
+}
+
+renderPartnerTable();
+
+// ── Monthly Summary Table ──
+(function() {
+  const body = document.getElementById('monthlySummaryBody');
+  let prevRev = 0;
+  body.innerHTML = monthly.map((m, i) => {
+    const roas = m.cost > 0 ? (m.revenue / m.cost).toFixed(1) : '—';
+    const conv = m.clicks > 0 ? (m.actions / m.clicks * 100).toFixed(2) : '—';
+    let mom = '';
+    if (i > 0 && prevRev > 0) {
+      const pct = ((m.revenue - prevRev) / prevRev * 100).toFixed(0);
+      const cls = pct >= 0 ? 'up' : 'down';
+      const arrow = pct >= 0 ? '▲' : '▼';
+      mom = `<span class="growth ${cls}">${arrow} ${Math.abs(pct)}%</span>`;
+    } else if (i === 0) {
+      mom = '<span style="color:#94A3B8;font-size:11px;">Launch</span>';
+    }
+    prevRev = m.revenue;
+    return `<tr>
+      <td style="font-weight:600;">${m.label}</td>
+      <td class="num">${m.total_partners}</td>
+      <td class="num" style="font-weight:600;">${m.active}</td>
+      <td class="num">${fmt(m.clicks)}</td>
+      <td class="num" style="font-weight:600;">${m.actions}</td>
+      <td class="num" style="font-weight:600;color:#FF5F00;">${fmtD(m.revenue)}</td>
+      <td class="num">${fmtD(m.cost)}</td>
+      <td class="num" style="color:#2E8B57;font-weight:600;">${roas}x</td>
+      <td class="num">${conv}%</td>
+      <td class="num">${mom}</td>
+    </tr>`;
+  }).join('') + (() => {
+    const t = monthly.reduce((a,m) => {
+      a.clicks += m.clicks; a.actions += m.actions; a.revenue += m.revenue; a.cost += m.cost;
+      return a;
+    }, {clicks:0, actions:0, revenue:0, cost:0});
+    return `<tr style="font-weight:700;background:#1C355E;border-top:2px solid #FF5F00;">
+      <td style="color:#fff;">TOTAL</td>
+      <td class="num" style="color:#fff;">—</td>
+      <td class="num" style="color:#fff;">—</td>
+      <td class="num" style="color:#fff;">${fmt(t.clicks)}</td>
+      <td class="num" style="color:#fff;">${t.actions}</td>
+      <td class="num" style="color:#fff;">${fmtD(t.revenue)}</td>
+      <td class="num" style="color:#fff;">${fmtD(t.cost)}</td>
+      <td class="num" style="color:#fff;">${t.cost > 0 ? (t.revenue/t.cost).toFixed(1) : 0}x</td>
+      <td class="num" style="color:#fff;">${t.clicks > 0 ? (t.actions/t.clicks*100).toFixed(2) : 0}%</td>
+      <td></td>
+    </tr>`;
+  })();
+})();
+
+// ── Resize handler ──
+window.addEventListener('resize', () => {
+  drawBarChart('revChart', monthly.map(m => m.revenue), '#FF5F00', '$', '', true);
+  drawBarChart('actionsChart', monthly.map(m => m.actions), '#1C355E', '', '', true);
+  drawBarChart('clicksChart', monthly.map(m => m.clicks), '#4A7FC1', '', '', true);
+  drawLineChart('convChart', monthly.map(m => m.clicks > 0 ? (m.actions/m.clicks*100) : 0), '#2E8B57', '%');
+  drawBarChart('capOneChart', capOneData, '#FF5F00', '$', '', true);
+});
+</script>
+
+</body>
+</html>
