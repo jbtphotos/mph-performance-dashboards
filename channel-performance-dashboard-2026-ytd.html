@@ -86,6 +86,47 @@
 
   .footer{text-align:center;padding:18px 32px;border-top:3px solid #FF5F00;background:#1C355E;color:rgba(255,255,255,0.6);font-size:11px;}
 
+  
+/* MPH-LAYOUT-OVERHAUL-v1 */
+
+  /* Sticky section navigation */
+  .section-nav{position:sticky;top:0;z-index:100;background:#FFFFFF;border-bottom:1px solid var(--border);box-shadow:0 1px 4px rgba(28,53,94,0.06);}
+  .section-nav-inner{max-width:1600px;margin:0 auto;padding:0 32px;display:flex;gap:4px;overflow-x:auto;}
+  .section-nav a{display:inline-block;padding:12px 16px;font-size:12px;font-weight:700;color:var(--navy);text-decoration:none;letter-spacing:0.4px;text-transform:uppercase;border-bottom:3px solid transparent;transition:all 0.15s;white-space:nowrap;}
+  .section-nav a:hover{color:var(--orange);}
+  .section-nav a.active{color:var(--orange);border-bottom-color:var(--orange);}
+
+  /* Per-section year toggle pills */
+  .year-toggle{display:inline-flex;gap:4px;background:#EEF1F6;padding:3px;border-radius:20px;margin-left:auto;}
+  .year-toggle button{font-family:Arial,'Helvetica Neue',Helvetica,sans-serif;font-size:11px;font-weight:700;padding:5px 14px;border-radius:16px;border:none;background:transparent;color:var(--text);cursor:pointer;transition:all 0.15s;letter-spacing:0.3px;}
+  .year-toggle button:hover{background:rgba(28,53,94,0.08);}
+  .year-toggle button.active{background:var(--navy);color:#fff;}
+  .year-toggle button.active:hover{background:var(--navy);}
+  .chart-card-head{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:8px;border-bottom:2px solid #FF5F00;padding-bottom:8px;}
+  .chart-card-head h3{border-bottom:none !important;padding-bottom:0 !important;margin-bottom:0 !important;flex:1;min-width:240px;}
+
+  /* Side-by-side chart grid (used when year toggle = both) */
+  .yt-pair{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  .yt-pair .yt-sub-title{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.6px;margin-bottom:6px;text-align:center;}
+  .yt-single canvas{display:block;}
+  .yt-pair canvas{display:block;}
+
+  /* ADR section: wider left lane (62/38) */
+  .grid-adr{display:grid;grid-template-columns:62fr 38fr;gap:18px;margin-bottom:22px;}
+
+  /* Merged revenue table: visual grouping for month blocks */
+  table.merged-rev th.mblk-start,table.merged-rev td.mblk-start{border-left:2px solid #1C355E;}
+  table.merged-rev th.mblk-mid,table.merged-rev td.mblk-mid{}
+  table.merged-rev th.mblk-end,table.merged-rev td.mblk-end{border-right:2px solid #1C355E;}
+  table.merged-rev thead th.month-group{background:#1C355E;color:#fff;text-align:center;font-size:10px;letter-spacing:0.5px;}
+  table.merged-rev thead th.sub-hdr{font-size:9px;font-weight:600;background:#2A4470;}
+  table.merged-rev tbody td.delta-cell{font-size:10px;font-weight:700;}
+
+  @media(max-width:1100px){
+    .grid-adr{grid-template-columns:1fr;}
+    .yt-pair{grid-template-columns:1fr;}
+  }
+
   @media(max-width:1100px){
     .kpi-row{grid-template-columns:repeat(3,1fr);}
     .grid-2{grid-template-columns:1fr;}
@@ -103,14 +144,16 @@
   <div class="header-inner">
     <div>
       <h1><span class="header-eyebrow">My Place Hotels</span>Channel Performance Dashboard — 2026 YTD</h1>
-      <div class="subtitle">Jan – Mar 2026 · Stay Date · All Properties · Excludes Cancelled Reservations · Compared vs same period 2025</div>
-      <div class="update-badge">Last updated: April 1, 2026 · Data through Mar 2026 (3 of 12 months)</div>
+      <div class="subtitle">Jan – Apr 2026 · Stay Date · All Properties · Excludes Cancelled Reservations · Compared vs same period 2025</div>
+      <div class="update-badge">Last updated: May 12, 2026 · Data through Apr 2026 (4 of 12 months)</div>
     </div>
     <div>
-      <div class="ytd-badge">2026 YTD · Q1</div>
+      <div class="ytd-badge">2026 YTD · Through Apr</div>
     </div>
   </div>
 </div>
+
+<div class="section-nav"><div class="section-nav-inner"><a href="#sec-revenue" data-target="sec-revenue">Revenue</a><a href="#sec-rn" data-target="sec-rn">Room Nights</a><a href="#sec-mix" data-target="sec-mix">Channel Mix</a><a href="#sec-adr" data-target="sec-adr">ADR</a><a href="#sec-detail" data-target="sec-detail">Detail Tables</a></div></div>
 
 <div class="dashboard">
 
@@ -118,95 +161,125 @@
   <div class="kpi-row">
     <div class="kpi-card">
       <div class="kpi-label">2026 YTD Net Revenue</div>
-      <div class="kpi-value">$14.99M</div>
-      <div class="kpi-sub">2025 same period: $13.00M</div>
-      <div class="kpi-yoy"><span style="color:#2E8B57;font-size:11px;font-weight:700;">▲ 15.4% vs 2025</span></div>
+      <div class="kpi-value">$34.64M</div>
+      <div class="kpi-sub">2025 same period: $30.81M</div>
+      <div class="kpi-yoy"><span style="color:#2E8B57;font-size:11px;font-weight:700;">▲ 12.4% vs 2025</span></div>
     </div>
     <div class="kpi-card green">
       <div class="kpi-label">2026 YTD Net Room Nights</div>
-      <div class="kpi-value">169,421</div>
-      <div class="kpi-sub">2025 same period: 144,512</div>
-      <div class="kpi-yoy"><span style="color:#2E8B57;font-size:11px;font-weight:700;">▲ 17.2% vs 2025</span></div>
+      <div class="kpi-value">375,330</div>
+      <div class="kpi-sub">2025 same period: 336,686</div>
+      <div class="kpi-yoy"><span style="color:#2E8B57;font-size:11px;font-weight:700;">▲ 11.5% vs 2025</span></div>
     </div>
     <div class="kpi-card">
       <div class="kpi-label">2026 YTD Blended ADR</div>
-      <div class="kpi-value">$88.48</div>
-      <div class="kpi-sub">2025 same period: $89.93</div>
-      <div class="kpi-yoy"><span style="color:#C0392B;font-size:11px;font-weight:700;">▼ 1.6% vs 2025</span></div>
+      <div class="kpi-value">$92.29</div>
+      <div class="kpi-sub">2025 same period: $91.51</div>
+      <div class="kpi-yoy"><span style="color:#2E8B57;font-size:11px;font-weight:700;">▲ 0.8% vs 2025</span></div>
     </div>
     <div class="kpi-card accent">
       <div class="kpi-label">Top Channel — 2026 YTD</div>
-      <div class="kpi-value">$8.49M</div>
-      <div class="kpi-sub">PMS · 56.7% of YTD total</div>
-      <div class="kpi-yoy"><span style="color:#2E8B57;font-size:11px;font-weight:700;">▲ 21.1% vs 2025</span></div>
+      <div class="kpi-value">$18.58M</div>
+      <div class="kpi-sub">PMS · 53.6% of YTD total</div>
+      <div class="kpi-yoy"><span style="color:#2E8B57;font-size:11px;font-weight:700;">▲ 12.5% vs 2025</span></div>
     </div>
     <div class="kpi-card green">
       <div class="kpi-label">Best Month — 2026 YTD</div>
-      <div class="kpi-value">Feb</div>
-      <div class="kpi-sub">$7.90M · 86,776 RNs</div>
-      <div class="kpi-yoy"><span style="color:#2E8B57;font-size:11px;font-weight:700;">▲ 16.4% vs 2025</span></div>
+      <div class="kpi-value">Apr</div>
+      <div class="kpi-sub">$9.98M · 103,141 RNs</div>
+      <div class="kpi-yoy"><span style="color:#2E8B57;font-size:11px;font-weight:700;">▲ 9.0% vs 2025</span></div>
     </div>
     <div class="kpi-card">
       <div class="kpi-label">2026 Online Channels YTD</div>
-      <div class="kpi-value">$6.50M</div>
-      <div class="kpi-sub">43.3% of YTD total</div>
-      <div class="kpi-yoy"><span style="color:#2E8B57;font-size:11px;font-weight:700;">▲ 8.7% vs 2025</span></div>
+      <div class="kpi-value">$16.06M</div>
+      <div class="kpi-sub">46.4% of YTD total</div>
+      <div class="kpi-yoy"><span style="color:#2E8B57;font-size:11px;font-weight:700;">▲ 12.3% vs 2025</span></div>
     </div>
   </div>
 
-  <!-- REVENUE CHART 2026 -->
-  <div class="chart-card">
-    <h3>Monthly Net Revenue by Channel — 2026 YTD (Jan – Mar 2026)</h3>
-    <p class="chart-desc">Stacked monthly net revenue by booking channel for 2026 YTD. Updated each month as new data becomes available. Use <strong>All Off</strong> + a single chip to isolate and analyze any individual channel.</p>
-    <div class="legend-chips" id="revLegend26"><span class="solo-label" id="revSoloLabel26"></span></div>
-    <canvas id="revChart26" height="320" style="width:100%;"></canvas>
+  <!-- REVENUE SECTION (year toggle: 2026 / 2025 / Side-by-Side) -->
+  <div id="sec-revenue" class="chart-card" data-yt-section="rev">
+    <div class="chart-card-head">
+      <h3 id="revTitle">Monthly Net Revenue by Channel — 2026 YTD (Jan – Apr 2026)</h3>
+      <div class="year-toggle" data-yt-target="rev">
+        <button data-yt="2026" class="active">2026</button>
+        <button data-yt="2025">2025</button>
+        <button data-yt="both">Side-by-Side</button>
+      </div>
+    </div>
+    <p class="chart-desc" id="revDesc">Stacked monthly net revenue by booking channel for 2026 YTD. Use <strong>All Off</strong> + a single chip to isolate and analyze any individual channel.</p>
+    <div class="legend-chips" id="revLegend"><span class="solo-label" id="revSoloLabel"></span></div>
+    <div class="yt-single" data-yt-mode="single">
+      <canvas id="revChartSingle" height="320" style="width:100%;"></canvas>
+    </div>
+    <div class="yt-pair" data-yt-mode="pair" style="display:none;">
+      <div>
+        <div class="yt-sub-title">2026 YTD</div>
+        <canvas id="revChartPair26" height="280" style="width:100%;"></canvas>
+      </div>
+      <div>
+        <div class="yt-sub-title">2025 Same Period</div>
+        <canvas id="revChartPair25" height="280" style="width:100%;"></canvas>
+      </div>
+    </div>
   </div>
-
-  <!-- REVENUE CHART 2025 (same period) -->
-  <div class="chart-card">
-    <h3>Monthly Net Revenue by Channel — 2025 Same Period (Jan – Mar 2026)</h3>
-    <p class="chart-desc">2025 revenue for the same 2-month window (Jan – Mar 2026), shown for direct apples-to-apples comparison. Channel toggles are shared across all charts.</p>
-    <div class="legend-chips" id="revLegend25"><span class="solo-label" id="revSoloLabel25"></span></div>
-    <canvas id="revChart25" height="320" style="width:100%;"></canvas>
+  <!-- ROOM NIGHTS SECTION (year toggle) -->
+  <div id="sec-rn" class="chart-card" data-yt-section="rn">
+    <div class="chart-card-head">
+      <h3 id="rnTitle">Monthly Net Room Nights by Channel — 2026 YTD (Jan – Apr 2026)</h3>
+      <div class="year-toggle" data-yt-target="rn">
+        <button data-yt="2026" class="active">2026</button>
+        <button data-yt="2025">2025</button>
+        <button data-yt="both">Side-by-Side</button>
+      </div>
+    </div>
+    <p class="chart-desc" id="rnDesc">Monthly room night production by booking channel for 2026 YTD. Reflects demand volume and channel mix.</p>
+    <div class="legend-chips" id="rnLegend"><span class="solo-label" id="rnSoloLabel"></span></div>
+    <div class="yt-single" data-yt-mode="single">
+      <canvas id="rnChartSingle" height="280" style="width:100%;"></canvas>
+    </div>
+    <div class="yt-pair" data-yt-mode="pair" style="display:none;">
+      <div>
+        <div class="yt-sub-title">2026 YTD</div>
+        <canvas id="rnChartPair26" height="240" style="width:100%;"></canvas>
+      </div>
+      <div>
+        <div class="yt-sub-title">2025 Same Period</div>
+        <canvas id="rnChartPair25" height="240" style="width:100%;"></canvas>
+      </div>
+    </div>
   </div>
-
-  <!-- RN CHART 2026 -->
-  <div class="chart-card">
-    <h3>Monthly Net Room Nights by Channel — 2026 YTD (Jan – Mar 2026)</h3>
-    <p class="chart-desc">Monthly room night production by booking channel for 2026 YTD. Reflects demand volume and channel mix. The total above each bar is the combined room nights for all active channels.</p>
-    <div class="legend-chips" id="rnLegend26"><span class="solo-label" id="rnSoloLabel26"></span></div>
-    <canvas id="rnChart26" height="280" style="width:100%;"></canvas>
+  <!-- CONTRIBUTION % SECTION (year toggle) -->
+  <div id="sec-mix" class="chart-card" data-yt-section="pct">
+    <div class="chart-card-head">
+      <h3 id="pctTitle">Monthly Revenue Contribution % by Channel — 2026 YTD</h3>
+      <div class="year-toggle" data-yt-target="pct">
+        <button data-yt="2026" class="active">2026</button>
+        <button data-yt="2025">2025</button>
+        <button data-yt="both">Side-by-Side</button>
+      </div>
+    </div>
+    <p class="chart-desc" id="pctDesc">Each bar totals 100% and shows each channel's proportional share of total monthly revenue for 2026. Useful for spotting early shifts in channel mix vs the prior year.</p>
+    <div class="yt-single" data-yt-mode="single">
+      <canvas id="pctChartSingle" height="260" style="width:100%;"></canvas>
+    </div>
+    <div class="yt-pair" data-yt-mode="pair" style="display:none;">
+      <div>
+        <div class="yt-sub-title">2026 YTD</div>
+        <canvas id="pctChartPair26" height="220" style="width:100%;"></canvas>
+      </div>
+      <div>
+        <div class="yt-sub-title">2025 Same Period</div>
+        <canvas id="pctChartPair25" height="220" style="width:100%;"></canvas>
+      </div>
+    </div>
+    <div class="legend-chips" id="pctLegend" style="margin-top:14px;margin-bottom:0;"></div>
   </div>
-
-  <!-- RN CHART 2025 (same period) -->
-  <div class="chart-card">
-    <h3>Monthly Net Room Nights by Channel — 2025 Same Period (Jan – Feb 2026)</h3>
-    <p class="chart-desc">2025 room night volume for the same 2-month window. Compare against 2026 to identify which channels are driving volume growth year-over-year.</p>
-    <div class="legend-chips" id="rnLegend25"><span class="solo-label" id="rnSoloLabel25"></span></div>
-    <canvas id="rnChart25" height="280" style="width:100%;"></canvas>
-  </div>
-
-  <!-- CONTRIBUTION % 2026 -->
-  <div class="chart-card">
-    <h3>Monthly Revenue Contribution % by Channel — 2026 YTD</h3>
-    <p class="chart-desc">Each bar totals 100% and shows each channel's proportional share of total monthly revenue for 2026. Useful for spotting early shifts in channel mix vs the prior year.</p>
-    <canvas id="pctChart26" height="260" style="width:100%;"></canvas>
-    <div class="legend-chips" id="pctLegend26" style="margin-top:14px;margin-bottom:0;"></div>
-  </div>
-
-  <!-- CONTRIBUTION % 2025 same period -->
-  <div class="chart-card">
-    <h3>Monthly Revenue Contribution % by Channel — 2025 Same Period</h3>
-    <p class="chart-desc">2025 channel mix for the same 2-month window. Compare against 2026 above to identify which channels are gaining or losing share.</p>
-    <canvas id="pctChart25" height="260" style="width:100%;"></canvas>
-    <div class="legend-chips" id="pctLegend25" style="margin-top:14px;margin-bottom:0;"></div>
-  </div>
-
-  <!-- DONUT — Revenue share -->
+<!-- DONUT — Revenue share -->
   <div class="grid-2">
     <div class="chart-card" style="margin-bottom:0;">
       <h3>2026 YTD Revenue Share by Channel</h3>
-      <p class="chart-desc">Full YTD revenue distribution across all channels through Feb 2026.</p>
+      <p class="chart-desc">Full YTD revenue distribution across all channels through Apr 2026.</p>
       <div class="donut-wrap">
         <canvas id="revDonut26" width="200" height="200"></canvas>
         <div class="donut-legend" id="revDonutLeg26"></div>
@@ -214,7 +287,7 @@
     </div>
     <div class="chart-card" style="margin-bottom:0;">
       <h3>2025 Same Period Revenue Share by Channel</h3>
-      <p class="chart-desc">2025 revenue distribution for Jan – Feb 2026. Compare channel mix proportions to see year-over-year share shifts.</p>
+      <p class="chart-desc">2025 revenue distribution for Jan – Apr 2026. Compare channel mix proportions to see year-over-year share shifts.</p>
       <div class="donut-wrap">
         <canvas id="revDonut25" width="200" height="200"></canvas>
         <div class="donut-legend" id="revDonutLeg25"></div>
@@ -227,7 +300,7 @@
   <div class="grid-2">
     <div class="chart-card" style="margin-bottom:0;">
       <h3>2026 YTD Room Night Share by Channel</h3>
-      <p class="chart-desc">Room night volume distribution by channel through Feb 2026. Compare against the revenue share donut to see which channels punch above or below their weight on ADR.</p>
+      <p class="chart-desc">Room night volume distribution by channel through Apr 2026. Compare against the revenue share donut to see which channels punch above or below their weight on ADR.</p>
       <div class="donut-wrap">
         <canvas id="rnDonut26" width="200" height="200"></canvas>
         <div class="donut-legend" id="rnDonutLeg26"></div>
@@ -235,7 +308,7 @@
     </div>
     <div class="chart-card" style="margin-bottom:0;">
       <h3>2025 Same Period Room Night Share by Channel</h3>
-      <p class="chart-desc">2025 room night mix for Jan – Feb 2026. Use alongside 2026 to identify channels that have gained or lost volume share.</p>
+      <p class="chart-desc">2025 room night mix for Jan – Apr 2026. Use alongside 2026 to identify channels that have gained or lost volume share.</p>
       <div class="donut-wrap">
         <canvas id="rnDonut25" width="200" height="200"></canvas>
         <div class="donut-legend" id="rnDonutLeg25"></div>
@@ -245,7 +318,7 @@
   <div style="height:22px;"></div>
 
   <!-- ADR -->
-  <div class="grid-2">
+  <div id="sec-adr" class="grid-adr">
     <div class="chart-card" style="margin-bottom:0;">
       <h3>YTD Net ADR by Channel — 2026 vs 2025</h3>
       <p class="chart-desc">YTD average daily rate per channel with 2026 (solid) stacked above the 2025 comparison bar (faded). The ▲/▼ shows year-over-year rate movement.</p>
@@ -271,16 +344,11 @@
   </div>
 
   <!-- DETAIL TABLES -->
-  <div class="chart-card">
-    <h3>2026 YTD Monthly Net Revenue by Channel — Full Detail ($)</h3>
-    <p class="chart-desc">Month-by-month net revenue for every channel in 2026 YTD. The % sub-value shows each channel's share of total revenue for that month.</p>
-    <div class="tbl-wrap"><table id="detailTable26"></table></div>
-  </div>
-
-  <div class="chart-card">
-    <h3>2025 Same Period Monthly Net Revenue by Channel — Full Detail ($)</h3>
-    <p class="chart-desc">2025 channel revenue for Jan – Feb 2026. Use alongside the 2026 table above for a direct channel-level monthly comparison.</p>
-    <div class="tbl-wrap"><table id="detailTable25"></table></div>
+  <!-- MERGED REVENUE DETAIL TABLE -->
+  <div id="sec-detail" class="chart-card">
+    <h3>Monthly Net Revenue by Channel — 2026 YTD vs 2025</h3>
+    <p class="chart-desc">Month-by-month net revenue per channel with 2026 (current), 2025 (same period), and the YoY % change shown side-by-side. Each three-column block represents one month; the rightmost block is the YTD total.</p>
+    <div class="tbl-wrap"><table id="revTableMerged" class="merged-rev"></table></div>
   </div>
 
   <!-- MERGED RN TABLE -->
@@ -300,12 +368,13 @@
 </div>
 
 <div class="footer">
-  Channel Performance Dashboard · My Place Hotels · 2026 YTD vs 2025 Same Period · Jan – Feb 2026 · Stay-date reports · Excludes cancelled reservations · Last updated March 19, 2026
+  Channel Performance Dashboard · My Place Hotels · 2026 YTD vs 2025 Same Period · Jan – Apr 2026 · Stay-date reports · Excludes cancelled reservations · Last updated May 12, 2026
 </div>
 
 <script>
-const MONTHS  = ["Jan", "Feb", "Mar"];
+const MONTHS  = ["Jan", "Feb", "Mar", "Apr"];
 const CHANNELS = ["PMS", "Expedia", "Website", "Booking", "GDS", "Expedia Programs", "Other OTA", "Priceline/Agoda", "HotelBeds", "BnBerry", "Hotel Tonight", "Hopper"];
+const PERIOD_LABEL = "Jan – Apr 2026";
 const COLORS = {
   'PMS':'#1C355E','Website':'#2E8B57','Expedia':'#E03030','Booking':'#FF5F00',
   'GDS':'#6B4CA8','Expedia Programs':'#0088CC','Priceline/Agoda':'#D4822A',
@@ -313,63 +382,22 @@ const COLORS = {
   'Hotel Tonight':'#C0392B','BnBerry':'#95A5A6',
 };
 
-const monthlyRev26={"PMS": [4201206.420000058, 4292448.450000056, 4962191.450000059], "Expedia": [925427.350000002, 1096166.7599999944, 1413179.7299999944], "Website": [659952.9599999951, 828363.1299999921, 1087190.169999996], "Booking": [551453.9899999984, 680638.7699999916, 917027.9399999931], "GDS": [294362.4000000009, 434461.6200000003, 494693.01000000024], "Expedia Programs": [220181.37, 287208.7499999999, 393355.80999999965], "Other OTA": [87443.73, 93605.47999999998, 136763.18], "Priceline/Agoda": [64537.37999999996, 76821.85000000003, 114040.09999999993], "HotelBeds": [45782.78999999999, 63893.91000000005, 89687.7], "BnBerry": [29760.99000000002, 38139.99999999998, 48162.55000000003], "Hotel Tonight": [5121.470000000001, 7580.1100000000015, 9152.479999999998], "Hopper": [1533.04, 3952.5600000000004, 5995.170000000001]}, monthlyRn26={"PMS": [48861, 48494, 54809], "Expedia": [11824, 12144, 14832], "Website": [6712, 8063, 10403], "Booking": [6206, 7000, 8886], "GDS": [3072, 4297, 4663], "Expedia Programs": [3033, 3401, 4503], "Other OTA": [1130, 1242, 1780], "Priceline/Agoda": [777, 818, 1223], "HotelBeds": [589, 771, 1028], "BnBerry": [360, 433, 482], "Hotel Tonight": [64, 74, 94], "Hopper": [17, 39, 65]}, monthlyAdr26={"PMS": [85.98281697059122, 88.515042067061, 90.53606980605483], "Expedia": [78.26685977672547, 90.26406126482168, 95.27910800970837], "Website": [98.32433849821142, 102.73634255239887, 104.50736998942574], "Booking": [88.85820012890724, 97.23410999999881, 103.19918298446918], "GDS": [95.82109375000029, 101.10812659995352, 106.0890006433627], "Expedia Programs": [72.59524233432245, 84.44832402234634, 87.35416611148116], "Other OTA": [77.38383185840708, 75.36673107890498, 76.83324719101124], "Priceline/Agoda": [83.05969111969107, 93.91424205378978, 93.24619787408008], "HotelBeds": [77.72969439728352, 82.87147859922185, 87.24484435797665], "BnBerry": [82.66941666666672, 88.0831408775981, 99.92230290456438], "Hotel Tonight": [80.02296875000002, 102.43391891891893, 97.36680851063828], "Hopper": [90.17882352941176, 101.34769230769231, 92.23338461538464]};
-const monthlyRev25={"PMS": [3530954.3900001515, 3485318.9900001334, 4623563.830000131], "Expedia": [872237.9499999982, 1098926.5300000014, 1372647.0699999924], "Website": [588456.2299999949, 704823.5599999913, 848694.5499999883], "Booking": [418201.0499999963, 570015.0699999925, 706686.1699999868], "GDS": [389599.8800000005, 441789.33000000037, 457630.3200000012], "Expedia Programs": [169248.76000000036, 221700.90000000034, 266925.89000000054], "Other OTA": [107035.36999999998, 113277.04000000001, 111361.25], "Priceline/Agoda": [94331.68999999974, 115449.03999999944, 179050.50000000026], "HotelBeds": [22317.719999999994, 19173.65, 70853.29000000004], "BnBerry": [0, 1009, 3928], "Hotel Tonight": [5222.609999999998, 8430.929999999998, 10861.769999999999], "Hopper": [7495.620000000001, 9743.889999999996, 8845.31]}, monthlyRn25={"PMS": [41203, 40074, 52116], "Expedia": [10040, 11863, 14873], "Website": [5883, 6532, 7831], "Booking": [4490, 5523, 6761], "GDS": [3813, 4180, 4180], "Expedia Programs": [2182, 2551, 3096], "Other OTA": [1330, 1419, 1409], "Priceline/Agoda": [1147, 1345, 1855], "HotelBeds": [329, 233, 770], "BnBerry": [0, 10, 23], "Hotel Tonight": [69, 75, 116], "Hopper": [98, 118, 104]}, monthlyAdr25={"PMS": [85.69653641725446, 86.97207640864724, 88.71678237009941], "Expedia": [86.87628984063717, 92.63479136811976, 92.29120352316227], "Website": [100.02655617881949, 107.90317819963121, 108.37626739879819], "Booking": [93.14054565701487, 103.20750860039703, 104.52391214317224], "GDS": [102.17673223183866, 105.69122727272739, 109.48093779904333], "Expedia Programs": [77.5658845096244, 86.90744805958454, 86.21637273901821], "Other OTA": [80.47772180451126, 79.82878083157154, 79.03566359119944], "Priceline/Agoda": [82.24210113339106, 85.83571747211853, 96.52318059299218], "HotelBeds": [67.83501519756837, 82.29034334763949, 92.01725974025975], "BnBerry": [0, 100.9, 170.7826086956522], "Hotel Tonight": [75.68999999999997, 112.41239999999998, 93.63594827586203], "Hopper": [76.48591836734694, 82.57533898305084, 85.0510576923077]};
-const moRev26=[7086763.890000055, 7903281.390000034, 9671439.290000042], moRn26=[82645, 86776, 102768], moAdr26=[85.75, 91.08, 94.11];
-const moRev25=[6205101.270000238, 6789657.930000293, 8661047.95000013], moRn25=[70584, 73923, 93134], moAdr25=[87.91, 91.85, 93.0];
-const annRev26={"PMS": 13455846.320000172, "Expedia": 3434773.8399999905, "Website": 2575506.259999983, "Booking": 2149120.699999983, "GDS": 1223517.0300000014, "Expedia Programs": 900745.9299999995, "Other OTA": 317812.38999999996, "Priceline/Agoda": 255399.3299999999, "HotelBeds": 199364.40000000002, "BnBerry": 116063.54000000002, "Hotel Tonight": 21854.059999999998, "Hopper": 11480.77}, annRn26={"PMS": 152164, "Expedia": 38800, "Website": 25178, "Booking": 22092, "GDS": 12032, "Expedia Programs": 10937, "Other OTA": 4152, "Priceline/Agoda": 2818, "HotelBeds": 2388, "BnBerry": 1275, "Hotel Tonight": 232, "Hopper": 121}, annAdr26={"PMS": 88.43, "Expedia": 88.53, "Website": 102.29, "Booking": 97.28, "GDS": 101.69, "Expedia Programs": 82.36, "Other OTA": 76.54, "Priceline/Agoda": 90.63, "HotelBeds": 83.49, "BnBerry": 91.03, "Hotel Tonight": 94.2, "Hopper": 94.88};
-const annRev25={"PMS": 11639837.210000416, "Expedia": 3343811.549999992, "Website": 2141974.3399999742, "Booking": 1694902.2899999756, "GDS": 1289019.5300000021, "Expedia Programs": 657875.5500000012, "Other OTA": 331673.66, "Priceline/Agoda": 388831.2299999994, "HotelBeds": 112344.66000000003, "BnBerry": 4937, "Hotel Tonight": 24515.309999999998, "Hopper": 26084.819999999992}, annRn25={"PMS": 133393, "Expedia": 36776, "Website": 20246, "Booking": 16774, "GDS": 12173, "Expedia Programs": 7829, "Other OTA": 4158, "Priceline/Agoda": 4347, "HotelBeds": 1332, "BnBerry": 33, "Hotel Tonight": 260, "Hopper": 320}, annAdr25={"PMS": 87.26, "Expedia": 90.92, "Website": 105.8, "Booking": 101.04, "GDS": 105.89, "Expedia Programs": 84.03, "Other OTA": 79.77, "Priceline/Agoda": 89.45, "HotelBeds": 84.34, "BnBerry": 149.61, "Hotel Tonight": 94.29, "Hopper": 81.52};
-const grandRev26=24661484, grandRn26=272189;
-const grandRev25=21655807, grandRn25=237641;
+const monthlyRev26={"PMS": [4201206.420000061, 4291906.090000043, 4961566.980000045, 5125869.290000021], "Expedia": [925427.3500000003, 1096166.7599999967, 1413164.3899999901, 1481080.7999999826], "Website": [659952.9599999945, 828363.1299999946, 1087190.1699999962, 1168983.0499999952], "Booking": [551453.989999997, 680638.7699999935, 917027.9399999937, 892951.2199999907], "GDS": [294362.4000000008, 434461.62000000034, 494693.00999999995, 530220.2200000002], "Expedia Programs": [220181.3699999997, 287208.7499999997, 393355.80999999907, 397922.01999999984], "Other OTA": [87443.73000000001, 93605.47999999998, 136763.18, 104905.07000000002], "Priceline/Agoda": [64537.37999999996, 76821.85000000003, 114040.09999999992, 124157.32999999989], "HotelBeds": [45782.79, 63893.91000000002, 89687.70000000004, 77451.01000000007], "BnBerry": [29760.990000000016, 38140.00000000001, 48162.55000000001, 59737.870000000024], "Hotel Tonight": [5121.469999999999, 7580.110000000001, 9152.48, 10289.490000000002], "Hopper": [1533.0399999999997, 3952.5600000000004, 5995.170000000002, 3858.83]}, monthlyRn26={"PMS": [48861, 48494, 54809, 55698], "Expedia": [11824, 12144, 14832, 15012], "Website": [6712, 8063, 10403, 10809], "Booking": [6206, 7000, 8886, 8092], "GDS": [3072, 4297, 4663, 4920], "Expedia Programs": [3033, 3401, 4503, 4608], "Other OTA": [1130, 1242, 1780, 1255], "Priceline/Agoda": [777, 818, 1223, 1170], "HotelBeds": [589, 771, 1028, 875], "BnBerry": [360, 433, 482, 561], "Hotel Tonight": [64, 74, 94, 101], "Hopper": [17, 39, 65, 40]}, monthlyAdr26={"PMS": [85.9828169705913, 88.5038580030528, 90.52467623930458, 92.02968311249994], "Expedia": [78.26685977672533, 90.26406126482186, 95.27807375943839, 98.65979216626583], "Website": [98.32433849821133, 102.7363425523992, 104.50736998942577, 108.14904709038719], "Booking": [88.85820012890701, 97.23410999999908, 103.19918298446925, 110.3498788927324], "GDS": [95.82109375000026, 101.10812659995354, 106.08900064336264, 107.76833739837403], "Expedia Programs": [72.59524233432235, 84.44832402234628, 87.35416611148102, 86.35460503472218], "Other OTA": [77.38383185840709, 75.36673107890498, 76.83324719101124, 83.5896972111554], "Priceline/Agoda": [83.05969111969107, 93.91424205378978, 93.24619787408007, 106.11737606837598], "HotelBeds": [77.72969439728354, 82.87147859922182, 87.24484435797669, 88.51544000000008], "BnBerry": [82.6694166666667, 88.08314087759817, 99.92230290456433, 106.48461675579327], "Hotel Tonight": [80.02296874999999, 102.43391891891892, 97.3668085106383, 101.8761386138614], "Hopper": [90.17882352941174, 101.34769230769231, 92.23338461538465, 96.47075]};
+const monthlyRev25={"PMS": [3531143.8800001354, 3485318.990000118, 4625851.750000108, 4874883.3400001], "Expedia": [872237.9499999965, 1099223.3800000045, 1372647.06999999, 1531075.0399999984], "Website": [588456.2299999952, 704823.5599999921, 848694.5499999902, 843519.5899999877], "Booking": [418201.04999999655, 570015.0699999928, 706686.1699999878, 725289.2299999895], "GDS": [389599.88000000076, 441789.33000000083, 457630.32000000076, 497110.100000001], "Expedia Programs": [169248.76000000033, 221700.9000000002, 266925.8900000003, 266384.6900000004], "Other OTA": [107035.36999999998, 113277.04000000001, 111361.25, 148046.27000000002], "Priceline/Agoda": [94331.68999999957, 115449.03999999944, 179050.5000000004, 188092.79000000007], "HotelBeds": [22317.719999999994, 19173.649999999998, 70853.29000000007, 55815.769999999975], "BnBerry": [0, 1009, 3928, 4072.209999999999], "Hotel Tonight": [5222.609999999999, 8430.93, 10861.769999999997, 9465.230000000003], "Hopper": [7495.620000000001, 9743.889999999998, 8845.309999999998, 7386.299999999999]}, monthlyRn25={"PMS": [41204, 40074, 52128, 55256], "Expedia": [10040, 11866, 14873, 16478], "Website": [5883, 6532, 7831, 7838], "Booking": [4491, 5523, 6761, 6777], "GDS": [3813, 4180, 4180, 4778], "Expedia Programs": [2182, 2551, 3096, 3274], "Other OTA": [1330, 1419, 1409, 1929], "Priceline/Agoda": [1147, 1345, 1855, 1873], "HotelBeds": [329, 233, 770, 621], "BnBerry": [0, 10, 23, 27], "Hotel Tonight": [69, 75, 116, 98], "Hopper": [98, 118, 104, 79]}, monthlyAdr25={"PMS": [85.6990554315148, 86.97207640864696, 88.74024996163497, 88.2236017808039], "Expedia": [86.8762898406371, 92.63638799932619, 92.29120352316211, 92.91631508678228], "Website": [100.02655617881952, 107.90317819963137, 108.37626739879839, 107.61923832610204], "Booking": [93.11980627922435, 103.20750860039703, 104.52391214317228, 107.02216762579158], "GDS": [102.17673223183864, 105.69122727272747, 109.48093779904325, 104.04146086228569], "Expedia Programs": [77.56588450962435, 86.90744805958455, 86.21637273901818, 81.3636805131339], "Other OTA": [80.47772180451126, 79.82878083157154, 79.03566359119944, 76.74767755313636], "Priceline/Agoda": [82.24210113339107, 85.83571747211855, 96.52318059299213, 100.423272824346], "HotelBeds": [67.83501519756837, 82.29034334763948, 92.01725974025983, 89.88046698872782], "BnBerry": [0, 100.9, 170.7826086956522, 150.82259259259257], "Hotel Tonight": [75.68999999999998, 112.4124, 93.63594827586203, 96.58397959183677], "Hopper": [76.48591836734694, 82.57533898305083, 85.05105769230767, 93.49746835443037]};
+const moRev26=[7086763.890000054, 7902739.030000027, 9670799.480000025, 9977426.19999999], moRn26=[82645, 86776, 102768, 103141], moAdr26=[85.75, 91.07, 94.1, 96.74];
+const moRev25=[6205290.7600001255, 6789954.780000107, 8663335.87000008, 9151140.560000079], moRn25=[70586, 73926, 93146, 99028], moAdr25=[87.91, 91.85, 93.01, 92.41];
+const annRev26={"PMS": 18580548.780000173, "Expedia": 4915839.299999969, "Website": 3744489.3099999805, "Booking": 3042071.919999975, "GDS": 1753737.2500000014, "Expedia Programs": 1298667.9499999983, "Other OTA": 422717.46, "Priceline/Agoda": 379556.6599999998, "HotelBeds": 276815.41000000015, "BnBerry": 175801.41000000006, "Hotel Tonight": 32143.55, "Hopper": 15339.600000000002}, annRn26={"PMS": 207862, "Expedia": 53812, "Website": 35987, "Booking": 30184, "GDS": 16952, "Expedia Programs": 15545, "Other OTA": 5407, "Priceline/Agoda": 3988, "HotelBeds": 3263, "BnBerry": 1836, "Hotel Tonight": 333, "Hopper": 161}, annAdr26={"PMS": 89.39, "Expedia": 91.35, "Website": 104.05, "Booking": 100.78, "GDS": 103.45, "Expedia Programs": 83.54, "Other OTA": 78.18, "Priceline/Agoda": 95.17, "HotelBeds": 84.83, "BnBerry": 95.75, "Hotel Tonight": 96.53, "Hopper": 95.28};
+const annRev25={"PMS": 16517197.960000463, "Expedia": 4875183.439999989, "Website": 2985493.9299999652, "Booking": 2420191.519999967, "GDS": 1786129.6300000034, "Expedia Programs": 924260.2400000012, "Other OTA": 479719.93, "Priceline/Agoda": 576924.0199999994, "HotelBeds": 168160.43000000005, "BnBerry": 9009.21, "Hotel Tonight": 33980.54, "Hopper": 33471.119999999995}, annRn25={"PMS": 188662, "Expedia": 53257, "Website": 28084, "Booking": 23552, "GDS": 16951, "Expedia Programs": 11103, "Other OTA": 6087, "Priceline/Agoda": 6220, "HotelBeds": 1953, "BnBerry": 60, "Hotel Tonight": 358, "Hopper": 399}, annAdr25={"PMS": 87.55, "Expedia": 91.54, "Website": 106.31, "Booking": 102.76, "GDS": 105.37, "Expedia Programs": 83.24, "Other OTA": 78.81, "Priceline/Agoda": 92.75, "HotelBeds": 86.1, "BnBerry": 150.15, "Hotel Tonight": 94.92, "Hopper": 83.89};
+const grandRev26=34637729, grandRn26=375330;
+const grandRev25=30809722, grandRn25=336686;
 
 function fmtM(v)  {return '$'+(v/1e6).toFixed(2)+'M';}
 function fmtK(v)  {return v>=1000?v.toLocaleString('en-US',{maximumFractionDigits:0}):v.toFixed(0);}
 function fmtD(v)  {return '$'+v.toFixed(2);}
 function fmtDol(v){return v>0?'$'+Math.round(v).toLocaleString():'—';}
 
-// ── Channel Toggles ───────────────────────────────────────────────────────────
+// (legacy channel-toggle block replaced by MPH-JS-OVERHAUL-v1)
 const activeChannels = new Set(CHANNELS);
-const ALL_LEGENDS = ['revLegend26','revLegend25','rnLegend26','rnLegend25','pctLegend26','pctLegend25'];
-const ALL_SOLOS   = ['revSoloLabel26','revSoloLabel25','rnSoloLabel26','rnSoloLabel25'];
-
-function refreshAllCharts() {
-  drawBar('revChart26',monthlyRev26,moRev26,fmtM);
-  drawBar('revChart25',monthlyRev25,moRev25,fmtM);
-  drawBar('rnChart26', monthlyRn26, moRn26, v=>fmtK(v));
-  drawBar('rnChart25', monthlyRn25, moRn25, v=>fmtK(v));
-  drawPct('pctChart26',monthlyRev26,moRev26);
-  drawPct('pctChart25',monthlyRev25,moRev25);
-}
-
-function updateSoloLabels() {
-  const active=CHANNELS.filter(c=>activeChannels.has(c));
-  const isSolo=active.length===1;
-  const name=isSolo?active[0]:'', col=isSolo?COLORS[name]:'#FF5F00';
-  ALL_SOLOS.forEach(id=>{
-    const el=document.getElementById(id); if(!el) return;
-    if(isSolo){
-      el.classList.add('visible'); el.style.color=col;
-      el.style.background=col+'15'; el.style.borderColor=col+'50';
-      el.innerHTML=`<span style="width:8px;height:8px;border-radius:50%;background:${col};display:inline-block;"></span> ${name} — solo view`;
-    } else el.classList.remove('visible');
-  });
-}
-
-function renderChips(id) {
-  const el=document.getElementById(id); if(!el) return;
-  const solo=el.querySelector('.solo-label');
-  el.innerHTML=`<div class="chip-ctrl">
-    <button class="ctrl-btn" onclick="selAll()">All On</button>
-    <button class="ctrl-btn" onclick="selNone()">All Off</button>
-  </div>`+CHANNELS.map(ch=>`
-    <div class="chip ${activeChannels.has(ch)?'':'inactive'}" onclick="toggle('${ch}')">
-      <div class="chip-dot" style="background:${COLORS[ch]}"></div>${ch}
-    </div>`).join('');
-  if(solo) el.appendChild(solo);
-}
-function selAll()  {CHANNELS.forEach(c=>activeChannels.add(c));   ALL_LEGENDS.forEach(renderChips); updateSoloLabels(); refreshAllCharts();}
-function selNone() {activeChannels.clear();                        ALL_LEGENDS.forEach(renderChips); updateSoloLabels(); refreshAllCharts();}
-function toggle(ch){activeChannels.has(ch)?activeChannels.delete(ch):activeChannels.add(ch); ALL_LEGENDS.forEach(renderChips); updateSoloLabels(); refreshAllCharts();}
 
 // ── Stacked Bar ───────────────────────────────────────────────────────────────
 function drawBar(canvasId, data, totals, fmtFn) {
@@ -635,28 +663,247 @@ function renderMergedPctTable() {
   document.getElementById('pctTableMerged').innerHTML=html;
 }
 
-// ── Init ──────────────────────────────────────────────────────────────────────
+// (legacy init replaced by MPH-JS-OVERHAUL-v1)
+
+// MPH-JS-OVERHAUL-v1
+
+// ── Year Toggle State (per section) ───────────────────────────────────────────
+const yearState = { rev: '2026', rn: '2026', pct: '2026' };
+const SECTION_TITLES = {
+  rev: {
+    '2026': ['Monthly Net Revenue by Channel — __CY__ YTD (__PERIOD__)', "Stacked monthly net revenue by booking channel for __CY__ YTD. Use <strong>All Off</strong> + a single chip to isolate and analyze any individual channel."],
+    '2025': ['Monthly Net Revenue by Channel — __PY__ Same Period (__PERIOD__)', "__PY__ revenue for the same __N__-month window, shown alone for a focused historical view. Channel toggles still apply."],
+    'both': ['Monthly Net Revenue by Channel — __CY__ vs __PY__', "Stacked monthly net revenue by channel — __CY__ on the left, __PY__ same period on the right — for direct apples-to-apples comparison."]
+  },
+  rn: {
+    '2026': ['Monthly Net Room Nights by Channel — __CY__ YTD (__PERIOD__)', 'Monthly room night production by booking channel for __CY__ YTD. Reflects demand volume and channel mix.'],
+    '2025': ['Monthly Net Room Nights by Channel — __PY__ Same Period (__PERIOD__)', '__PY__ room night volume for the same __N__-month window. Compare against __CY__ to identify which channels are driving growth.'],
+    'both': ['Monthly Net Room Nights by Channel — __CY__ vs __PY__', 'Monthly room night volume by channel — __CY__ on the left, __PY__ same period on the right.']
+  },
+  pct: {
+    '2026': ['Monthly Revenue Contribution % by Channel — __CY__ YTD', "Each bar totals 100% and shows each channel's proportional share of total monthly revenue for __CY__."],
+    '2025': ['Monthly Revenue Contribution % by Channel — __PY__ Same Period', "__PY__ channel mix for the same __N__-month window. Compare against __CY__ to identify which channels are gaining or losing share."],
+    'both': ['Monthly Revenue Contribution % by Channel — __CY__ vs __PY__', 'Channel mix percentages by month — __CY__ on the left, __PY__ same period on the right.']
+  }
+};
+
+function applySectionTitle(section, mode) {
+  const tpl = SECTION_TITLES[section][mode];
+  if (!tpl) return;
+  const period = (typeof PERIOD_LABEL!=='undefined')?PERIOD_LABEL:'';
+  const nMonths = MONTHS.length;
+  const titleEl = document.getElementById(section + 'Title');
+  const descEl  = document.getElementById(section + 'Desc');
+  const t = tpl[0].replaceAll('__CY__', '2026').replaceAll('__PY__', '2025').replaceAll('__PERIOD__', period).replaceAll('__N__', nMonths);
+  const d = tpl[1].replaceAll('__CY__', '2026').replaceAll('__PY__', '2025').replaceAll('__PERIOD__', period).replaceAll('__N__', nMonths);
+  if (titleEl) titleEl.textContent = t;
+  if (descEl)  descEl.innerHTML  = d;
+}
+
+function setYear(section, mode) {
+  yearState[section] = mode;
+  // Update active button
+  const wrap = document.querySelector('[data-yt-target="'+section+'"]');
+  if (wrap) wrap.querySelectorAll('button').forEach(b => b.classList.toggle('active', b.dataset.yt===mode));
+  // Toggle single vs pair containers
+  const card = document.querySelector('[data-yt-section="'+section+'"]');
+  if (card) {
+    const single = card.querySelector('[data-yt-mode="single"]');
+    const pair   = card.querySelector('[data-yt-mode="pair"]');
+    if (mode === 'both') {
+      if (single) single.style.display = 'none';
+      if (pair)   pair.style.display = 'grid';
+    } else {
+      if (single) single.style.display = 'block';
+      if (pair)   pair.style.display = 'none';
+    }
+  }
+  applySectionTitle(section, mode);
+  renderSection(section);
+}
+
+function renderSection(section) {
+  const mode = yearState[section];
+  if (section === 'rev') {
+    if (mode === 'both') {
+      drawBar('revChartPair26', monthlyRev26, moRev26, fmtM);
+      drawBar('revChartPair25', monthlyRev25, moRev25, fmtM);
+    } else if (mode === '2026') {
+      drawBar('revChartSingle', monthlyRev26, moRev26, fmtM);
+    } else {
+      drawBar('revChartSingle', monthlyRev25, moRev25, fmtM);
+    }
+  } else if (section === 'rn') {
+    if (mode === 'both') {
+      drawBar('rnChartPair26', monthlyRn26, moRn26, v=>fmtK(v));
+      drawBar('rnChartPair25', monthlyRn25, moRn25, v=>fmtK(v));
+    } else if (mode === '2026') {
+      drawBar('rnChartSingle', monthlyRn26, moRn26, v=>fmtK(v));
+    } else {
+      drawBar('rnChartSingle', monthlyRn25, moRn25, v=>fmtK(v));
+    }
+  } else if (section === 'pct') {
+    if (mode === 'both') {
+      drawPct('pctChartPair26', monthlyRev26, moRev26);
+      drawPct('pctChartPair25', monthlyRev25, moRev25);
+    } else if (mode === '2026') {
+      drawPct('pctChartSingle', monthlyRev26, moRev26);
+    } else {
+      drawPct('pctChartSingle', monthlyRev25, moRev25);
+    }
+  }
+}
+
+function renderAllToggleSections() { renderSection('rev'); renderSection('rn'); renderSection('pct'); }
+
+function wireYearToggles() {
+  document.querySelectorAll('.year-toggle').forEach(tg => {
+    const section = tg.dataset.ytTarget;
+    tg.querySelectorAll('button').forEach(btn => {
+      btn.addEventListener('click', () => setYear(section, btn.dataset.yt));
+    });
+  });
+}
+
+// ── Sticky Section Nav (scroll-spy) ──────────────────────────────────────────
+function wireSectionNav() {
+  const links = document.querySelectorAll('.section-nav a');
+  const sections = Array.from(links).map(a => document.getElementById(a.dataset.target)).filter(Boolean);
+  function onScroll() {
+    const navH = document.querySelector('.section-nav').offsetHeight + 20;
+    let activeIdx = 0;
+    for (let i = 0; i < sections.length; i++) {
+      const rect = sections[i].getBoundingClientRect();
+      if (rect.top - navH < 10) activeIdx = i;
+    }
+    links.forEach((l, i) => l.classList.toggle('active', i === activeIdx));
+  }
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+  // Smooth scroll with offset for sticky nav
+  links.forEach(l => l.addEventListener('click', e => {
+    e.preventDefault();
+    const id = l.dataset.target;
+    const el = document.getElementById(id);
+    if (!el) return;
+    const navH = document.querySelector('.section-nav').offsetHeight;
+    const y = el.getBoundingClientRect().top + window.pageYOffset - navH - 12;
+    window.scrollTo({ top: y, behavior: 'smooth' });
+  }));
+}
+
+// ── Merged Revenue Detail Table (Channel × [Mo26, Mo25, MoΔ%] × N months + YTD) ──
+function renderMergedRevenueTable() {
+  const fmt = v => v >= 1e6 ? '$'+(v/1e6).toFixed(2)+'M' : (v>0 ? '$'+Math.round(v).toLocaleString() : '—');
+  const delta = (a, b) => {
+    if (b === 0) return ['—', '#5A6B84'];
+    const pct = (a - b) / b * 100;
+    const color = pct >= 0 ? '#2E8B57' : '#C0392B';
+    const arrow = pct >= 0 ? '▲' : '▼';
+    return [arrow + Math.abs(pct).toFixed(1) + '%', color];
+  };
+  // Header: two rows. Top row = month group labels (3-cell colspan each).
+  // Bottom row = sub-headers (2026 | 2025 | Δ%).
+  let html = '<thead>';
+  html += '<tr><th rowspan="2">Channel</th>';
+  MONTHS.forEach(m => { html += '<th colspan="3" class="month-group">' + m + '</th>'; });
+  html += '<th colspan="3" class="month-group">YTD</th>';
+  html += '</tr><tr>';
+  for (let i = 0; i < MONTHS.length + 1; i++) {
+    html += '<th class="sub-hdr mblk-start">2026</th><th class="sub-hdr mblk-mid">2025</th><th class="sub-hdr mblk-end">Δ%</th>';
+  }
+  html += '</tr></thead><tbody>';
+
+  CHANNELS.forEach(ch => {
+    const c26arr = monthlyRev26[ch] || [], c25arr = monthlyRev25[ch] || [];
+    const ytd26 = c26arr.reduce((s,v)=>s+v,0), ytd25 = c25arr.reduce((s,v)=>s+v,0);
+    html += '<tr><td style="color:'+COLORS[ch]+'">● '+ch+'</td>';
+    MONTHS.forEach((_, mi) => {
+      const v26 = c26arr[mi] || 0, v25 = c25arr[mi] || 0;
+      const [d, dc] = delta(v26, v25);
+      html += '<td class="mblk-start">'+fmt(v26)+'</td>';
+      html += '<td class="mblk-mid" style="color:#5A6B84;">'+fmt(v25)+'</td>';
+      html += '<td class="mblk-end delta-cell" style="color:'+dc+';">'+d+'</td>';
+    });
+    const [yd, ydc] = delta(ytd26, ytd25);
+    html += '<td class="mblk-start" style="font-weight:700;">'+fmt(ytd26)+'</td>';
+    html += '<td class="mblk-mid" style="color:#5A6B84;font-weight:700;">'+fmt(ytd25)+'</td>';
+    html += '<td class="mblk-end delta-cell" style="color:'+ydc+';">'+yd+'</td>';
+    html += '</tr>';
+  });
+
+  // Total row
+  const t26 = moRev26.reduce((s,v)=>s+v,0), t25 = moRev25.reduce((s,v)=>s+v,0);
+  html += '<tr class="total-row"><td>TOTAL</td>';
+  MONTHS.forEach((_, mi) => {
+    const v26 = moRev26[mi] || 0, v25 = moRev25[mi] || 0;
+    const [d] = delta(v26, v25);
+    html += '<td class="mblk-start">'+fmt(v26)+'</td>';
+    html += '<td class="mblk-mid">'+fmt(v25)+'</td>';
+    html += '<td class="mblk-end">'+d+'</td>';
+  });
+  const [yd] = delta(t26, t25);
+  html += '<td class="mblk-start">'+fmt(t26)+'</td><td class="mblk-mid">'+fmt(t25)+'</td><td class="mblk-end">'+yd+'</td>';
+  html += '</tr></tbody>';
+  document.getElementById('revTableMerged').innerHTML = html;
+}
+
+// Override the legacy refreshAllCharts (called by chip toggles) to drive the
+// new toggle-aware containers.
+function refreshAllCharts() {
+  renderAllToggleSections();
+}
+
+// Adjust renderChips so the single shared legend container drives all charts.
+const SHARED_LEGENDS = ['revLegend', 'rnLegend', 'pctLegend'];
+const SHARED_SOLOS   = ['revSoloLabel', 'rnSoloLabel'];
+
+function updateSoloLabels() {
+  const active = CHANNELS.filter(c => activeChannels.has(c));
+  const isSolo = active.length === 1;
+  const name = isSolo ? active[0] : '', col = isSolo ? COLORS[name] : '#FF5F00';
+  SHARED_SOLOS.forEach(id => {
+    const el = document.getElementById(id); if (!el) return;
+    if (isSolo) {
+      el.classList.add('visible'); el.style.color = col;
+      el.style.background = col + '15'; el.style.borderColor = col + '50';
+      el.innerHTML = `<span style="width:8px;height:8px;border-radius:50%;background:${col};display:inline-block;"></span> ${name} — solo view`;
+    } else el.classList.remove('visible');
+  });
+}
+
+function renderChips(id) {
+  const el = document.getElementById(id); if (!el) return;
+  const solo = el.querySelector('.solo-label');
+  el.innerHTML = `<div class="chip-ctrl">
+    <button class="ctrl-btn" onclick="selAll()">All On</button>
+    <button class="ctrl-btn" onclick="selNone()">All Off</button>
+  </div>` + CHANNELS.map(ch => `
+    <div class="chip ${activeChannels.has(ch)?'':'inactive'}" onclick="toggle('${ch}')">
+      <div class="chip-dot" style="background:${COLORS[ch]}"></div>${ch}
+    </div>`).join('');
+  if (solo) el.appendChild(solo);
+}
+function selAll()  { CHANNELS.forEach(c=>activeChannels.add(c)); SHARED_LEGENDS.forEach(renderChips); updateSoloLabels(); refreshAllCharts(); }
+function selNone() { activeChannels.clear(); SHARED_LEGENDS.forEach(renderChips); updateSoloLabels(); refreshAllCharts(); }
+function toggle(ch){ activeChannels.has(ch)?activeChannels.delete(ch):activeChannels.add(ch); SHARED_LEGENDS.forEach(renderChips); updateSoloLabels(); refreshAllCharts(); }
+
 function init() {
-  ALL_LEGENDS.forEach(renderChips); updateSoloLabels();
-  drawBar('revChart26',monthlyRev26,moRev26,fmtM);
-  drawBar('revChart25',monthlyRev25,moRev25,fmtM);
-  drawBar('rnChart26', monthlyRn26, moRn26, v=>fmtK(v));
-  drawBar('rnChart25', monthlyRn25, moRn25, v=>fmtK(v));
-  drawPct('pctChart26',monthlyRev26,moRev26);
-  drawPct('pctChart25',monthlyRev25,moRev25);
+  SHARED_LEGENDS.forEach(renderChips); updateSoloLabels();
+  wireYearToggles();
+  wireSectionNav();
+  // Render the three toggle-controlled sections in their default 2026 view
+  renderAllToggleSections();
   drawAdrLine(); renderDonuts(); renderAdrBars(); renderYoyBars();
-  renderTable('detailTable26',monthlyRev26,moRev26,fmtDol,true);
-  renderTable('detailTable25',monthlyRev25,moRev25,fmtDol,true);
+  renderMergedRevenueTable();
   renderMergedRnTable(); renderMergedPctTable();
 }
 
-window.addEventListener('resize',()=>{
-  drawBar('revChart26',monthlyRev26,moRev26,fmtM); drawBar('revChart25',monthlyRev25,moRev25,fmtM);
-  drawBar('rnChart26',monthlyRn26,moRn26,v=>fmtK(v)); drawBar('rnChart25',monthlyRn25,moRn25,v=>fmtK(v));
-  drawPct('pctChart26',monthlyRev26,moRev26); drawPct('pctChart25',monthlyRev25,moRev25);
+window.addEventListener('resize', () => {
+  renderAllToggleSections();
   drawAdrLine();
 });
-window.addEventListener('load',init);
+window.addEventListener('load', init);
 </script>
 </body>
 </html>
